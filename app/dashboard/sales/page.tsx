@@ -37,7 +37,7 @@ const page = async () => {
   return <div className="w-full">
     <h1 className="text-2xl">Orders</h1>
    <Separator />
-   {orders === null || orders.length === 0 ? <p>No orders yet</p> :
+   {orders === null || orders.length === 0 ? <p>No orders yet.</p> :
    <Table>
 
       <TableHeader>
