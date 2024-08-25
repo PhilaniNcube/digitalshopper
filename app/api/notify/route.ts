@@ -69,13 +69,6 @@ export async function POST(request: Request) {
       <ul>
        <li>Order Number: ${order?.id}</li>
        <li>Total: ${formatter(order?.total_amount)}</li>
-       <li>Order Items:
-         <ul>
-           ${order?.order_items.map((item: { product: { title: string; price: number; }; quantity: number; }) => (
-              `<li>${item.product.title} : ${item.quantity} x ${formatter(item.product.price)}</li>`
-           ))}
-         </ul>
-       </li>
       </ul>
       <p>Your order will be shipped to the following address:</p>
       <p>${order?.address}</p>
@@ -97,13 +90,7 @@ export async function POST(request: Request) {
        <li>Name: ${order?.first_name} ${order.last_name}</li>
        <li>Address: ${order?.address}</li>
        <li>Total: ${formatter(order?.total_amount)}</li>
-       <li>Order Items:
-         <ul>
-           ${order.order_items.map((item) => (
-              `<li>${item.product.title} : ${item.quantity} x ${formatter(item.product.price)}</li>`
-           ))}
-         </ul>
-       </li>
+
       </ul>
 
       <h2>Digital Shopper</h2>

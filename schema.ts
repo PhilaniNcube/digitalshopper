@@ -131,7 +131,8 @@ export type Database = {
 						first_name: string;
 						id: string;
 						last_name: string;
-						order_items: Json;
+						// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+						order_items: any[];
 						paid: boolean;
 						payment_id: string | null;
 						phone: string;
@@ -151,7 +152,8 @@ export type Database = {
 						first_name?: string;
 						id?: string;
 						last_name?: string;
-						order_items: Json;
+						// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+						order_items: any[];
 						paid?: boolean;
 						payment_id?: string | null;
 						phone?: string;
@@ -171,7 +173,8 @@ export type Database = {
 						first_name?: string;
 						id?: string;
 						last_name?: string;
-						order_items?: Json;
+						// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+						order_items?: any[];
 						paid?: boolean;
 						payment_id?: string | null;
 						phone?: string;
@@ -327,7 +330,7 @@ export type Database = {
 				};
 				products: {
 					Row: {
-						attributes: {key:string, value:string}[] | null;
+						attributes: { key: string; value: string }[] | null;
 						brand: string;
 						category: string;
 						created_at: string;
@@ -346,7 +349,7 @@ export type Database = {
 						variants: Json | null;
 					};
 					Insert: {
-						attributes?: {key:string, value:string}[] | null;
+						attributes?: { key: string; value: string }[] | null;
 						brand: string;
 						category: string;
 						created_at?: string;
@@ -365,7 +368,7 @@ export type Database = {
 						variants?: Json | null;
 					};
 					Update: {
-						attributes?: {key:string, value:string}[] | null;
+						attributes?: { key: string; value: string }[] | null;
 						brand?: string;
 						category?: string;
 						created_at?: string;
