@@ -1,9 +1,9 @@
-import { Database } from "@/schema";
+import type { Database } from "@/schema";
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { cookies } from "next/headers";
 import ProductDetails from "./ProductDetails";
 import analytics from "@/lib/utils";
-import { Metadata } from "next";
+import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
 
@@ -18,8 +18,8 @@ export async function generateMetadata({
     const cookieStore = cookies()
 
   const supabase = createServerClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
     {
       cookies: {
         get(name: string) {
@@ -43,7 +43,7 @@ export async function generateMetadata({
       .join(", "),
     category: product?.category?.title,
     creator: "Athena Media",
-    viewport: "width=device-width, initial-scale=1.0",
+
     robots: "index, follow",
 
     openGraph: {
@@ -55,6 +55,7 @@ export async function generateMetadata({
       url: `${siteURL}/products/${slug}`,
       images: [
         {
+          // biome-ignore lint/style/noNonNullAssertion: <explanation>
           url: product?.images[0]!,
           width: 500,
           height: 500,
@@ -73,8 +74,8 @@ const page = async ({ params: { slug } }: { params: { slug: string } }) => {
     const cookieStore = cookies()
 
   const supabase = createServerClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
     {
       cookies: {
         get(name: string) {

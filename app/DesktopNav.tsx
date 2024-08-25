@@ -3,10 +3,10 @@ import { SettingsIcon, ShoppingBag } from "lucide-react";
 import Link from "next/link";
 import SignIn from "@/components/Auth/SignIn";
 import SignOut from "@/components/Auth/SignOut";
-import { Database } from "@/schema";
+import type { Database } from "@/schema";
 import CartSheet from "@/components/Cart/CartSheet";
 import Image from "next/image";
-import { Session } from "@supabase/supabase-js";
+import type { Session } from "@supabase/supabase-js";
 import SearchInput from "@/components/Products/SearchInput";
 
 
@@ -25,11 +25,11 @@ const DesktopNav = ({ session, categories, is_admin }: { session: Session | null
           className="object-cover w-16"
         />
       </Link>
-      <div className="flex space-x-4 items-center">
+      <div className="flex items-center space-x-4">
         <nav className="flex items-center justify-start space-x-3">
           {categories.map((link) => (
             <Link
-              className="font-medium hover:text-slate-300 text-sm"
+              className="text-sm font-medium hover:text-slate-300"
               href={`/categories/${link.slug}`}
               key={link.id}
             >
