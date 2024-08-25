@@ -4,16 +4,14 @@ import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
 import formatter from "@/lib/currency";
-import { Database } from "@/schema";
+import type { Database } from "@/schema";
 import { ChevronLeft, ChevronRight, Link2Icon, TrashIcon } from "lucide-react";
-
 import Link from "next/link";
 import ToggleFeatured from "./ToggleFeatured";
 import ToggleInStock from "./ToggleInStock";
@@ -21,11 +19,16 @@ import { AlertDialog } from "@radix-ui/react-alert-dialog";
 import { AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { createClient } from "@/utils/supabase/client";
 import { toast } from "@/components/ui/use-toast";
-import { revalidatePath, revalidateTag } from "next/cache";
 import { useRouter } from "next/navigation";
 
+type Product = Database["public"]["Tables"]["products"]["Row"] & {
+  category: Database["public"]["Tables"]["categories"]["Row"];
+  brand: Database["public"]["Tables"]["brands"]["Row"];
+  sub_category: Database["public"]["Tables"]["sub_categories"]["Row"];
+};
+
 type ProductsTableProps = {
-  products: Database["public"]["Tables"]["products"]["Row"][];
+  products: Product[]
   hasPrevPage: boolean;
   hasNextPage: boolean;
   page: string | string[];
@@ -47,14 +50,14 @@ const supabase = createClient()
 
   const deleteProduct = async (id: string) => {
 
-    const { data, error } = await supabase.from("products").delete().match({ id });
+    const {  error } = await supabase.from("products").delete().match({ id });
 
     if (error) {
       console.log(error);
       toast({
-        title: "Error",
-        description: "Error deleting product" + error.message,
-      })
+							title: "Error",
+							description: `Error deleting product ${error.message}`,
+						});
     }
 
     toast({
@@ -94,7 +97,7 @@ const supabase = createClient()
                   <p>{product.sub_category.title}</p>
                   <small className="text-xs">
                     {product.frame_style
-                      ? `Frame Style - ${product.frame_style}`
+                      ? `Frame Styles - ${product.frame_style}`
                       : null}
                   </small>
                   <small className="text-xs">
@@ -103,12 +106,12 @@ const supabase = createClient()
                 </div>
               </TableCell>
               <TableCell>
-                <ToggleFeatured featured={product.featured} id={product.id} />
+                <ToggleFeatured featured={product.featured || false} id={product.id} />
               </TableCell>
               <TableCell>
-                <ToggleInStock instock={product.instock} id={product.id} />
+                <ToggleInStock instock={product.instock || false} id={product.id} />
               </TableCell>
-              <TableCell className="flex gap-3 items-center">
+              <TableCell className="flex items-center gap-3">
                 <Link href={`/dashboard/products/${product.slug}`}>
                   <Button variant="link" type="button">
                     <Link2Icon />
@@ -123,7 +126,7 @@ const supabase = createClient()
                   <AlertDialogContent>
                     <AlertDialogHeader>
                       <AlertDialogTitle>
-                        Are you absolutely sure?
+                        Are you absolutely sure
                       </AlertDialogTitle>
                       <AlertDialogDescription>
                         This action cannot be undone. This will permanently
