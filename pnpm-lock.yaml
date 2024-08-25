@@ -80,14 +80,11 @@ importers:
       '@reduxjs/toolkit':
         specifier: ^1.9.7
         version: 1.9.7(react-redux@8.1.3(@types/react-dom@18.2.5)(@types/react@18.2.12)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(redux@4.2.1))(react@18.3.1)
-      '@supabase/auth-helpers-nextjs':
-        specifier: ^0.8.7
-        version: 0.8.7(@supabase/supabase-js@2.45.2(bufferutil@4.0.8)(utf-8-validate@6.0.4))
       '@supabase/ssr':
-        specifier: ^0.0.5
-        version: 0.0.5(@supabase/supabase-js@2.45.2(bufferutil@4.0.8)(utf-8-validate@6.0.4))
+        specifier: ^0.5.0
+        version: 0.5.0(@supabase/supabase-js@2.45.2(bufferutil@4.0.8)(utf-8-validate@6.0.4))
       '@supabase/supabase-js':
-        specifier: latest
+        specifier: ^2.45.1
         version: 2.45.2(bufferutil@4.0.8)(utf-8-validate@6.0.4)
       '@tailwindcss/container-queries':
         specifier: ^0.1.1
@@ -1365,6 +1362,11 @@ packages:
       react-redux:
         optional: true
 
+  '@rollup/rollup-linux-x64-gnu@4.21.0':
+    resolution: {integrity: sha512-e2hrvElFIh6kW/UNBQK/kzqMNY5mO+67YtEh9OA65RM5IJXYTWiXjX6fjIiPaqOkBthYF1EqgiZ6OXKcQsM0hg==}
+    cpu: [x64]
+    os: [linux]
+
   '@rushstack/eslint-patch@1.10.4':
     resolution: {integrity: sha512-WJgX9nzTqknM393q1QJDJmoW28kUfEnybeTfVNcNAPnIx210RXm2DiXiHzfNPJNIUUb1tJnz/l4QGtJ30PgWmA==}
 
@@ -1373,16 +1375,6 @@ packages:
 
   '@selderee/plugin-htmlparser2@0.11.0':
     resolution: {integrity: sha512-P33hHGdldxGabLFjPPpaTxVolMrzrcegejx+0GxjrIb9Zv48D8yAIA/QTDR2dFl7Uz7urX8aX6+5bCZslr+gWQ==}
-
-  '@supabase/auth-helpers-nextjs@0.8.7':
-    resolution: {integrity: sha512-iYdOjFo0GkRvha340l8JdCiBiyXQuG9v8jnq7qMJ/2fakrskRgHTCOt7ryWbip1T6BExcWKC8SoJrhCzPOxhhg==}
-    peerDependencies:
-      '@supabase/supabase-js': ^2.19.0
-
-  '@supabase/auth-helpers-shared@0.6.3':
-    resolution: {integrity: sha512-xYQRLFeFkL4ZfwC7p9VKcarshj3FB2QJMgJPydvOY7J5czJe6xSG5/wM1z63RmAzGbCkKg+dzpq61oeSyWiGBQ==}
-    peerDependencies:
-      '@supabase/supabase-js': ^2.19.0
 
   '@supabase/auth-js@2.64.4':
     resolution: {integrity: sha512-9ITagy4WP4FLl+mke1rchapOH0RQpf++DI+WSG2sO1OFOZ0rW3cwAM0nCrMOxu+Zw4vJ4zObc08uvQrXx590Tg==}
@@ -1400,10 +1392,10 @@ packages:
   '@supabase/realtime-js@2.10.2':
     resolution: {integrity: sha512-qyCQaNg90HmJstsvr2aJNxK2zgoKh9ZZA8oqb7UT2LCh3mj9zpa3Iwu167AuyNxsxrUE8eEJ2yH6wLCij4EApA==}
 
-  '@supabase/ssr@0.0.5':
-    resolution: {integrity: sha512-D7kfzODHzmSxdIVfJ0mzsX/9HjwrGbGyUQAdLss2tTVas2ry+g7KDZJC2kTURa5H+OJ3HEL7xz27S26kQ7li9g==}
+  '@supabase/ssr@0.5.0':
+    resolution: {integrity: sha512-5E0NmPpfXBzfATgYhg7o/nPkVu+38mx7pO5vlhxnk/5sYGnIZcpMHJs3jONb7Jx5IJN2kTPb59luEw66MOOTaA==}
     peerDependencies:
-      '@supabase/supabase-js': ^2.33.1
+      '@supabase/supabase-js': ^2.43.4
 
   '@supabase/storage-js@2.7.0':
     resolution: {integrity: sha512-iZenEdO6Mx9iTR6T7wC7sk6KKsoDPLq8rdu5VRy7+JiT1i8fnqfcOr6mfF2Eaqky9VQzhP8zZKQYjzozB65Rig==}
@@ -1886,6 +1878,10 @@ packages:
 
   cookie@0.5.0:
     resolution: {integrity: sha512-YZ3GUyn/o8gfKJlnlX7g7xq4gyO6OSuhGPKaaGssGB2qgDUS0gPgtTvoyZLTt9Ab6dC4hfc9dV5arkvc/OCmrw==}
+    engines: {node: '>= 0.6'}
+
+  cookie@0.6.0:
+    resolution: {integrity: sha512-U71cyTamuh1CRNCfpGY6to28lxvNwPG4Guz/EVjgf3Jmzv0vlDp1atT9eS5dDjMYHucpHbWns6Lwf3BKz6svdw==}
     engines: {node: '>= 0.6'}
 
   core-util-is@1.0.3:
@@ -2690,9 +2686,6 @@ packages:
   jju@1.4.0:
     resolution: {integrity: sha512-8wb9Yw966OSxApiCt0K3yNJL8pnNeIv+OEq2YMidz4FKP6nonSRoOXc80iXY4JaN2FC11B9qsNmDsm+ZOfMROA==}
 
-  jose@4.15.9:
-    resolution: {integrity: sha512-1vUQX+IdDMVPj4k8kOxgUqlcK518yluMuGZwqlr44FS1ppZB/5GWh4rZG89erpOBOJjU/OBsnCVFfapsRz6nEA==}
-
   js-beautify@1.15.1:
     resolution: {integrity: sha512-ESjNzSlt/sWE8sciZH8kBF8BPlwXPwhR6pWKAw8bw4Bwj+iZcnKW6ONWUutJ7eObuBZQpiIb8S7OYspWrKt7rA==}
     engines: {node: '>=14'}
@@ -3211,9 +3204,6 @@ packages:
     resolution: {integrity: sha512-ARhCpm70fzdcvNQfPoy49IaanKkTlRWF2JMzqhcJbhSFRZv7nPTvZJdcY7301IPmvW+/p0RgIWnQDLJxifsQ7g==}
     engines: {node: '>=8'}
 
-  ramda@0.29.1:
-    resolution: {integrity: sha512-OfxIeWzd4xdUNxlWhgFazxsA/nl3mS4/jGZI5n00uWOoSSFRhC1b6gl6xvmzUamgmqELraWp0J/qqVlXYPDPyA==}
-
   react-dom@18.2.0:
     resolution: {integrity: sha512-6IMTriUmvsjHUjNtEDudZfuDQUoWXVxKHhlEGSk81n4YFS+r/Kl99wXiwlVXtPBtJenozv2P+hxDsw9eA7Xo6g==}
     peerDependencies:
@@ -3452,9 +3442,6 @@ packages:
 
   set-blocking@2.0.0:
     resolution: {integrity: sha512-KiKBS8AnWGEyLzofFfmvKwpdPzqiy16LvQfK3yv/fVH7Bj13/wl3JSR1J+rfgRE9q7xUJK4qvgS8raSOeLUehw==}
-
-  set-cookie-parser@2.7.0:
-    resolution: {integrity: sha512-lXLOiqpkUumhRdFF3k1osNXCy9akgx/dyPZ5p8qAg9seJzXr5ZrlqZuWIMuY6ejOsVLE6flJ5/h3lsn57fQ/PQ==}
 
   set-function-length@1.2.2:
     resolution: {integrity: sha512-pgRc4hJ4/sNjWCSS9AmnS40x3bNMDTknHgL5UaMBTMyJnU90EgWh1Rz+MC9eFu4BuN/UwZjKQuY/1v3rM7HMfg==}
@@ -5036,6 +5023,9 @@ snapshots:
       react: 18.3.1
       react-redux: 8.1.3(@types/react-dom@18.2.5)(@types/react@18.2.12)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(redux@4.2.1)
 
+  '@rollup/rollup-linux-x64-gnu@4.21.0':
+    optional: true
+
   '@rushstack/eslint-patch@1.10.4': {}
 
   '@selderee/plugin-htmlparser2@0.10.0':
@@ -5047,17 +5037,6 @@ snapshots:
     dependencies:
       domhandler: 5.0.3
       selderee: 0.11.0
-
-  '@supabase/auth-helpers-nextjs@0.8.7(@supabase/supabase-js@2.45.2(bufferutil@4.0.8)(utf-8-validate@6.0.4))':
-    dependencies:
-      '@supabase/auth-helpers-shared': 0.6.3(@supabase/supabase-js@2.45.2(bufferutil@4.0.8)(utf-8-validate@6.0.4))
-      '@supabase/supabase-js': 2.45.2(bufferutil@4.0.8)(utf-8-validate@6.0.4)
-      set-cookie-parser: 2.7.0
-
-  '@supabase/auth-helpers-shared@0.6.3(@supabase/supabase-js@2.45.2(bufferutil@4.0.8)(utf-8-validate@6.0.4))':
-    dependencies:
-      '@supabase/supabase-js': 2.45.2(bufferutil@4.0.8)(utf-8-validate@6.0.4)
-      jose: 4.15.9
 
   '@supabase/auth-js@2.64.4':
     dependencies:
@@ -5085,11 +5064,12 @@ snapshots:
       - bufferutil
       - utf-8-validate
 
-  '@supabase/ssr@0.0.5(@supabase/supabase-js@2.45.2(bufferutil@4.0.8)(utf-8-validate@6.0.4))':
+  '@supabase/ssr@0.5.0(@supabase/supabase-js@2.45.2(bufferutil@4.0.8)(utf-8-validate@6.0.4))':
     dependencies:
       '@supabase/supabase-js': 2.45.2(bufferutil@4.0.8)(utf-8-validate@6.0.4)
-      cookie: 0.5.0
-      ramda: 0.29.1
+      cookie: 0.6.0
+    optionalDependencies:
+      '@rollup/rollup-linux-x64-gnu': 4.21.0
 
   '@supabase/storage-js@2.7.0':
     dependencies:
@@ -5641,6 +5621,8 @@ snapshots:
   console-control-strings@1.1.0: {}
 
   cookie@0.5.0: {}
+
+  cookie@0.6.0: {}
 
   core-util-is@1.0.3: {}
 
@@ -6643,8 +6625,6 @@ snapshots:
 
   jju@1.4.0: {}
 
-  jose@4.15.9: {}
-
   js-beautify@1.15.1:
     dependencies:
       config-chain: 1.1.13
@@ -7140,8 +7120,6 @@ snapshots:
 
   quick-lru@4.0.1: {}
 
-  ramda@0.29.1: {}
-
   react-dom@18.2.0(react@18.2.0):
     dependencies:
       loose-envify: 1.4.0
@@ -7403,8 +7381,6 @@ snapshots:
   semver@7.6.3: {}
 
   set-blocking@2.0.0: {}
-
-  set-cookie-parser@2.7.0: {}
 
   set-function-length@1.2.2:
     dependencies:

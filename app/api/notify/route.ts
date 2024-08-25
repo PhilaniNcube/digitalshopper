@@ -1,11 +1,7 @@
 // TODO: Duplicate or move this file outside the `_examples` folder to make it a route
 
 import formatter from '@/lib/currency';
-import { Database } from '@/schema'
 import { createClient } from '@/utils/supabase/server';
-import { CookieOptions, createServerClient } from '@supabase/ssr';
-import { cookies } from 'next/headers';
-
 import { NextResponse } from 'next/server'
 import { Resend } from 'resend';
 
@@ -19,39 +15,21 @@ export const dynamic = 'force-dynamic'
 export async function POST(request: Request) {
   // Create a Supabase client configured to use cookies
 
-      const cookieStore = cookies()
-
-
-  const supabase = createServerClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get(name: string) {
-          return cookieStore.get(name)?.value
-        },
-        set(name: string, value: string, options: CookieOptions) {
-          cookieStore.set({ name, value, ...options })
-        },
-        remove(name: string, options: CookieOptions) {
-          cookieStore.set({ name, value: '', ...options })
-        },
-      },
-    })
-
+  const supabase = createClient()
 
 
   const data = await request.text()
 
   console.log(data)
 
-  let notificationArr = data.split('&')
+  const notificationArr = data.split('&')
   let obj: {
     [key: string]: string
   } = {}
 
+  // biome-ignore lint/complexity/noForEach: <explanation>
   notificationArr.forEach((item) => {
-    let arr = item.split('=')
+    const arr = item.split('=')
     obj = {
       ...obj,
       [arr[0]]: arr[1]
@@ -67,13 +45,15 @@ export async function POST(request: Request) {
   if (error) {
     console.log(error)
     return NextResponse.json({ status: 200})
+  // biome-ignore lint/style/noUselessElse: <explanation>
   } else if(order === null || payment_status !== 'COMPLETE') {
     return NextResponse.json({ status: 200})
+  // biome-ignore lint/style/noUselessElse: <explanation>
   }  else if (payment_status === 'COMPLETE') {
 
     const {data:order, error} = await supabase.from('orders').update({paid: true, payment_id: pf_payment_id}).eq('id', item_name).select('*').single()
 
-    if (error) {
+    if (error || order.order_items === null) {
       console.log(error)
       return NextResponse.json({ status: 200})
     }
@@ -91,7 +71,7 @@ export async function POST(request: Request) {
        <li>Total: ${formatter(order?.total_amount)}</li>
        <li>Order Items:
          <ul>
-           ${order.order_items.map((item) => (
+           ${order?.order_items.map((item: { product: { title: string; price: number; }; quantity: number; }) => (
               `<li>${item.product.title} : ${item.quantity} x ${formatter(item.product.price)}</li>`
            ))}
          </ul>

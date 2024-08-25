@@ -12,10 +12,16 @@ import analytics, { cn } from "@/lib/utils";
 
 
 type DetailProps = {
-  product: Database["public"]["Tables"]["products"]["Row"];
+  product: Database["public"]["Tables"]["products"]["Row"] & {
+    category: Database["public"]["Tables"]["categories"]["Row"];
+    brand: Database["public"]["Tables"]["brands"]["Row"];
+    sub_category: Database["public"]["Tables"]["sub_categories"]["Row"];
+  };
 }
 
 const ProductDetails = ({product}:DetailProps) => {
+
+  console.log(product)
 
   const [selectedImage, setSelectedImage] = useState(product.images[0]);
 
@@ -30,9 +36,6 @@ const ProductDetails = ({product}:DetailProps) => {
         {
           item_id: product.id,
           item_name: product.title,
-          item_category: product.category.title,
-          item_category_2: product.sub_category.title,
-          item_brand: product.brand.name,
           price: product.price,
         },
       ],
@@ -55,7 +58,7 @@ const ProductDetails = ({product}:DetailProps) => {
 				<div className="grid w-full grid-cols-1 gap-6 mt-5 md:grid-cols-2">
 					<div className="flex w-full gap-4">
 						<div className="flex flex-col gap-2 w-[16%]">
-							{product.images?.map((image, index) => (
+							{product.images?.map((image) => (
 								<Image
 									src={image}
 									itemProp="image"

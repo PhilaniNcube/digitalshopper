@@ -1,18 +1,24 @@
 import { Toaster } from "@/components/ui/toaster";
 import "./globals.css";
 import { Manrope } from "next/font/google";
-import { createServerClient, type CookieOptions } from "@supabase/ssr";
-import { cookies } from "next/headers";
-import { Database } from "@/schema";
 import DesktopNav from "./DesktopNav";
 import TabletNav from "./TabletNav";
 import Footer from "./Footer";
 import CartProvider from "@/components/Providers/CartProvider";
 import Script from "next/script";
 import analytics from "@/lib/utils";
-import { Metadata, Viewport } from "next";
-import { ClerkProvider } from "@clerk/nextjs";
+import type { Metadata, Viewport } from "next";
 import { createClient } from "@/utils/supabase/server";
+import { fetchCategoriesFromDatabase } from "@/utils/fetchers/categories";
+import { getAdmin, getSession } from "@/utils/fetchers/auth";
+
+type Category = {
+	created_at: string;
+	id: string;
+	image_url: string;
+	slug: string;
+	title: string;
+};
 
 const manrope = Manrope({
 	weight: ["300", "400", "500", "600", "700"],
@@ -52,20 +58,14 @@ export default async function RootLayout({
 }: {
 	children: React.ReactNode;
 }) {
-	const supabase = createClient();
 
-	const {
-		data: { session },
-	} = await supabase.auth.getSession();
 
-	const { data: categories, error } = await supabase
-		.from("categories")
-		.select("*")
-		.order("title", { ascending: false })
-		.neq("id", "1ee42d6c-11a4-41a1-af96-1479a544382f");
-	//  .neq("id", "41e92af3-10d1-4ae4-9214-9ba17acab833")
+  const categories = await fetchCategoriesFromDatabase();
+	const isAdmin = await getAdmin();
+  console.log({isAdmin});
 
-	const { data: is_admin } = await supabase.rpc("is_admin").single();
+  const session = await getSession();
+
 
 	await analytics.page();
 
@@ -86,6 +86,8 @@ export default async function RootLayout({
 
 			<body className={manrope.className}>
 				<noscript>
+					{/* biome-ignore lint/a11y/useIframeTitle: <explanation> */}
+					{/* biome-ignore lint/style/useSelfClosingElements: <explanation> */}
 					<iframe
 						src="https://www.googletagmanager.com/ns.html?id=GTM-W63KNR93"
 						height="0"
@@ -97,17 +99,17 @@ export default async function RootLayout({
 					<nav className="text-white bg-black">
 						{/** Desktop Navigation **/}
 						<DesktopNav
-							session={session}
-							categories={categories!}
-							is_admin={is_admin!}
+
+
+
 						/>
 						{/** Desktop Navigation Ends**/}
 						{/** Tablet Navigation Starts**/}
-						<TabletNav session={session} categories={categories!} />
+						<TabletNav />
 					</nav>
 					{children}
 					<Toaster />
-					<Footer categories={categories!} />
+					<Footer />
 				</CartProvider>
 			</body>
 		</html>

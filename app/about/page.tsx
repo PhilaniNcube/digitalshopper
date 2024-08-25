@@ -1,7 +1,7 @@
 import PageHeader from "@/components/PageHeader";
 import Image from "next/image";
 
-import { Metadata } from "next";
+import type { Metadata } from "next";
 import AboutHero from "./_components/about-hero";
 import Advantage from "./_components/advantage";
 import Team from "./_components/team";

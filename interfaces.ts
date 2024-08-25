@@ -1,4 +1,4 @@
-import { Database } from "./schema";
+import type { Database } from "./schema";
 
 export interface CartProduct {
   product: Database['public']['Tables']['products']['Row']
@@ -30,3 +30,6 @@ export interface PayfastData {
   }
 
 }
+
+
+export type Category = Database['public']['Tables']['categories']['Row']
