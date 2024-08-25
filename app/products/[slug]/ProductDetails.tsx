@@ -7,7 +7,8 @@ import Image from "next/image";
 import CartButton from "./CartButton";
 import { Separator } from "@/components/ui/separator";
 import { useEffect, useState } from "react";
-import analytics, { cn } from "@/lib/utils";
+import { sendGTMEvent } from "@next/third-parties/google";
+import { cn } from "@/lib/utils";
 
 
 
@@ -29,18 +30,19 @@ const ProductDetails = ({product}:DetailProps) => {
   // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
 
-    analytics.track("view_item", {
-      currency: "ZAR",
-      value: product.price,
-      items: [
-        {
-          item_id: product.id,
-          item_name: product.title,
-          price: product.price,
-        },
-      ],
-    });
-
+ sendGTMEvent({
+		event: "view_item",
+		data: {
+			currency: "ZAR",
+			value: product.price,
+			items: [
+				{
+					item_id: product.id,
+					item_name: product.title,
+				},
+			],
+		},
+	});
 
   },[])
 

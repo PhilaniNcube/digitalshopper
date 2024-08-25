@@ -14,33 +14,24 @@ import LoadMore from "@/components/Products/LoadMore";
 const page = async ({
   searchParams,
 }: {
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams: { [key: string]: string  };
 }) => {
+  // biome-ignore lint/complexity/useLiteralKeys: <explanation>
   const page = searchParams["page"] ?? "1";
-
   // const per_page = searchParams["per_page"] ?? "40";
 
-  const search = searchParams["search"] ?? "";
-  const category = searchParams["category"] ?? "";
+		// biome-ignore lint/complexity/useLiteralKeys: <explanation>
+		const search = searchParams["search"] ?? "";
+
 
   // const start = (Number(page) - 1) * Number(per_page);
   // const end = start + Number(per_page);
 
-  const products = await fetchProducts(Number(page), search, category);
+  const pageNumber = Number(page)
 
-  // const cookieStore = cookies();
+  const products = await fetchProducts(pageNumber, search);
 
-  // const supabase = createServerClient<Database>(
-  //   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  //   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-  //   {
-  //     cookies: {
-  //       get(name: string) {
-  //         return cookieStore.get(name)?.value;
-  //       },
-  //     },
-  //   }
-  // );
+
 
 
 

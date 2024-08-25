@@ -4,9 +4,9 @@ import { createClient } from "@/utils/supabase/server";
 
 
 export async function fetchProducts(
-		search: string | string[],
-		category: string | string[],
-		page = 1,
+  page = 1,
+  search = "",
+
 	) {
 		const supabase = createClient();
 

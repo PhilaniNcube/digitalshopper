@@ -1,6 +1,6 @@
 "use client"
 
-import { Database } from "@/schema";
+import type { Database } from "@/schema";
 import { useEffect, useState } from "react";
 import {useInView} from "react-intersection-observer"
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
@@ -41,7 +41,7 @@ const LoadMore = () => {
 
 
        const nextPage = pagesLoaded + 1;
-       const newProducts = (await fetchProducts(nextPage, search, category)) ?? [];
+       const newProducts = (await fetchProducts(nextPage, search)) ?? [];
 
         if (newProducts.length === 0) {
           setEnd(true);
@@ -54,6 +54,7 @@ const LoadMore = () => {
       setPagesLoaded(nextPage);
  }
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
     if (inView) {
 

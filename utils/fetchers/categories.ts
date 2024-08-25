@@ -62,3 +62,18 @@ export const fetchFrameStyles = async () => {
 
 	return frame_styles;
 };
+
+
+export async function fetchSubCategories () {
+  const supabase = createClient();
+
+  const {data, error} = await supabase
+     .from("sub_categories")
+     .select("*, categories(id,slug, title, image_url)");
+
+   if(error) {
+    throw new Error(error.message)
+   }
+
+   return data
+}

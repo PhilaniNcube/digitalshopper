@@ -1,7 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button";
-import { Database } from "@/schema";
+import type { Database } from "@/schema";
 import { CheckCheck, CheckCircle, MinusIcon, PlusIcon } from "lucide-react";
 import { useState } from "react";
 import {
@@ -13,10 +13,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import analytics, { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { useAppDispatch, useAppSelector } from "@/store/store";
 import { productQty, totalCartItems, totalCartPrice } from "@/store/features/cartSlice";
 import { increment, decrement, openCart } from "@/store/features/cartSlice";
+import { sendGTMEvent } from "@next/third-parties/google";
 
 type CartButtonProps = {
   product: Database["public"]["Tables"]["products"]["Row"];
@@ -36,19 +37,7 @@ const CartButton = ({product}:CartButtonProps) => {
 
 
 
-   const trackRemoveFromCart = () => {
-        analytics.track("remove_from_cart", {
-         currency: "ZAR",
-         items: cartItems.map((item) => ({
-           item_id: item.product.product.id,
-           item_name: item.product.product.title,
-           item_category: item.product.product.category.title,
-           item_brand: item.product.product.brand.name,
-           price: item.product.product.price,
-           quantity: item.qty,
-         })),
-       });
-   }
+
 
   const qty =
     cartItems.find(
@@ -57,10 +46,26 @@ const CartButton = ({product}:CartButtonProps) => {
         item.product.selectedVariant === selectedVariant
     )?.qty || 0;
 
+       const trackRemoveFromCart = () => {
+               sendGTMEvent({
+																event: "remove_form_cart",
+																value: product.price,
+																items: [
+																	{
+																		item_id: product.id,
+																		item_name: product.title,
+																		quantity: qty - 1,
+																		price: product.price,
+																	},
+																],
+															});
+   }
+
   return (
     <div>
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-        {product.variants?.map((variant, index) => (
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
+
+        {product.variants?.map((variant:{variant_name:string, variant_value:string}) => (
           <Button
             className={cn(
               selectedVariant === variant.variant_value &&
@@ -68,7 +73,7 @@ const CartButton = ({product}:CartButtonProps) => {
               "border border-black hover:bg-white hover:text-black relative capitalize"
             )}
             type="button"
-            key={index}
+            key={variant.variant_name}
             onClick={() => setSelectedVariant(variant.variant_value)}
           >
             {selectedVariant === variant.variant_value && (
@@ -81,8 +86,8 @@ const CartButton = ({product}:CartButtonProps) => {
         ))}
       </div>
 
-      <div className="flex space-x-3 mt-4">
-        <div className="flex space-x-3  items-centre bg-slate-200">
+      <div className="flex mt-4 space-x-3">
+        <div className="flex space-x-3 items-centre bg-slate-200">
           <Button
             onClick={() => {
               dispatch(decrement({ product, selectedVariant }))
@@ -93,27 +98,24 @@ const CartButton = ({product}:CartButtonProps) => {
           >
             <MinusIcon className="w-8 h-8" />
           </Button>
-          <div className="px-4 flex items-center text-xl font-semibold">
+          <div className="flex items-center px-4 text-xl font-semibold">
             {qty}
           </div>
           <Button
             onClick={() => {
               dispatch(increment({ product, selectedVariant }))
-               analytics.track("add_to_cart", {
-                 currency: "ZAR",
-                 value: product.price,
-                 items: [
-                   {
-                     item_id: product.id,
-                     item_name: product.title,
-                     item_category: product.category.title,
-                     item_category_2: product.sub_category.title,
-                     item_brand: product.brand.name,
-                     price: product.price,
-                     quantity: 1,
-                   },
-                 ],
-               });
+              sendGTMEvent({
+                event: "add_to_cart",
+                value: product.price,
+                items: [
+                  {
+                    item_id: product.id,
+                    item_name: product.title,
+                    quantity: qty + 1,
+                    price: product.price,
+                  },
+                ],
+              });
             }}
             className="rounded-none hover:bg-slate-400"
             variant="ghost"
@@ -121,7 +123,7 @@ const CartButton = ({product}:CartButtonProps) => {
             <PlusIcon className="w-8 h-8" />
           </Button>
         </div>
-        <Button onClick={() => dispatch(openCart())} className="rounded-none  bg-brand hover:bg-brand_light text-white text-md lg:text-lg uppercase ">
+        <Button onClick={() => dispatch(openCart())} className="text-white uppercase rounded-none bg-brand hover:bg-brand_light text-md lg:text-lg ">
           View Cart
         </Button>
       </div>

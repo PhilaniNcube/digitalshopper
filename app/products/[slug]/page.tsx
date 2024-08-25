@@ -1,9 +1,9 @@
 import type { Database } from "@/schema";
-import { createServerClient, type CookieOptions } from '@supabase/ssr'
-import { cookies } from "next/headers";
+
 import ProductDetails from "./ProductDetails";
-import analytics from "@/lib/utils";
 import type { Metadata } from "next";
+import { createClient } from "@/utils/supabase/server";
+import { sendGTMEvent } from "@next/third-parties/google";
 
 export const dynamic = "force-dynamic";
 
@@ -15,19 +15,8 @@ export async function generateMetadata({
   const { slug } = params;
   const siteURL = "https://www.digitalshopper.co.za";
 
-    const cookieStore = cookies()
+  const supabase = createClient()
 
-  const supabase = createServerClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-    {
-      cookies: {
-        get(name: string) {
-          return cookieStore.get(name)?.value
-        },
-      },
-    }
-  )
 
   const { data: product, error } = await supabase
     .from("products")
@@ -41,7 +30,6 @@ export async function generateMetadata({
     keywords: product?.attributes
       ?.map((attribute) => attribute.value)
       .join(", "),
-    category: product?.category?.title,
     creator: "Athena Media",
 
     robots: "index, follow",
@@ -71,32 +59,26 @@ export async function generateMetadata({
 
 const page = async ({ params: { slug } }: { params: { slug: string } }) => {
 
-    const cookieStore = cookies()
 
-  const supabase = createServerClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-    {
-      cookies: {
-        get(name: string) {
-          return cookieStore.get(name)?.value
-        },
-      },
-    }
-  )
+const supabase = createClient();
 
 
 
   const {data:product, error} = await supabase.from("products").select("*, brand(*), category(*), sub_category(*)").eq("slug", slug).single();
 
-    analytics.track("view_item", {
-      item_id: product?.id,
-      item_name: product?.title,
-      item_category: product?.category?.title,
-      item_brand: product?.brand?.name,
-      price: product?.price,
+  sendGTMEvent({
+    event: "view_item",
+    data: {
       currency: "ZAR",
-    });
+      value: product?.price ,
+      items: [
+        {
+          item_id: product?.id,
+          item_name: product?.title,
+        },
+      ],
+    },
+  })
 
   return (
     <main className="">
@@ -105,6 +87,7 @@ const page = async ({ params: { slug } }: { params: { slug: string } }) => {
           <h1>Product not found</h1>
         </div>
       ) : (
+        // @ts-ignore
         <ProductDetails product={product} />
       )}
     </main>

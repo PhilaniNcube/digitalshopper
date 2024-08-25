@@ -1,12 +1,6 @@
 "use client"
-import {useState, useEffect} from 'react'
-import { createClient } from '@/utils/supabase/client';
 
-import formatter from "@/lib/currency";
-import analytics from "@/lib/utils";
-import { Database } from "@/schema";
-import Image from "next/image";
-import Link from "next/link";
+import type { Database } from "@/schema";
 import ProductGridItem from "./ProductGridItem";
 
 type ProductsGridProps = {

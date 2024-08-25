@@ -346,7 +346,8 @@ export type Database = {
 						slug: string;
 						sub_category: string;
 						title: string;
-						variants: Json | null;
+						// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+						variants: any;
 					};
 					Insert: {
 						attributes?: { key: string; value: string }[] | null;
@@ -365,7 +366,7 @@ export type Database = {
 						slug: string;
 						sub_category: string;
 						title: string;
-						variants?: Json | null;
+
 					};
 					Update: {
 						attributes?: { key: string; value: string }[] | null;
@@ -384,7 +385,8 @@ export type Database = {
 						slug?: string;
 						sub_category?: string;
 						title?: string;
-						variants?: Json | null;
+					// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+						variants?: any;
 					};
 					Relationships: [
 						{

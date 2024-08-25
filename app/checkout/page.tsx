@@ -1,10 +1,10 @@
 import BackButton from "@/components/BackButton";
 import CheckoutForm from "./CheckoutForm";
-import analytics from "@/lib/utils";
+
 
 const page = async () => {
 
-  analytics.track("begin_checkout")
+
 
   return (
     <main>
