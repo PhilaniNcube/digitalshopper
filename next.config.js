@@ -1,13 +1,19 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: {
-    serverActions: true,
-  },
   images: {
-    domains: [
-      "wrdsrupthgeuaredfstv.supabase.co",
-      "res.cloudinary.com",
-      "images.unsplash.com",
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "wrdsrupthgeuaredfstv.supabase.co",
+      },
+      {
+        protocol: "https",
+        hostname: "res.cloudinary.com",
+      },
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+      },
     ],
   },
 };
