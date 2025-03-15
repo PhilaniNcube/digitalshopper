@@ -63,6 +63,7 @@ const page = async (
     '@context': 'https://schema.org',
     '@type': 'CollectionPage',
     name: category ? `${category.title} Collection` : `Product Collection`,
+    
     description: category ? `Browse our collection of ${category.title} products` : 'Browse our product collection',
     url: `https://www.digitalshopper.co.za/categories/${slug}`,
     ...(category?.image_url && { 
@@ -78,12 +79,15 @@ const page = async (
           name: product.title,
           description: product.description,
           image: product.images[0],
+          
           url: `https://www.digitalshopper.co.za/products/${product.slug}`,
           offers: {
             '@type': 'Offer',
             price: product.price,
             priceCurrency: 'ZAR',
+            shipping: `150 ZAR` ,
             availability: product.instock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock'
+            
           }
         }
       }))
