@@ -30,7 +30,7 @@ function generateGoogleMerchantFeed(products: any[]) {
           <g:id>${product.id}</g:id>
           <g:title><![CDATA[${product.title}]]></g:title>
           <g:description><![CDATA[${product.description}]]></g:description>
-          <g:link>https://digitalshopper.co.za/${product.link}</g:link>
+          <g:link>https://digitalshopper.co.za/${product.slug}</g:link>
           <g:image_link><![CDATA[${product.images[0]}]]></g:image_link>
           <g:availability>in_stock</g:availability>
           <g:price>${product.price} ZAR</g:price>
