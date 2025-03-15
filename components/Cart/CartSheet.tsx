@@ -169,7 +169,7 @@ const CartSheet = () => {
 					))}
 				</div>
 				<Separator />
-				<SheetFooter>
+				<div>
 					<SheetClose onClick={() => dispatch(closeCart())} asChild>
 						<div className="w-full">
 							<div className="w-full">
@@ -180,7 +180,7 @@ const CartSheet = () => {
 							</div>
 							<Link href="/checkout">
 								<Button
-									className="w-full text-white rounded-none bg-brand hover:bg-brand_light"
+									className="w-full rounded-none bg-brand hover:bg-brand_light"
 									type="button"
 									// aria-disabled={emptyCart}
 									// disabled={emptyCart}
@@ -192,8 +192,8 @@ const CartSheet = () => {
 											return;
 										}
 										sendGTMEvent({
-                      event: "begin_checkout",
-                    });
+											event: "begin_checkout",
+										});
 									}}
 								>
 									Chekout
@@ -201,7 +201,7 @@ const CartSheet = () => {
 							</Link>
 						</div>
 					</SheetClose>
-				</SheetFooter>
+				</div>
 			</SheetContent>
 		</Sheet>
 	);

@@ -17,7 +17,7 @@ const page = async (props: { params: Promise<{ slug: string }> }) => {
 
     const productData = supabase
 		.from("products")
-		.select("*, category(*), brand(*), sub_category(*), frame_style(*)")
+		.select("*, category(*), brand(*), sub_category(*)")
 		.eq("slug", slug)
 		.single();
     const categoriesData = supabase
@@ -30,32 +30,26 @@ const page = async (props: { params: Promise<{ slug: string }> }) => {
 		.order("name", { ascending: true });
     const sub_categoriesData = supabase
 		.from("sub_categories")
-		.select("*, category(*)")
-		.order("title", { ascending: true });
-    const frameStylesData = supabase
-		.from("frame_styles")
 		.select("*")
 		.order("title", { ascending: true });
-    const coloursData = supabase.from("colour").select("*");
-    const sizeData = supabase.from("size").select("*");
+
+
+
 
     const [
 		{ data: product, error: productError },
 		{ data: categories, error: categoriesError },
 		{ data: brands, error: brandsError },
 		{ data: sub_categories, error: sub_categoriesError },
-		{ data: colours, error: coloursError },
-		{ data: sizes, error: sizesError },
-		{ data: frame_styles, error: frameStylesError },
+
 	] = await Promise.all([
 		productData,
 		categoriesData,
 		brandsData,
 		sub_categoriesData,
-		coloursData,
-		sizeData,
-		frameStylesData,
 	]);
+
+	console.log({ product});
 
     return (
 		<div className="w-full">
@@ -70,21 +64,20 @@ const page = async (props: { params: Promise<{ slug: string }> }) => {
 			</div>
 			<Separator className="my-4" />
 			{!product ||
-			!colours ||
-			!sizes ||
+	
 			!categories ||
 			!sub_categories ||
-			!brands ||
-			!frame_styles ? null : (
+			!brands ?
+		 null : (
 				<ProductUpdateForm
           //@ts-ignore
 					product={product}
-					colours={colours}
-					sizes={sizes}
+					
+			
 					categories={categories}
 					sub_categories={sub_categories}
 					brands={brands}
-					frame_styles={frame_styles}
+					
 				/>
 			)}
 		</div>

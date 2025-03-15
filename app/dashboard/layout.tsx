@@ -7,24 +7,13 @@ import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
 import { createServerClient } from "@supabase/ssr";
 import { redirect } from "next/navigation";
+import { createClient } from "@/utils/supabase/server";
 
 export const dynamic = "force-dynamic";
 
 const layout = async ({children}:{children:ReactNode}) => {
 
-  const cookieStore = await cookies();
-
-  const supabase = createServerClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get(name: string) {
-          return cookieStore.get(name)?.value;
-        },
-      },
-    }
-  );
+  const supabase = await createClient()
 
   const {data} = await supabase.rpc("is_admin").single()
 
@@ -93,7 +82,7 @@ const layout = async ({children}:{children:ReactNode}) => {
           </div>
         </aside>
         <div className="flex-1 h-full bg-slate-100">
-          <ScrollArea className="container h-full py-6">{children}</ScrollArea>
+          <ScrollArea className="container h-[calc(100dvh-40px)] py-6">{children}</ScrollArea>
         </div>
       </div>
     </main>
