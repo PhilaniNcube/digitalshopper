@@ -6,7 +6,7 @@ import Link from "next/link";
 
 const CategoriesSection = async () => {
 
-    const cookieStore = cookies()
+    const cookieStore = await cookies()
 
   const supabase = createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -30,7 +30,7 @@ const CategoriesSection = async () => {
   return <section>
     <div className="container py-10 grid md:grid-cols-2 lg:grid-cols-3 gap-6">
       {categories?.map((category) => (
-        <Link href={`/categories/${category.slug}`} className="w-full bg-slate-100 hover:bg-slate-200 transition-all duration-200 hover:shadow-md">
+        <Link key={category.id} href={`/categories/${category.slug}`} className="w-full bg-slate-100 hover:bg-slate-200 transition-all duration-200 hover:shadow-md">
           <Image src={category.image_url} width={1280} height={1080} alt={category.title} className="w-full object-cover aspect-video" />
           <div className="p-4 w-full flex flex-col justify-center items-center">
            <h3 className="text-black font-bold uppercase text-lg">{category.title}</h3>

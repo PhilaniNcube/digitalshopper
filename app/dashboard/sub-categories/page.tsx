@@ -33,7 +33,7 @@ export const dynamic = "force-dynamic";
 
 const page = async () => {
 
-  const supabase = createClient()
+  const supabase = await createClient()
 
   const categoriesData = supabase.from("categories").select("*");
 

@@ -7,7 +7,7 @@ import { createServerClient } from "@supabase/ssr";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
-        const cookieStore = cookies();
+        const cookieStore = await cookies();
 
      const supabase = createServerClient<Database>(
        process.env.NEXT_PUBLIC_SUPABASE_URL!,

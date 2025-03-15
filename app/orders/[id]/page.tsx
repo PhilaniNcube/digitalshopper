@@ -1,32 +1,37 @@
 import { Separator } from "@/components/ui/separator";
 import { Database } from "@/schema";
 
-const page = async ({params: {id}}:{params: {id:string}}) => {
+const page = async (props:{params: Promise<{id:string}>}) => {
+  const params = await props.params;
 
-     const url = `${process.env.NEXT_PUBLIC_SITE_URL}/api/orders/${id}`;
+  const {
+    id
+  } = params;
 
-     const orderResponse = await fetch(url, {
-       method: "GET",
-       headers: {
-         "Content-Type": "application/json",
-       },
-       cache: "no-cache",
-     })
-       .then((res) => {
-         if (!res.ok) {
-           throw new Error(`Network response was not ok (${res.status})`);
-         }
-         return res.json();
-       })
-       .then((data) => {
-         console.log(data);
-         return data;
-       })
-       .catch((error) => console.log(error));
+  const url = `${process.env.NEXT_PUBLIC_SITE_URL}/api/orders/${id}`;
 
-    //  console.log({orderResponse});
+  const orderResponse = await fetch(url, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    cache: "no-cache",
+  })
+    .then((res) => {
+      if (!res.ok) {
+        throw new Error(`Network response was not ok (${res.status})`);
+      }
+      return res.json();
+    })
+    .then((data) => {
+      console.log(data);
+      return data;
+    })
+    .catch((error) => console.log(error));
 
-    const data:{message:string, status:number, data:Database['public']['Tables']['orders']['Row'] | null} = await orderResponse;
+  //  console.log({orderResponse});
+
+  const data:{message:string, status:number, data:Database['public']['Tables']['orders']['Row'] | null} = await orderResponse;
 
 
   return (

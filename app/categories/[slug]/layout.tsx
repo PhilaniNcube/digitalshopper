@@ -7,24 +7,33 @@ import {
 	fetchSubCategoriesByCategorySlug,
 } from "@/utils/fetchers/categories";
 
-const layout = async ({
-	children,
-	params: { slug },
-}: {
-	children: ReactNode;
-	params: { slug: string };
-}) => {
-	const frameSylesData = fetchFrameStyles();
-	const categoryData = fetchCategoryBySlug(slug);
-	const subCategoriesData = fetchSubCategoriesByCategorySlug(slug);
+const layout = async (
+    props: {
+        children: ReactNode;
+        params: Promise<{ slug: string }>;
+    }
+) => {
+    const params = await props.params;
 
-	const [frame_styles, category, sub_categories] = await Promise.all([
+    const {
+        slug
+    } = params;
+
+    const {
+        children
+    } = props;
+
+    const frameSylesData = fetchFrameStyles();
+    const categoryData = fetchCategoryBySlug(slug);
+    const subCategoriesData = fetchSubCategoriesByCategorySlug(slug);
+
+    const [frame_styles, category, sub_categories] = await Promise.all([
 		frameSylesData,
 		categoryData,
 		subCategoriesData,
 	]);
 
-	return (
+    return (
 		<main>
 			{category ? (
 				<CategoryHeader title={category.title} />

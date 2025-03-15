@@ -3,7 +3,7 @@
 import { createClient } from "@/utils/supabase/server";
 
 export const fetchCategoriesFromDatabase = async () => {
-	const supabase = createClient();
+	const supabase = await createClient();
 
 	const { data: categories, error } = await supabase
 		.from("categories")
@@ -18,7 +18,7 @@ export const fetchCategoriesFromDatabase = async () => {
 };
 
 export const fetchCategoryBySlug = async (slug: string) => {
-	const supabase = createClient();
+	const supabase = await createClient();
 
 	const { data: category, error } = await supabase
 		.from("categories")
@@ -34,7 +34,7 @@ export const fetchCategoryBySlug = async (slug: string) => {
 };
 
 export const fetchSubCategoriesByCategorySlug = async (slug: string) => {
-	const supabase = createClient();
+	const supabase = await createClient();
 
 	const { data: sub_categories, error: sub_categoriesError } = await supabase
 		.from("sub_categories")
@@ -49,7 +49,7 @@ export const fetchSubCategoriesByCategorySlug = async (slug: string) => {
 };
 
 export const fetchFrameStyles = async () => {
-	const supabase = createClient();
+	const supabase = await createClient();
 
 	const { data: frame_styles, error: frame_styles_error } = await supabase
 		.from("frame_styles")
@@ -65,7 +65,7 @@ export const fetchFrameStyles = async () => {
 
 
 export async function fetchSubCategories () {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const {data, error} = await supabase
      .from("sub_categories")

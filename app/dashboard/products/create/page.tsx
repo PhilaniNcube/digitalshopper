@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 
 const page = async () => {
 
-    const cookieStore = cookies()
+    const cookieStore = await cookies()
 
   const supabase = createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,

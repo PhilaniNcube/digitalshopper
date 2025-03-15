@@ -5,12 +5,12 @@ import { CookieOptions, createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 
-export const dynamic = 'force-dynamic'
 
-export async function GET( request: Request,
-  { params }: { params: { slug: string } }) {
+
+export async function GET(request: Request, props: { params: Promise<{ slug: string }> }) {
+  const params = await props.params;
   // Create a Supabase client configured to use cookies
-      const cookieStore = cookies()
+  const cookieStore = await cookies()
 
 
   const supabase = createServerClient<Database>(

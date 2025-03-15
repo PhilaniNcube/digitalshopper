@@ -1,21 +1,21 @@
-import type { Database } from "@/schema";
 
 import ProductDetails from "./ProductDetails";
 import type { Metadata } from "next";
 import { createClient } from "@/utils/supabase/server";
-import { sendGTMEvent } from "@next/third-parties/google";
+
 
 export const dynamic = "force-dynamic";
 
-export async function generateMetadata({
-  params,
-}: {
-  params: { slug: string };
-}): Promise<Metadata> {
+export async function generateMetadata(
+  props: {
+    params: Promise<{ slug: string }>;
+  }
+): Promise<Metadata> {
+  const params = await props.params;
   const { slug } = params;
   const siteURL = "https://www.digitalshopper.co.za";
 
-  const supabase = createClient()
+  const supabase = await createClient()
 
 
   const { data: product, error } = await supabase
@@ -27,9 +27,6 @@ export async function generateMetadata({
   return {
     title: `${product?.title} | Digital Shopper`,
     description: product?.description,
-    keywords: product?.attributes
-      ?.map((attribute) => attribute.value)
-      .join(", "),
     creator: "Athena Media",
 
     robots: "index, follow",
@@ -41,15 +38,6 @@ export async function generateMetadata({
       type: "website",
 
       url: `${siteURL}/products/${slug}`,
-      images: [
-        {
-          // biome-ignore lint/style/noNonNullAssertion: <explanation>
-          url: product?.images[0]!,
-          width: 500,
-          height: 500,
-          alt: product?.title,
-        },
-      ],
     },
     alternates: {
       canonical: `${siteURL}/products/${slug}`,
@@ -57,28 +45,21 @@ export async function generateMetadata({
   };
 }
 
-const page = async ({ params: { slug } }: { params: { slug: string } }) => {
+const page = async (props: { params: Promise<{ slug: string }> }) => {
+  const params = await props.params;
+
+  const {
+    slug
+  } = params;
 
 
-const supabase = createClient();
+  const supabase = await createClient();
 
 
 
   const {data:product, error} = await supabase.from("products").select("*, brand(*), category(*), sub_category(*)").eq("slug", slug).single();
 
-  sendGTMEvent({
-    event: "view_item",
-    data: {
-      currency: "ZAR",
-      value: product?.price ,
-      items: [
-        {
-          item_id: product?.id,
-          item_name: product?.title,
-        },
-      ],
-    },
-  })
+
 
   return (
     <main className="">
@@ -88,7 +69,7 @@ const supabase = createClient();
         </div>
       ) : (
         // @ts-ignore
-        <ProductDetails product={product} />
+        (<ProductDetails product={product} />)
       )}
     </main>
   );

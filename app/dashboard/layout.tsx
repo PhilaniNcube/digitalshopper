@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 
 const layout = async ({children}:{children:ReactNode}) => {
 
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
 
   const supabase = createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,

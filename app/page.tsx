@@ -11,7 +11,7 @@ import { createServerClient } from '@supabase/ssr'
 import HomeHero from '@/components/Homepage/HomeHero'
 import FeaturedProducts from '@/components/Products/FeaturedProducts'
 
-export const dynamic = 'force-dynamic'
+
 
 export const metadata:Metadata = {
   title: "Digital Shopper",

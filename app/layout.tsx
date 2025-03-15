@@ -6,18 +6,9 @@ import TabletNav from "./TabletNav";
 import Footer from "./Footer";
 import CartProvider from "@/components/Providers/CartProvider";
 import type { Metadata, Viewport } from "next";
-import { fetchCategoriesFromDatabase } from "@/utils/fetchers/categories";
-import { getAdmin, getSession } from "@/utils/fetchers/auth";
+import { getAdmin } from "@/utils/fetchers/auth";
 import { GoogleTagManager } from "@next/third-parties/google";
-import { sendGTMEvent } from "@next/third-parties/google";
 
-type Category = {
-	created_at: string;
-	id: string;
-	image_url: string;
-	slug: string;
-	title: string;
-};
 
 const manrope = Manrope({
 	weight: ["300", "400", "500", "600", "700"],

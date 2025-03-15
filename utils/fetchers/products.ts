@@ -1,7 +1,7 @@
 import { createClient } from "@/utils/supabase/server";
 
 export async function fetchProductBySlug(slug: string) {
-	const supabase = createClient();
+	const supabase = await createClient();
 
 	const { data: product, error } = await supabase
 		.from("products")

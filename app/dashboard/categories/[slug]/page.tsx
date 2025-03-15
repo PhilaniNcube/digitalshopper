@@ -12,10 +12,11 @@ import CategoryDetails from './_components/CategoryDetails';
 
 export const dynamic = "force-dynamic";
 
-const page =async ({params}:{params: {slug:string}}) => {
+const page =async (props:{params: Promise<{slug:string}>}) => {
+  const params = await props.params;
 
 
-    const cookieStore = cookies()
+  const cookieStore = await cookies()
 
   const supabase = createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -30,7 +31,7 @@ const page =async ({params}:{params: {slug:string}}) => {
   )
 
 
-// fecth the category details
+  // fecth the category details
   const {data:category,error} = await supabase.from("categories").select("*").eq('slug', params.slug).single()
 
   // Fetch products by category from the supabase database

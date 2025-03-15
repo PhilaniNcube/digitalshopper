@@ -1,17 +1,20 @@
 import type { Database } from "@/schema";
 import Hero from "./Hero";
 import OrderDetails from "./OrderDetails";
-import { cookies } from "next/headers";
-import { createServerClient } from "@supabase/ssr";
 import { createClient } from "@/utils/supabase/server";
-import { sendGTMEvent } from "@next/third-parties/google";
 
-const page = async ({ params: { id } }: { params: { id: string } }) => {
-	const supabase = createClient();
 
-	const url = `${process.env.NEXT_PUBLIC_SITE_URL}/api/orders/${id}`;
+const page = async (props: { params: Promise<{ id: string }> }) => {
+    const params = await props.params;
 
-	const orderResponse = await fetch(url, {
+    const {
+        id
+    } = params;
+
+
+    const url = `${process.env.NEXT_PUBLIC_SITE_URL}/api/orders/${id}`;
+
+    const orderResponse = await fetch(url, {
 		method: "GET",
 		headers: {
 			"Content-Type": "application/json",
@@ -30,36 +33,19 @@ const page = async ({ params: { id } }: { params: { id: string } }) => {
 		})
 		.catch((error) => console.log(error));
 
-	//  console.log({orderResponse});
 
-	const data: {
+
+    const data: {
 		message: string;
 		status: number;
 		data: Database["public"]["Tables"]["orders"]["Row"] | null;
 	} = await orderResponse;
 
-	const order = data.data;
+    const order = data.data;
 
-	if (order?.paid) {
-		sendGTMEvent({
-			event: "purchase",
-			value: order?.total_amount,
-			transaction_id: order?.id,
-			affiliation: "Digital Shopper",
-			currency: "ZAR",
-			shipping: order?.shipping,
-			items: order?.order_items.map((item) => ({
-				item_id: item.product.id,
-				item_name: item.product.title,
-				item_category: item.product.category.title,
-				item_brand: item.product.brand.name,
-				price: item.product.price,
-				quantity: item.quantity,
-			})),
-		});
-	}
 
-	return (
+
+    return (
 		<main className="container py-10">
 			<Hero />
 			{order ? (

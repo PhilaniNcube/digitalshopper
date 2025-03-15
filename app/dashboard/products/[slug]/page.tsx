@@ -6,34 +6,40 @@ import ProductUpdateForm from "./ProductUpdateForm";
 
 import { createClient } from "@/utils/supabase/server";
 
-const page = async ({ params: { slug } }: { params: { slug: string } }) => {
-	const supabase = createClient();
+const page = async (props: { params: Promise<{ slug: string }> }) => {
+    const params = await props.params;
 
-	const productData = supabase
+    const {
+        slug
+    } = params;
+
+    const supabase = await createClient();
+
+    const productData = supabase
 		.from("products")
 		.select("*, category(*), brand(*), sub_category(*), frame_style(*)")
 		.eq("slug", slug)
 		.single();
-	const categoriesData = supabase
+    const categoriesData = supabase
 		.from("categories")
 		.select("*")
 		.order("title", { ascending: true });
-	const brandsData = supabase
+    const brandsData = supabase
 		.from("brands")
 		.select("*")
 		.order("name", { ascending: true });
-	const sub_categoriesData = supabase
+    const sub_categoriesData = supabase
 		.from("sub_categories")
 		.select("*, category(*)")
 		.order("title", { ascending: true });
-	const frameStylesData = supabase
+    const frameStylesData = supabase
 		.from("frame_styles")
 		.select("*")
 		.order("title", { ascending: true });
-	const coloursData = supabase.from("colour").select("*");
-	const sizeData = supabase.from("size").select("*");
+    const coloursData = supabase.from("colour").select("*");
+    const sizeData = supabase.from("size").select("*");
 
-	const [
+    const [
 		{ data: product, error: productError },
 		{ data: categories, error: categoriesError },
 		{ data: brands, error: brandsError },
@@ -51,7 +57,7 @@ const page = async ({ params: { slug } }: { params: { slug: string } }) => {
 		frameStylesData,
 	]);
 
-	return (
+    return (
 		<div className="w-full">
 			<div className="flex items-end justify-between w-full">
 				<h1 className="text-3xl font-bold">Products</h1>

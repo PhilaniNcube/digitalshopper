@@ -7,15 +7,15 @@ import { CookieOptions, createServerClient } from '@supabase/ssr'
 
 
 
-export const dynamic = 'force-dynamic'
 
 
-export async function GET( request: Request,
-  { params }: { params: { id: string } }) {
 
-    const id = params.id
+export async function GET(request: Request, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
 
-    const cookieStore = cookies()
+  const id = params.id
+
+  const cookieStore = await cookies()
 
 
   const supabase = createServerClient<Database>(
@@ -54,8 +54,8 @@ export async function GET( request: Request,
 }
 
 
-export async function POST(request: Request,
-  { params }: { params: { id: string } }){
+export async function POST(request: Request, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
 
   const id = params.id
 
@@ -109,5 +109,4 @@ export async function POST(request: Request,
       custom_str2: custom_str2,
     }
   })
-
-  }
+}

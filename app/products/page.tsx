@@ -11,17 +11,18 @@ import { fetchProducts } from "@/actions/products";
 import Spinner from "./_components/spinner";
 import LoadMore from "@/components/Products/LoadMore";
 
-const page = async ({
-  searchParams,
-}: {
-  searchParams: { [key: string]: string  };
-}) => {
+const page = async (
+  props: {
+    searchParams: Promise<{ [key: string]: string  }>;
+  }
+) => {
+  const searchParams = await props.searchParams;
   // biome-ignore lint/complexity/useLiteralKeys: <explanation>
   const page = searchParams["page"] ?? "1";
   // const per_page = searchParams["per_page"] ?? "40";
 
-		// biome-ignore lint/complexity/useLiteralKeys: <explanation>
-		const search = searchParams["search"] ?? "";
+  // biome-ignore lint/complexity/useLiteralKeys: <explanation>
+  const search = searchParams["search"] ?? "";
 
 
   // const start = (Number(page) - 1) * Number(per_page);
@@ -55,14 +56,14 @@ const page = async ({
   //     .ilike("description", `%${search}%`)
   //     .order("title", { ascending: true });
 
-      // const { data, error: errorSearch } = await supabase
-      //   .rpc("filter_products", {
-      //     search_text: search,
-      //   })
-      //   .limit(Number(per_page))
-      //   .range(Number(start), Number(end));
+  // const { data, error: errorSearch } = await supabase
+  //   .rpc("filter_products", {
+  //     search_text: search,
+  //   })
+  //   .limit(Number(per_page))
+  //   .range(Number(start), Number(end));
 
-      // console.log({data, error:errorSearch});
+  // console.log({data, error:errorSearch});
 
 
 

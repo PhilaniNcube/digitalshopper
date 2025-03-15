@@ -7,7 +7,7 @@ import { Resend } from 'resend';
 
 const resend = new Resend(process.env.NEXT_PUBLIC_RESEND_API_KEY);
 
-export const dynamic = 'force-dynamic'
+
 
 
 
@@ -15,7 +15,7 @@ export const dynamic = 'force-dynamic'
 export async function POST(request: Request) {
   // Create a Supabase client configured to use cookies
 
-  const supabase = createClient()
+  const supabase = await createClient()
 
 
   const data = await request.text()

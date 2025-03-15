@@ -12,26 +12,32 @@ export const dynamic = "force-dynamic";
 
 type Products = Database['public']['Tables']['products']['Row'][];
 
-const page = async ({
-  params: { slug },
-  searchParams,
-}: {
-  params: { slug: string };
-  searchParams: { [key: string]: string | string[] | undefined };
-}) => {
-    const cookieStore = cookies();
+const page = async (
+  props: {
+    params: Promise<{ slug: string }>;
+    searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+  }
+) => {
+  const searchParams = await props.searchParams;
+  const params = await props.params;
 
-    const supabase = createServerClient<Database>(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          get(name: string) {
-            return cookieStore.get(name)?.value;
-          },
+  const {
+    slug
+  } = params;
+
+  const cookieStore = await cookies();
+
+  const supabase = createServerClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name: string) {
+          return cookieStore.get(name)?.value;
         },
-      }
-    );
+      },
+    }
+  );
 
   const sub_category = searchParams["sub_category"] ? searchParams["sub_category"] : "";
   const frame_style = searchParams["frame_style"] ? searchParams["frame_style"] : "";
@@ -129,13 +135,12 @@ query = query
   //   }
 
 
-               return (
-             <div className="flex justify-center w-full px-4">
-              {products.length === 0 ? (<NoProducts />) :
-               <ProductsGrid products={products!} />
-              }
-             </div>
-           );
-
+  return (
+<div className="flex justify-center w-full px-4">
+ {products.length === 0 ? (<NoProducts />) :
+  <ProductsGrid products={products!} />
+ }
+</div>
+);
 };
 export default page;

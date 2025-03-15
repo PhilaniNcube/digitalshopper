@@ -3,12 +3,12 @@ import { CookieOptions, createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 
-export const dynamic = 'force-dynamic'
+
 
 export async function POST(request: Request) {
   const requestUrl = new URL(request.url)
   const {email, password} = await request.json()
-  const cookieStore = cookies()
+  const cookieStore = await cookies()
 
     const supabase = createServerClient<Database>(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,

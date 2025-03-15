@@ -1,21 +1,9 @@
 
 import { Menu, ShoppingCart } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
-import {
-	Sheet,
-	SheetClose,
-	SheetContent,
-	SheetDescription,
-	SheetFooter,
-	SheetHeader,
-	SheetTitle,
-	SheetTrigger,
-} from "@/components/ui/sheet";
 import MenuDrawer from "./MenuDrawer";
 import type { Database } from "@/schema";
 import Image from "next/image";
-import type { Session } from "@supabase/supabase-js";
 import SearchInput from "@/components/Products/SearchInput";
 import { fetchCategoriesFromDatabase } from "@/utils/fetchers/categories";
 

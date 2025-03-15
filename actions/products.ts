@@ -8,7 +8,7 @@ export async function fetchProducts(
   search = "",
 
 	) {
-		const supabase = createClient();
+		const supabase = await createClient();
 
 		const per_page = 20;
 

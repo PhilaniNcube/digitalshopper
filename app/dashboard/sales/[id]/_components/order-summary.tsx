@@ -26,7 +26,7 @@ export default function Component({order}:{order:Database['public']['Tables']['o
 						</CardHeader>
 						<CardContent>
 							<ul className="grid gap-4">
-								{order.order_items.map((item) => (
+								{order.order_items && order.order_items?.map((item) => (
 									<li key={item.product.id} className="flex items-center gap-4">
 										<img
 											src={item.product.images[0]}

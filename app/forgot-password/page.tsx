@@ -14,7 +14,7 @@ export default async function Component() {
 
   const forgotPasswordAction = async (formData:FormData) => {
     "use server"
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
 
       const supabase = createServerClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
