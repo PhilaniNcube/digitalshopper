@@ -34,7 +34,7 @@ function generateGoogleMerchantFeed(products: any[]) {
           <g:image_link><![CDATA[${product.images[0]}]]></g:image_link>
           <g:availability>in_stock</g:availability>
           <g:price>${product.price} ZAR</g:price>
-          <g:brand><![CDATA[${product.brand.title}]]></g:brand>
+          <g:brand><![CDATA[${product.brand.name}]]></g:brand>
           <g:condition><![CDATA[New]]></g:condition>
         </item>
       `;
