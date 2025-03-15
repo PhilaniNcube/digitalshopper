@@ -6,6 +6,8 @@ import ProductUpdateForm from "./ProductUpdateForm";
 
 import { createClient } from "@/utils/supabase/server";
 
+
+
 const page = async (props: { params: Promise<{ slug: string }> }) => {
     const params = await props.params;
 
