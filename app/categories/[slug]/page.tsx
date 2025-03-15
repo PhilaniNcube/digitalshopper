@@ -1,11 +1,6 @@
 // import CategoryHeader from "@/components/CategoriesPage/CategoryHeader";
 import { Database } from "@/schema";
-import { cookies } from "next/headers";
-// import Filter from "./Filter";
 import ProductsGrid from "@/components/Products/ProductsGrid";
-import { Suspense } from "react";
-import ProductsSkeleton from "@/components/Products/ProductsSkeleton";
-import { createServerClient } from "@supabase/ssr";
 import NoProducts from "@/components/Products/NoProducts";
 import Script from "next/script";
 import { createClient } from "@/utils/supabase/server";

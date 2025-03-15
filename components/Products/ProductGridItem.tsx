@@ -22,7 +22,7 @@ const ProductGridItem = ({ product }: ProductItemProps) => {
         className="object-cover w-full aspect-square"
       />
       <div className="mt-3">
-        <h2 className="text-sm font-semibold text-slate-800 line-clamp-1">
+        <h2 className="text-sm font-semibold text-slate-800 line-clamp-2"> 
           {product.title}
         </h2>
         <p className="text-lg font-medium tracking-wide line-clamp-2" suppressHydrationWarning>
