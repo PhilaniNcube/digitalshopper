@@ -8,6 +8,7 @@ import ProductsSkeleton from "@/components/Products/ProductsSkeleton";
 import { createServerClient } from "@supabase/ssr";
 import NoProducts from "@/components/Products/NoProducts";
 import Script from "next/script";
+import { createClient } from "@/utils/supabase/server";
 
 
 type Products = Database['public']['Tables']['products']['Row'][];
@@ -21,23 +22,15 @@ const page = async (
   const searchParams = await props.searchParams;
   const params = await props.params;
 
+  const sub_category = searchParams.sub_category as string || "";
+
   const {
     slug
   } = params;
 
-  const cookieStore = await cookies();
+  const supabase = await createClient();
 
-  const supabase = createServerClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get(name: string) {
-          return cookieStore.get(name)?.value;
-        },
-      },
-    }
-  );
+
 
   // Get category details for JSON-LD
   const { data: category, error: categoryError } = await supabase
@@ -46,11 +39,13 @@ const page = async (
     .eq("slug", slug)
     .single();
 
+    // create a a query to search the supabase database for products in the category with the slug
+        
 
 
-  let query = supabase.from("products").select('*, category!inner(id, title,slug), sub_category!inner(id, title,slug)')
 
-
+  let query = sub_category  ? supabase.from("products").select('*, category!inner(id, title,slug), sub_category!inner(id, title,slug)').eq("category.slug", slug).filter('sub_category.slug', 'like' ,`${sub_category}` ).order('created_at', {ascending: false})
+   : supabase.from("products").select('*, category!inner(id, title,slug), sub_category!inner(id, title,slug)').eq("category.slug", slug).order('created_at', {ascending: false})
 
   let products: Products = [];
 
