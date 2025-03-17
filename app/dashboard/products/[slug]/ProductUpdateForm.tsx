@@ -295,7 +295,7 @@ const ProductUpdateForm = ({
 				description: "Product was updated successfully",
 			});
 			setLoading(false);
-			router.back();
+			router.refresh();
 		}
 	}
 
