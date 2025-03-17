@@ -93,17 +93,7 @@ const supabase = createClient()
               <TableCell>{product.brand.name}</TableCell>
               <TableCell>{product.category.title}</TableCell>
               <TableCell>
-                <div className="flex flex-col gap-y-2">
-                  <p>{product.sub_category.title}</p>
-                  <small className="text-xs">
-                    {product.frame_style
-                      ? `Frame Styles - ${product.frame_style}`
-                      : null}
-                  </small>
-                  <small className="text-xs">
-                    {product.gender ? `Gender - ${product.gender}` : null}
-                  </small>
-                </div>
+              {product.sub_category.title}
               </TableCell>
               <TableCell>
                 <ToggleFeatured featured={product.featured || false} id={product.id} />

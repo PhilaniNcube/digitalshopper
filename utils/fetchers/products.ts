@@ -100,3 +100,21 @@ export async function fetchInStockProducts(	page = 1,
 		return null;
 	}
 	}
+
+
+	export async function getProductsCount() {
+		const supabase = await createClient();
+	
+		const { data, error , count} = await supabase
+			.from("products")
+			.select("id", {
+				count: "exact",
+			});
+	
+		if (error) {
+			console.error("Error fetching products count", error);
+			return 0;
+		}
+	
+		return count
+	}
