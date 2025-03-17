@@ -39,8 +39,8 @@ const page = async (
 
 
 
-  let query = sub_category  ? supabase.from("products").select('*, category!inner(id, title,slug), sub_category!inner(id, title,slug)').eq("category.slug", slug).filter('sub_category.slug', 'like' ,`${sub_category}` ).order('created_at', {ascending: false})
-   : supabase.from("products").select('*, category!inner(id, title,slug), sub_category!inner(id, title,slug)').eq("category.slug", slug).order('created_at', {ascending: false})
+  let query = sub_category  ? supabase.from("products").select('*, category!inner(id, title,slug), sub_category!inner(id, title,slug)').eq("instock", true).eq("category.slug", slug).filter('sub_category.slug', 'like' ,`${sub_category}` ).order('created_at', {ascending: false})
+   : supabase.from("products").select('*, category!inner(id, title,slug), sub_category!inner(id, title,slug)').eq("instock", true).eq("category.slug", slug).order('created_at', {ascending: false})
 
   let products: Products = [];
 

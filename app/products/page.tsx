@@ -1,15 +1,11 @@
-import { cookies } from "next/headers";
+
 import Filter from "./_components/filter";
 import Search from "./_components/search";
-import { createServerClient } from "@supabase/ssr";
-import { Database } from "@/schema";
 import ProductsGrid from "@/components/Products/ProductsGrid";
 import NoProducts from "@/components/Products/NoProducts";
 import { Suspense } from "react";
-import Pagination from "./_components/pagination";
-import { fetchProducts } from "@/actions/products";
-import Spinner from "./_components/spinner";
 import LoadMore from "@/components/Products/LoadMore";
+import { fetchInStockProducts } from "@/utils/fetchers/products";
 
 const page = async (
   props: {
@@ -30,7 +26,7 @@ const page = async (
 
   const pageNumber = Number(page)
 
-  const products = await fetchProducts(pageNumber, search);
+  const products = await fetchInStockProducts(pageNumber, search);
 
 
 
