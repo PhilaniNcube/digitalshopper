@@ -136,8 +136,8 @@ const supabase = createClient()
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                       <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction>
-                        <Button onClick={() => deleteProduct(product.id)} type="button">
+                      <AlertDialogAction className="bg-transparent hover:bg-transparent" onClick={() => deleteProduct(product.id)} type="button">
+                        <Button >
                           Delete
                         </Button>
                       </AlertDialogAction>

@@ -1,10 +1,11 @@
 "use client";
 
+import { toggleInStockAction } from "@/actions/products";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "@/components/ui/use-toast";
-import { Database } from "@/schema";
-import { createBrowserClient } from '@supabase/ssr'
 import { useRouter } from "next/navigation";
+import { startTransition, useActionState } from "react";
+
 
 const ToggleInStock = ({
   id,
@@ -13,35 +14,32 @@ const ToggleInStock = ({
   id: string;
   instock: boolean;
 }) => {
-  const router = useRouter();
 
-    const supabase = createBrowserClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  )
+  const clientAction = async () => {
+    await toggleInStockAction(id, instock);
 
-  const toggleInStock = async () => {
-    const { data: product, error } = await supabase
-      .from("products")
-      .update({ featured: !instock })
-      .eq("id", id)
-      .single();
-    if (error) {
-      throw new Error(error.message);
-    }
-    toast({
-      title: "Updated",
-    });
-    router.refresh();
   };
+
+  const [state, formAction, isPending] = useActionState(clientAction, null);
 
   return (
     <Switch
-      name="featured"
-      id="featured"
-      onClick={toggleInStock}
+      name="instock"
+      id="instock"
+      onClick={() => {
+        startTransition(() => {
+          formAction();
+          toast({
+            title: "Product updated",
+            description: `Product is now ${!instock ? "in stock" : "out of stock"
+              }.`,
+          });
+        });
+      }}
       checked={instock}
+      disabled={isPending}
     />
   );
 };
+
 export default ToggleInStock;

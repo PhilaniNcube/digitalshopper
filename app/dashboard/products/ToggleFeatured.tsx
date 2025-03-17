@@ -1,36 +1,44 @@
 "use client"
 
+import { toggleFeaturedAction } from "@/actions/products";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "@/components/ui/use-toast";
-import { Database } from "@/schema";
-import { createBrowserClient } from '@supabase/ssr'
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 const ToggleFeatured = ({id, featured}:{id:string, featured:boolean}) => {
+    const router = useRouter();
+    const [isPending, setIsPending] = useState(false);
 
-    const router = useRouter()
+    const handleToggle = async () => {
+        setIsPending(true);
+        try {
+            await toggleFeaturedAction(id, featured);
+            toast({
+                title: "Product updated",
+                description: `Product is now ${!featured ? 'featured' : 'unfeatured'}.`
+            });
+            router.refresh();
+        } catch (error) {
+            toast({
+                title: "Error",
+                description: "Failed to update product",
+                variant: "destructive"
+            });
+        } finally {
+            setIsPending(false);
+        }
+    };
 
-      const supabase = createBrowserClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  )
-
-    const toggleFeatured = async () => {
-       const { data: product, error } = await supabase
-         .from("products")
-         .update({ featured: !featured })
-         .eq("id", id)
-         .single();
-       if (error) {
-         throw new Error(error.message);
-       }
-        toast({
-          title: "Updated"
-        })
-        router.refresh()
-
-    }
-
-  return <Switch name="featured" id="featured" onClick={toggleFeatured} checked={featured} />;
+    return (
+        <Switch 
+            name="featured" 
+            id="featured" 
+            onClick={handleToggle} 
+            checked={featured}
+            disabled={isPending}
+        />
+    );
 };
+
 export default ToggleFeatured;
