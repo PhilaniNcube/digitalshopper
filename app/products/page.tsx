@@ -32,41 +32,7 @@ const page = async (
 
 
 
-  //   const {
-  //     data: products,
-  //     error,
-  //     count,
-  //   } = await supabase
-  //     .from("products")
-  //     .select(
-  //       "*, category!inner(id, slug, title), sub_category(*), brand(*), frame_style, gender",
-  //       {
-  //         count: "exact",
-  //       }
-  //     )
-  //     .limit(Number(per_page))
-  //     .range(Number(start), Number(end))
-  //     .ilike("category.slug", `%${category}%`)
-  //     .ilike("title", `%${search}%`)
-  //     .ilike("sub_category.title", `%${search}%`)
-  //     .ilike("description", `%${search}%`)
-  //     .order("title", { ascending: true });
 
-  // const { data, error: errorSearch } = await supabase
-  //   .rpc("filter_products", {
-  //     search_text: search,
-  //   })
-  //   .limit(Number(per_page))
-  //   .range(Number(start), Number(end));
-
-  // console.log({data, error:errorSearch});
-
-
-
-  // const hasPrevPage = start > 0;
-  // const hasNextPage = end < count!;
-
-  // console.log({ hasPrevPage, hasNextPage });
 
   return (
     <main className="container py-10">
@@ -81,10 +47,9 @@ const page = async (
               <ProductsGrid products={products} />
             )}
           </Suspense>
-          <LoadMore />
+     
         </div>
-        <div className="h-[40px]">
-        </div>
+ 
       </section>
     </main>
   );

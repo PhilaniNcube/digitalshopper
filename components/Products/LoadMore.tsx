@@ -4,9 +4,10 @@ import type { Database } from "@/schema";
 import { useEffect, useState } from "react";
 import {useInView} from "react-intersection-observer"
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
-import { fetchProducts } from "@/actions/products";
+
 import ProductsGrid from "./ProductsGrid";
 import Spinner from "@/app/products/_components/spinner";
+import { fetchInStockProducts } from "@/utils/fetchers/products";
 
 const LoadMore = () => {
 
@@ -41,7 +42,7 @@ const LoadMore = () => {
 
 
        const nextPage = pagesLoaded + 1;
-       const newProducts = (await fetchProducts(nextPage, search)) ?? [];
+       const newProducts = (await fetchInStockProducts(nextPage, search)) ?? [];
 
         if (newProducts.length === 0) {
           setEnd(true);

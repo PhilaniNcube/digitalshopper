@@ -3,8 +3,7 @@ import { Database } from "@/schema";
 import { useEffect, useState } from "react";
 import { useInView } from "react-intersection-observer";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
-import { fetchProducts } from "@/actions/products";
-import Spinner from "@/app/products/_components/spinner";
+
 
 const LoadMoreCtagoryProducts = ({params: {slug}}:{params:{slug:string}}) => {
 
