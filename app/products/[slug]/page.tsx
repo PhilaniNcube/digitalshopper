@@ -36,7 +36,14 @@ export async function generateMetadata(
       description: product?.description,
       siteName: "Digital Shopper",
       type: "website",
-
+      images: [
+        {
+          url: product.images[0],
+          width:500,
+          height:500,
+          alt: product?.title
+        }
+      ],
       url: `${siteURL}/products/${slug}`,
     },
     alternates: {
