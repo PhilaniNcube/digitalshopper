@@ -58,12 +58,12 @@ export function ResetPasswordForm() {
 	return (
 		<form className="grid gap-5" onSubmit={onSubmit}>
 			<div className="grid gap-2">
-				<Label htmlFor="password">New password</Label>
+				<Label htmlFor="password" className="text-slate-100">New password</Label>
 				<Input id="password" type="password" placeholder="••••••••" {...register("password")} />
 				{errors.password ? <p className="text-sm text-red-300">{errors.password.message}</p> : null}
 			</div>
 			<div className="grid gap-2">
-				<Label htmlFor="confirmPassword">Confirm password</Label>
+				<Label htmlFor="confirmPassword" className="text-slate-100">Confirm password</Label>
 				<Input id="confirmPassword" type="password" placeholder="••••••••" {...register("confirmPassword")} />
 				{errors.confirmPassword ? (
 					<p className="text-sm text-red-300">{errors.confirmPassword.message}</p>

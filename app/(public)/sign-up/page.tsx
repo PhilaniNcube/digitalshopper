@@ -14,7 +14,7 @@ export default function SignUpPage() {
 			<Card className="mx-auto w-full max-w-xl bg-surface-low">
 				<CardHeader>
 				
-					<CardTitle>Create account</CardTitle>
+					<CardTitle className="text-white">Create account</CardTitle>
 				</CardHeader>
 				<CardContent className="space-y-6">
 					<SignUpForm />

@@ -42,7 +42,7 @@ export function ForgotPasswordForm() {
 	return (
 		<form className="grid gap-5" onSubmit={onSubmit}>
 			<div className="grid gap-2">
-				<Label htmlFor="email">Email</Label>
+				<Label htmlFor="email" className="text-slate-100">Email</Label>
 				<Input id="email" type="email" placeholder="you@example.com" {...register("email")} />
 				{errors.email ? <p className="text-sm text-red-300">{errors.email.message}</p> : null}
 			</div>
