@@ -56,7 +56,7 @@ export function SignInForm() {
 				<Input id="password" type="password" placeholder="••••••••" {...register("password")} />
 				{errors.password ? <p className="text-sm text-red-300">{errors.password.message}</p> : null}
 			</div>
-			<Button type="submit" disabled={isSubmitting}>
+			<Button type="submit" className="bg-primary-strong text-white rounded-none h-12" disabled={isSubmitting}>
 				{isSubmitting ? "Signing in..." : "Sign in"}
 			</Button>
 		</form>

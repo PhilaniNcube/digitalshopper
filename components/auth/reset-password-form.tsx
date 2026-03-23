@@ -69,7 +69,7 @@ export function ResetPasswordForm() {
 					<p className="text-sm text-red-300">{errors.confirmPassword.message}</p>
 				) : null}
 			</div>
-			<Button type="submit" disabled={isSubmitting}>
+			<Button type="submit" className="bg-primary-strong text-white rounded-none h-12" disabled={isSubmitting}>
 				{isSubmitting ? "Updating password..." : "Update password"}
 			</Button>
 		</form>

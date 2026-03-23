@@ -13,7 +13,7 @@ export default function SignUpPage() {
 		<div className="mx-auto flex min-h-[calc(100vh-160px)] w-full max-w-7xl items-center px-6 py-12 lg:px-10">
 			<Card className="mx-auto w-full max-w-xl bg-surface-low">
 				<CardHeader>
-					<p className="text-xs uppercase tracking-[0.22em] text-muted-foreground">Authentication</p>
+				
 					<CardTitle>Create account</CardTitle>
 				</CardHeader>
 				<CardContent className="space-y-6">

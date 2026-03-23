@@ -46,7 +46,7 @@ export function ForgotPasswordForm() {
 				<Input id="email" type="email" placeholder="you@example.com" {...register("email")} />
 				{errors.email ? <p className="text-sm text-red-300">{errors.email.message}</p> : null}
 			</div>
-			<Button type="submit" disabled={isSubmitting}>
+			<Button type="submit" className="bg-primary-strong text-white rounded-none h-12" disabled={isSubmitting}>
 				{isSubmitting ? "Sending link..." : "Send reset link"}
 			</Button>
 		</form>
