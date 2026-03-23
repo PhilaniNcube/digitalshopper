@@ -7,6 +7,7 @@ import { notFound } from "next/navigation";
 import { PackageCheck, ShoppingCart, Truck } from "lucide-react";
 import { AddToCartButton } from "@/components/products/add-to-cart-button";
 import { ProductImageGallery } from "@/components/products/product-image-gallery";
+import { TrackViewItem } from "@/components/products/track-view-item";
 import { Badge } from "@/components/ui/badge";
 import {
   fetchProductBySlug,
@@ -162,6 +163,7 @@ const ProductDetails = async ({
 
   return (
     <div className="mx-auto w-full max-w-7xl px-4 py-10 lg:px-8">
+      <TrackViewItem product={cartProduct} />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

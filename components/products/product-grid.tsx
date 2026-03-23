@@ -11,6 +11,7 @@ import {
 	PaginationPrevious,
 } from "@/components/ui/pagination";
 import { fetchCatalogProducts } from "@/dal/queries/products";
+import { TrackViewItemList } from "@/components/products/track-view-item-list";
 import { Boxes, PackageCheck, SearchX } from "lucide-react";
 
 function buildProductsHref({
@@ -138,6 +139,21 @@ export async function ProductGrid({ searchParamsPromise }: { searchParamsPromise
 				</section>
 			) : (
 				<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 ">
+					<TrackViewItemList
+						products={products.items.map((p) => ({
+							id: p.id,
+							slug: p.slug,
+							title: p.title,
+							category: p.category?.slug ?? "uncategorized",
+							price: Math.round(p.promoPrice ?? p.rrpIncl ?? p.price * 1.14 * 1.15),
+							image: p.mainImage ?? "/images/banner.webp",
+							summary: p.summary ?? p.shortDescription ?? "",
+							specs: p.specs.slice(0, 3),
+							featured: p.featured,
+							inStock: p.inStock,
+						}))}
+						listName={category !== "all" ? `Category: ${category}` : "Product Grid"}
+					/>
 					{products.items.map((product) => (
 						<ProductCard key={product.id} product={product} />
 					))}

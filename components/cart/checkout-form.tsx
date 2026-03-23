@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Field, FieldLabel, FieldError } from "@/components/ui/field";
+import { trackBeginCheckout } from "@/lib/gtm";
 import { getCartSubtotal, useCartStore } from "@/stores/cart-store";
 import { formatCurrency } from "@/lib/utils";
 import { checkoutAction, type CheckoutState } from "@/dal/actions/checkout";
@@ -66,6 +67,14 @@ export function CheckoutForm() {
     resolver: zodResolver(checkoutSchema),
     mode: "onBlur",
   });
+
+  // Track begin_checkout on mount when there are items
+  useEffect(() => {
+    if (items.length > 0) {
+      trackBeginCheckout(items, total);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Redirect to Payfast after a successful server action
   useEffect(() => {
