@@ -98,7 +98,7 @@ export function CartSheet() {
                         <div className="flex items-center gap-2">
                           <Button
                             size="icon"
-                            variant=""
+                            
                             onClick={() => decrement(item.product.id)}
                           >
                             <Minus className="size-4" />
@@ -108,7 +108,7 @@ export function CartSheet() {
                           </span>
                           <Button
                             size="icon"
-                            variant=""
+                            
                             onClick={() => increment(item.product.id)}
                           >
                             <Plus className="size-4" />
