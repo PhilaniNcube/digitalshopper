@@ -90,10 +90,12 @@ function ProductDetailsSkeleton() {
 
 const ProductPage = ({ params }: { params: Promise<{ slug: string }> }) => {
   return (
+    <div>
     <Suspense fallback={<ProductDetailsSkeleton />}>
       <ProductDetails searchParamsPromise={params} />;
     </Suspense>
-  );
+  </div>
+);
 };
 
 export default ProductPage;
