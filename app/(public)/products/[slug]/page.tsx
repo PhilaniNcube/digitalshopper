@@ -3,7 +3,36 @@ import { fetchProductBySlug } from "@/dal/queries/products";
 import ProductDetails from "@/components/products/product-details";
 import { Suspense } from "react";
 
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const product = await fetchProductBySlug(slug);
 
+  if (!product) {
+    return { title: "Product Not Found | Digital Shopper" };
+  }
+
+  const price = product.rrpIncl ?? product.price * 1.14 * 1.15;
+
+  return {
+    title: `${product.title} | Digital Shopper`,
+    description:
+      product.shortDescription ??
+      product.summary ??
+      `Buy ${product.title} for R${price} at Digital Shopper.`,
+    openGraph: {
+      title: product.title,
+      description:
+        product.shortDescription ??
+        product.summary ??
+        `Buy ${product.title} for R${price} at Digital Shopper.`,
+      images: product.featuredImage ? [product.featuredImage] : [],
+    },
+  };
+}
 
 function ProductDetailsSkeleton() {
   return (
