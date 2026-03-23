@@ -230,7 +230,7 @@ export function UsersTable({ users, pagination }: UsersTableProps) {
 						: `${pagination.totalItems} user(s) total`}
 				</p>
 				<div className="flex items-center gap-2">
-					<Button variant="outline" size="sm" asChild disabled={!pagination.hasPreviousPage}>
+					<Button  className="border bg-primary-strong! border-white text-white" size="sm" asChild disabled={!pagination.hasPreviousPage}>
 						<Link
 							href={previousPageHref}
 							aria-disabled={!pagination.hasPreviousPage}
@@ -242,7 +242,7 @@ export function UsersTable({ users, pagination }: UsersTableProps) {
 					<span className="text-sm text-white">
 						Page {currentPage} of {totalPages}
 					</span>
-					<Button variant="outline" size="sm" asChild disabled={!pagination.hasNextPage}>
+					<Button  className="border bg-primary-strong! border-white text-white" size="sm" asChild disabled={!pagination.hasNextPage}>
 						<Link
 							href={nextPageHref}
 							aria-disabled={!pagination.hasNextPage}
