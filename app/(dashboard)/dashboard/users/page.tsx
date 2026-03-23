@@ -1,7 +1,11 @@
 import { Suspense } from "react";
 import UserData from "@/components/dashboard/users/user-data";
 
-export default function DashboardUsersPage() {
+type DashboardUsersPageProps = {
+	searchParams: Promise<Record<string, string | string[] | undefined>>;
+};
+
+export default function DashboardUsersPage({ searchParams }: DashboardUsersPageProps) {
 	return (
 		<div className="container py-8">
 			<Suspense
@@ -14,7 +18,7 @@ export default function DashboardUsersPage() {
 					</div>
 				}
 			>
-				<UserData />
+				<UserData searchParams={searchParams} />
 			</Suspense>
 		</div>
 	);

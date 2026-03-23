@@ -23,13 +23,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         <DashboardSidebar />
         <SidebarInset>
           <header className="flex h-14 items-center gap-3 border-b border-surface-elevated px-6">
-            <SidebarTrigger className="-ml-2" />
-            <Separator orientation="vertical" className="h-5" />
-            <p className="text-xs uppercase tracking-[0.22em] text-muted-foreground">
-              Admin Panel
-            </p>
+            <SidebarTrigger className="-ml-2 text-white" />
+          
+           
           </header>
-          <main className="flex-1 px-6 py-8 lg:px-10">{children}</main>
+          <main className="flex-1 px-6 ">{children}</main>
         </SidebarInset>
       </TooltipProvider>
     </SidebarProvider>

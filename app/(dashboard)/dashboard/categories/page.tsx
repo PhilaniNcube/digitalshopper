@@ -1,9 +1,13 @@
 import { Suspense } from "react";
 import CategoryData from "@/components/dashboard/categories/category-data";
 
-export default function DashboardCategoriesPage() {
+type DashboardCategoriesPageProps = {
+	searchParams: Promise<Record<string, string | string[] | undefined>>;
+};
+
+export default function DashboardCategoriesPage({ searchParams }: DashboardCategoriesPageProps) {
 	return (
-		<div className="container py-8">
+		<div className="container">
 			<Suspense
 				fallback={
 					<div className="space-y-6">
@@ -14,7 +18,7 @@ export default function DashboardCategoriesPage() {
 					</div>
 				}
 			>
-				<CategoryData />
+				<CategoryData searchParams={searchParams} />
 			</Suspense>
 		</div>
 	);

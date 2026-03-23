@@ -1,7 +1,11 @@
 import { Suspense } from "react";
 import OrderData from "@/components/dashboard/orders/order-data";
 
-export default function DashboardOrdersPage() {
+type DashboardOrdersPageProps = {
+	searchParams: Promise<Record<string, string | string[] | undefined>>;
+};
+
+export default function DashboardOrdersPage({ searchParams }: DashboardOrdersPageProps) {
 	return (
 		<div className="container py-8">
 			<Suspense
@@ -14,7 +18,7 @@ export default function DashboardOrdersPage() {
 					</div>
 				}
 			>
-				<OrderData />
+				<OrderData searchParams={searchParams} />
 			</Suspense>
 		</div>
 	);

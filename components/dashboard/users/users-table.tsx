@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import {
 	type ColumnDef,
@@ -7,10 +8,9 @@ import {
 	flexRender,
 	getCoreRowModel,
 	getFilteredRowModel,
-	getPaginationRowModel,
 	useReactTable,
 } from "@tanstack/react-table";
-import type { UserListItem } from "@/dal/queries/users";
+import type { UserListItem, UserPaginationMeta } from "@/dal/queries/users";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -97,7 +97,12 @@ const columns: ColumnDef<UserListItem>[] = [
 	},
 ];
 
-export function UsersTable({ users }: { users: UserListItem[] }) {
+type UsersTableProps = {
+	users: UserListItem[];
+	pagination: UserPaginationMeta;
+};
+
+export function UsersTable({ users, pagination }: UsersTableProps) {
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 
 	const table = useReactTable({
@@ -107,8 +112,13 @@ export function UsersTable({ users }: { users: UserListItem[] }) {
 		onColumnFiltersChange: setColumnFilters,
 		getCoreRowModel: getCoreRowModel(),
 		getFilteredRowModel: getFilteredRowModel(),
-		getPaginationRowModel: getPaginationRowModel(),
 	});
+
+	const filteredCount = table.getFilteredRowModel().rows.length;
+	const currentPage = pagination.page;
+	const totalPages = Math.max(1, pagination.totalPages);
+	const previousPageHref = `?page=${Math.max(1, currentPage - 1)}&pageSize=${pagination.pageSize}`;
+	const nextPageHref = `?page=${currentPage + 1}&pageSize=${pagination.pageSize}`;
 
 	return (
 		<div className="space-y-4">
@@ -215,28 +225,31 @@ export function UsersTable({ users }: { users: UserListItem[] }) {
 			{/* Pagination */}
 			<div className="flex items-center justify-between">
 				<p className="text-sm text-white">
-					{table.getFilteredRowModel().rows.length} user(s) total
+					{columnFilters.length > 0
+						? `${filteredCount} filtered user(s) on this page`
+						: `${pagination.totalItems} user(s) total`}
 				</p>
 				<div className="flex items-center gap-2">
-					<Button
-						variant="outline"
-						size="sm"
-						onClick={() => table.previousPage()}
-						disabled={!table.getCanPreviousPage()}
-					>
-						Previous
+					<Button variant="outline" size="sm" asChild disabled={!pagination.hasPreviousPage}>
+						<Link
+							href={previousPageHref}
+							aria-disabled={!pagination.hasPreviousPage}
+							tabIndex={pagination.hasPreviousPage ? undefined : -1}
+						>
+							Previous
+						</Link>
 					</Button>
 					<span className="text-sm text-white">
-						Page {table.getState().pagination.pageIndex + 1} of{" "}
-						{table.getPageCount()}
+						Page {currentPage} of {totalPages}
 					</span>
-					<Button
-						variant="outline"
-						size="sm"
-						onClick={() => table.nextPage()}
-						disabled={!table.getCanNextPage()}
-					>
-						Next
+					<Button variant="outline" size="sm" asChild disabled={!pagination.hasNextPage}>
+						<Link
+							href={nextPageHref}
+							aria-disabled={!pagination.hasNextPage}
+							tabIndex={pagination.hasNextPage ? undefined : -1}
+						>
+							Next
+						</Link>
 					</Button>
 				</div>
 			</div>
