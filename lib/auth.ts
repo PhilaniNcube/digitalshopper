@@ -31,7 +31,11 @@ export const auth = betterAuth({
 			});
 		},
 	},
-	trustedOrigins: [appUrl],
+	trustedOrigins: [
+		appUrl,
+		"https://www.digitalshopper.co.za",
+		"https://digitalshopper.co.za",
+	],
 	plugins: [
 		adminPlugin({
 			defaultRole: "user",
