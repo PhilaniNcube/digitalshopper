@@ -1,10 +1,16 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  reactCompiler: true,
+  cacheComponents: true,
   images: {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "wrdsrupthgeuaredfstv.supabase.co",
+        hostname: "images.unsplash.com",
+      },
+      {
+        protocol: "https",
+        hostname: "unsplash.com",
       },
       {
         protocol: "https",
@@ -12,10 +18,14 @@ const nextConfig = {
       },
       {
         protocol: "https",
-        hostname: "images.unsplash.com",
+        hostname: "syntech.co.za",
+      },
+      {
+        protocol: "https",
+        hostname: "www.syntech.co.za",
       },
     ],
   },
 };
 
-module.exports = nextConfig
+module.exports = nextConfig;
