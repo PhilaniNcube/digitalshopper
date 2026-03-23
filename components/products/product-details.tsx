@@ -27,7 +27,7 @@ export async function generateMetadata({
 		return { title: "Product Not Found | Digital Shopper" };
 	}
 
-	const price = (product.price / 100).toFixed(2);
+	const price = product.rrpIncl ?? product.price * 1.14 * 1.15;
 
 	return {
 		title: `${product.title} | Digital Shopper`,
