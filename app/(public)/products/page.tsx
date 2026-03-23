@@ -1,7 +1,19 @@
+import type { Metadata } from "next";
 import { ProductFiltersPanel } from "@/components/products/product-filters-panel";
 import { ProductGrid } from "@/components/products/product-grid";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Suspense } from "react";
+
+export const metadata: Metadata = {
+	title: "Products | Digital Shopper",
+	description:
+		"Explore our extensive catalog of tech products, computer hardware, and electronics. Filter by category, brand, and price.",
+	openGraph: {
+		title: "Products | Digital Shopper",
+		description:
+			"Explore our extensive catalog of tech products, computer hardware, and electronics.",
+	},
+};
 
 type ProductsPageProps = {
 	searchParams: Promise<Record<string, string | string[] | undefined>>;

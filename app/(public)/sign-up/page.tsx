@@ -1,6 +1,12 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { SignUpForm } from "@/components/auth/sign-up-form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+export const metadata: Metadata = {
+	title: "Create Account | Digital Shopper",
+	description: "Create a Digital Shopper account to start shopping for tech and electronics online.",
+};
 
 export default function SignUpPage() {
 	return (

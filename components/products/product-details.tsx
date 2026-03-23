@@ -13,6 +13,38 @@ import {
   type ProductWithImagesAndInventory,
 } from "@/dal/queries/products";
 import { formatCurrency } from "@/lib/utils";
+import { Metadata } from "next";
+
+export async function generateMetadata({
+	params,
+}: {
+	params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+	const { slug } = await params;
+	const product = await fetchProductBySlug(slug);
+
+	if (!product) {
+		return { title: "Product Not Found | Digital Shopper" };
+	}
+
+	const price = (product.price / 100).toFixed(2);
+
+	return {
+		title: `${product.title} | Digital Shopper`,
+		description:
+			product.shortDescription ??
+			product.summary ??
+			`Buy ${product.title} for R${price} at Digital Shopper.`,
+		openGraph: {
+			title: product.title,
+			description:
+				product.shortDescription ??
+				product.summary ??
+				`Buy ${product.title} for R${price} at Digital Shopper.`,
+			images: product.featuredImage ? [product.featuredImage] : [],
+		},
+	};
+}
 
 function getDisplayPrice(product: ProductWithImagesAndInventory) {
   return product.promoPrice ?? product.rrpIncl ?? product.price * 1.14 * 1.15;
@@ -98,8 +130,42 @@ const ProductDetails = async ({
     ([, v]) => v != null && String(v).trim() !== "",
   );
 
+  const mainImage =
+    product.images.find((i) => i.isPrimary)?.url ??
+    product.featuredImage ??
+    "/images/banner.webp";
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.title,
+    ...(product.summary && { description: product.summary }),
+    image: mainImage,
+    ...(product.supplierSku && { sku: product.supplierSku }),
+    ...(product.ean && { gtin: product.ean }),
+    ...(product.brand?.name && {
+      brand: { "@type": "Brand", name: product.brand.name },
+    }),
+    offers: {
+      "@type": "Offer",
+      url: `https://digitalshopper.co.za/products?slug=${product.slug}`,
+      priceCurrency: "ZAR",
+      price: Math.round(price),
+      availability: product.inStock
+        ? "https://schema.org/InStock"
+        : "https://schema.org/BackOrder",
+      ...(product.category?.name && {
+        itemCondition: "https://schema.org/NewCondition",
+      }),
+    },
+  };
+
   return (
     <div className="mx-auto w-full max-w-7xl px-4 py-10 lg:px-8">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       {/* ── Breadcrumb ── */}
       <nav className="mb-8 flex items-center gap-2 text-xs text-slate-500">
         <Link href="/products" className="transition hover:text-white">

@@ -1,4 +1,10 @@
+import type { Metadata } from "next";
 import { Separator } from "@/components/ui/separator"
+
+export const metadata: Metadata = {
+	title: "Refund & Cancellation Policy | Digital Shopper",
+	description: "Details regarding Digital Shopper repairs, return authorizations, restocking fees, and cancellation terms.",
+};
 
 export default function ReturnsPolicyPage() {
   return (

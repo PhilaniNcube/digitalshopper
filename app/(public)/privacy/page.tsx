@@ -1,4 +1,10 @@
+import type { Metadata } from "next";
 import { Separator } from "@/components/ui/separator"
+
+export const metadata: Metadata = {
+	title: "Privacy Policy | Digital Shopper",
+	description: "Learn how Digital Shopper collects, uses, and protects your personal data.",
+};
 
 export default function PrivacyPolicyPage() {
   return (

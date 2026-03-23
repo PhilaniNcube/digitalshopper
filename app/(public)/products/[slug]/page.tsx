@@ -1,5 +1,9 @@
+import type { Metadata } from "next";
+import { fetchProductBySlug } from "@/dal/queries/products";
 import ProductDetails from "@/components/products/product-details";
 import { Suspense } from "react";
+
+
 
 function ProductDetailsSkeleton() {
   return (

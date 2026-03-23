@@ -1,6 +1,12 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { ClearCartOnSuccess } from "@/components/cart/clear-cart-on-success";
 import { Button } from "@/components/ui/button";
+
+export const metadata: Metadata = {
+	title: "Order Confirmed | Digital Shopper",
+	description: "Your payment was received and your order is confirmed.",
+};
 
 export default function OrderSuccessPage() {
 	return (

@@ -1,6 +1,12 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { SignInForm } from "@/components/auth/sign-in-form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+export const metadata: Metadata = {
+	title: "Sign In | Digital Shopper",
+	description: "Sign in to your Digital Shopper account to manage orders and checkout faster.",
+};
 
 export default function SignInPage() {
 	return (

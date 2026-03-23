@@ -1,4 +1,10 @@
+import type { Metadata } from "next";
 import { Separator } from "@/components/ui/separator"
+
+export const metadata: Metadata = {
+	title: "Shipping Policy | Digital Shopper",
+	description: "Information about Digital Shopper shipping methods, rates, delivery times, and order tracking.",
+};
 
 export default function ShippingPolicyPage() {
   return (

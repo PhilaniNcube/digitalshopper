@@ -1,5 +1,11 @@
+import type { Metadata } from "next";
 import { ForgotPasswordForm } from "@/components/auth/forgot-password-form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+export const metadata: Metadata = {
+	title: "Forgot Password | Digital Shopper",
+	description: "Request a password reset link for your Digital Shopper account.",
+};
 
 export default function ForgotPasswordPage() {
 	return (
