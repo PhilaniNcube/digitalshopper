@@ -1,5 +1,6 @@
 import "server-only";
 
+import { cacheLife } from "next/cache";
 import { and, asc, desc, eq, ilike, inArray, like, or, sql, type SQL } from "drizzle-orm";
 import {
 	brands,
@@ -194,6 +195,9 @@ function normalizeSearchTerm(value?: string) {
 }
 
 export async function fetchProductBySlug(slug: string): Promise<ProductWithImagesAndInventory | null> {
+	"use cache";
+	cacheLife("hours");
+
 	const product = await db.query.products.findFirst({
 		where: eq(products.slug, slug),
 		with: {

@@ -1,6 +1,3 @@
-"use cache";
-
-import { cacheLife } from "next/cache";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -75,8 +72,6 @@ const ProductDetails = async ({
 }: {
   searchParamsPromise: Promise<{ slug: string }>;
 }) => {
-  cacheLife("hours");
-
   const { slug } = await searchParamsPromise;
   const product = await fetchProductBySlug(slug);
 
@@ -132,7 +127,7 @@ const ProductDetails = async ({
   };
 
   return (
-    <div className="mx-auto w-full max-w-7xl px-4 py-10 lg:px-8">
+    <>
       <TrackViewItem product={cartProduct} />
       <script
         type="application/ld+json"
@@ -303,7 +298,7 @@ const ProductDetails = async ({
           />
         </section>
       )}
-    </div>
+    </>
   );
 };
 

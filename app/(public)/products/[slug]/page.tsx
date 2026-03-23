@@ -36,7 +36,7 @@ export async function generateMetadata({
 
 function ProductDetailsSkeleton() {
   return (
-    <div className="mx-auto w-full max-w-7xl px-4 py-10 lg:px-8 animate-pulse">
+    <div className="animate-pulse">
       {/* Breadcrumb */}
       <div className="mb-8 flex items-center gap-2">
         <div className="h-3 w-16 rounded bg-white/8" />
@@ -88,14 +88,16 @@ function ProductDetailsSkeleton() {
   );
 }
 
-const ProductPage = ({ params }: { params: Promise<{ slug: string }> }) => {
+export default function ProductPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
   return (
-    <div>
-    <Suspense fallback={<ProductDetailsSkeleton />}>
-      <ProductDetails searchParamsPromise={params} />;
-    </Suspense>
-  </div>
-);
-};
-
-export default ProductPage;
+    <div className="mx-auto w-full max-w-7xl px-4 py-10 lg:px-8">
+      <Suspense fallback={<ProductDetailsSkeleton />}>
+        <ProductDetails searchParamsPromise={params} />
+      </Suspense>
+    </div>
+  );
+}
