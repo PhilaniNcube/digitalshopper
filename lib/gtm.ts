@@ -15,7 +15,7 @@ function toGtmItem(product: CartProduct, quantity = 1): GtmItem {
 		item_id: product.id,
 		item_name: product.title,
 		item_category: product.category,
-		price: product.price / 100,
+		price: product.price,
 		quantity,
 	};
 }
@@ -25,7 +25,7 @@ export function trackViewItem(product: CartProduct) {
 		event: "view_item",
 		ecommerce: {
 			currency: "ZAR",
-			value: product.price / 100,
+			value: product.price,
 			items: [toGtmItem(product)],
 		},
 	});
@@ -52,7 +52,7 @@ export function trackAddToCart(product: CartProduct) {
 		event: "add_to_cart",
 		ecommerce: {
 			currency: "ZAR",
-			value: product.price / 100,
+			value: product.price,
 			items: [toGtmItem(product)],
 		},
 	});
@@ -63,7 +63,7 @@ export function trackBeginCheckout(items: CartLine[], value: number) {
 		event: "begin_checkout",
 		ecommerce: {
 			currency: "ZAR",
-			value: value / 100,
+			value: value,
 			items: items.map((line) =>
 				toGtmItem(line.product, line.quantity),
 			),
@@ -82,8 +82,8 @@ export function trackPurchase(
 		ecommerce: {
 			transaction_id: transactionId,
 			currency: "ZAR",
-			value: value / 100,
-			shipping: shipping / 100,
+			value: value,
+			shipping: shipping,
 			items: items.map((line) =>
 				toGtmItem(line.product, line.quantity),
 			),
