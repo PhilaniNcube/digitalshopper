@@ -9,7 +9,7 @@ import { admin as adminPlugin } from "better-auth/plugins";
 const appUrl =
 	process.env.BETTER_AUTH_URL ??
 	process.env.NEXT_PUBLIC_SITE_URL ??
-	"http://localhost:3000";
+	"https://www.digitalshopper.co.za";
 
 export const auth = betterAuth({
 	baseURL: appUrl,
@@ -31,6 +31,7 @@ export const auth = betterAuth({
 			});
 		},
 	},
+	trustedOrigins: [appUrl],
 	plugins: [
 		adminPlugin({
 			defaultRole: "user",
