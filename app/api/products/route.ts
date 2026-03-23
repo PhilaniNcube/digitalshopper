@@ -49,7 +49,7 @@ export async function GET() {
       // const salePrice = row.rrpIncl ? row.rrpIncl : (row.price * 1.15) * 1.15;
       const regularPrice = row.promoPrice
         ? row.rrpIncl
-        : row.price * 1.15 * 1.15;
+        : row.rrpIncl;
       const title = escapeXml(row.title);
       const description = escapeXml((row.summary ?? row.title).slice(0, 5000));
       const link = `${SITE_URL}/products/${row.slug}`;

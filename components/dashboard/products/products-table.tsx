@@ -1,0 +1,228 @@
+"use client";
+
+import Link from "next/link";
+import { useState } from "react";
+import {
+	type ColumnDef,
+	type ColumnFiltersState,
+	flexRender,
+	getCoreRowModel,
+	getFilteredRowModel,
+	useReactTable,
+} from "@tanstack/react-table";
+import type { ProductListItem, ProductPaginationMeta } from "@/dal/queries/products";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
+import {
+	Table,
+	TableBody,
+	TableCell,
+	TableHead,
+	TableHeader,
+	TableRow,
+} from "@/components/ui/table";
+import { formatCurrency } from "@/lib/utils";
+
+
+const columns: ColumnDef<ProductListItem>[] = [
+	{
+		accessorKey: "title",
+		header: "Product",
+        cell: ({ row }) => {
+            const product = row.original;
+            return (
+                <div className="flex items-center gap-2">
+                    <p className='max-w-[28ch] truncate'>{product.title}</p>
+                </div>
+            );
+        }
+	},
+	{
+		accessorKey: "supplierSku",
+		header: "SKU",
+	},
+	{
+		id: "brand",
+		header: "Brand",
+		cell: ({ row }) => <p className='max-w-[28ch] truncate'>{row.original.brand?.name ?? "Unassigned"}</p>,
+		filterFn: (row, _columnId, filterValue) => {
+			const brandName = row.original.brand?.name?.toLowerCase() ?? "";
+			return brandName.includes((filterValue as string).toLowerCase());
+		},
+	},
+	{
+		id: "category",
+		header: "Category",
+		cell: ({ row }) => <p className='max-w-[23ch] truncate'>{row.original.category?.name ?? "Unassigned"}</p>,
+	},
+	{
+		accessorKey: "price",
+		header: "Price",
+		cell: ({ row }) => formatCurrency(row.original.price),
+	},
+	{
+		accessorKey: "totalStock",
+		header: "Stock",
+	},
+	{
+		accessorKey: "active",
+		header: "Active",
+		cell: ({ row }) => (
+			<Badge variant={row.original.active ? "default" : "secondary"}>
+				{row.original.active ? "Active" : "Hidden"}
+			</Badge>
+		),
+		filterFn: (row, columnId, filterValue) => {
+			if (filterValue === "all") return true;
+			return String(row.getValue<boolean>(columnId)) === filterValue;
+		},
+	},
+	{
+		accessorKey: "inStock",
+		header: "Availability",
+		cell: ({ row }) => (
+			<Badge variant={row.original.inStock ? "default" : "outline"}>
+				{row.original.inStock ? "In stock" : "Out of stock"}
+			</Badge>
+		),
+		filterFn: (row, columnId, filterValue) => {
+			if (filterValue === "all") return true;
+			return String(row.getValue<boolean>(columnId)) === filterValue;
+		},
+	},
+];
+
+type ProductsTableProps = {
+	products: ProductListItem[];
+	pagination: ProductPaginationMeta;
+};
+
+export function ProductsTable({ products, pagination }: ProductsTableProps) {
+	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+
+	const table = useReactTable({
+		data: products,
+		columns,
+		state: { columnFilters },
+		onColumnFiltersChange: setColumnFilters,
+		getCoreRowModel: getCoreRowModel(),
+		getFilteredRowModel: getFilteredRowModel(),
+	});
+
+	const filteredCount = table.getFilteredRowModel().rows.length;
+	const currentPage = pagination.page;
+	const totalPages = Math.max(1, pagination.totalPages);
+	const previousPageHref = `?page=${Math.max(1, currentPage - 1)}&pageSize=${pagination.pageSize}`;
+	const nextPageHref = `?page=${currentPage + 1}&pageSize=${pagination.pageSize}`;
+
+	return (
+		<div className="space-y-4">
+			<div className="flex flex-wrap items-center gap-3">
+				<Input
+					placeholder="Search by product..."
+					value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
+					onChange={(event) => table.getColumn("title")?.setFilterValue(event.target.value)}
+					className="max-w-xs h-12 placeholder:text-slate-100"
+				/>
+				<Input
+					placeholder="Search by SKU..."
+					value={(table.getColumn("supplierSku")?.getFilterValue() as string) ?? ""}
+					onChange={(event) => table.getColumn("supplierSku")?.setFilterValue(event.target.value)}
+					className="max-w-xs h-12 placeholder:text-slate-100"
+				/>
+				<Select
+					value={(table.getColumn("active")?.getFilterValue() as string) ?? "all"}
+					onValueChange={(value) => table.getColumn("active")?.setFilterValue(value)}
+				>
+					<SelectTrigger className="max-w-xs h-12! text-slate-100">
+						<SelectValue placeholder="Visibility" />
+					</SelectTrigger>
+					<SelectContent>
+						<SelectItem value="all">All visibility</SelectItem>
+						<SelectItem value="true">Active</SelectItem>
+						<SelectItem value="false">Hidden</SelectItem>
+					</SelectContent>
+				</Select>
+				<Select
+					value={(table.getColumn("inStock")?.getFilterValue() as string) ?? "all"}
+					onValueChange={(value) => table.getColumn("inStock")?.setFilterValue(value)}
+				>
+					<SelectTrigger className="max-w-xs h-12! text-slate-100">
+						<SelectValue placeholder="Stock" />
+					</SelectTrigger>
+					<SelectContent>
+						<SelectItem value="all">All stock states</SelectItem>
+						<SelectItem value="true">In stock</SelectItem>
+						<SelectItem value="false">Out of stock</SelectItem>
+					</SelectContent>
+				</Select>
+			</div>
+
+			<Table className="text-slate-100">
+				<TableHeader>
+					{table.getHeaderGroups().map((headerGroup) => (
+						<TableRow key={headerGroup.id}>
+							{headerGroup.headers.map((header) => (
+								<TableHead key={header.id} className="text-slate-100">
+									{header.isPlaceholder
+										? null
+										: flexRender(header.column.columnDef.header, header.getContext())}
+								</TableHead>
+							))}
+						</TableRow>
+					))}
+				</TableHeader>
+				<TableBody>
+					{table.getRowModel().rows.length ? (
+						table.getRowModel().rows.map((row) => (
+							<TableRow key={row.id}>
+								{row.getVisibleCells().map((cell) => (
+									<TableCell key={cell.id}>
+										{flexRender(cell.column.columnDef.cell, cell.getContext())}
+									</TableCell>
+								))}
+							</TableRow>
+						))
+					) : (
+						<TableRow>
+							<TableCell colSpan={columns.length} className="h-24 text-center text-white">
+								No products found.
+							</TableCell>
+						</TableRow>
+					)}
+				</TableBody>
+			</Table>
+
+			<div className="flex items-center justify-between">
+				<p className="text-sm text-white">
+					{columnFilters.length > 0
+						? `${filteredCount} filtered product(s) on this page`
+						: `${pagination.totalItems} product(s) total`}
+				</p>
+				<div className="flex items-center gap-2">
+					<Button variant="outline" size="sm" asChild disabled={!pagination.hasPreviousPage}>
+						<Link href={previousPageHref} aria-disabled={!pagination.hasPreviousPage} tabIndex={pagination.hasPreviousPage ? undefined : -1}>
+							Previous
+						</Link>
+					</Button>
+					<span className="text-sm text-white">
+						Page {currentPage} of {totalPages}
+					</span>
+					<Button variant="outline" size="sm" asChild disabled={!pagination.hasNextPage}>
+						<Link href={nextPageHref} aria-disabled={!pagination.hasNextPage} tabIndex={pagination.hasNextPage ? undefined : -1}>
+							Next
+						</Link>
+					</Button>
+				</div>
+			</div>
+		</div>
+	);
+}

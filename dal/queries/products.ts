@@ -13,6 +13,7 @@ import {
 	products,
 } from "@/db/schema";
 import { db } from "@/lib/db";
+import { requireAdmin } from "@/lib/session";
 
 const DEFAULT_PAGE = 1;
 const DEFAULT_PAGE_SIZE = 20;
@@ -235,6 +236,32 @@ export async function fetchProductById(id: string): Promise<ProductWithImagesAnd
 
 export async function fetchProducts(options: ProductPaginationOptions = {}): Promise<PaginatedProductsResult> {
 	return fetchPaginatedProducts(ACTIVE_PRODUCTS_FILTER, options);
+}
+
+export async function getAdminProducts(
+	options: ProductPaginationOptions = {},
+): Promise<PaginatedProductsResult> {
+	await requireAdmin();
+
+	const pagination = normalizePagination(options);
+
+	const [items, totalItems] = await Promise.all([
+		db.query.products.findMany({
+			with: {
+				brand: true,
+				category: true,
+			},
+			orderBy: (product) => [desc(product.createdAt), asc(product.title)],
+			limit: pagination.pageSize,
+			offset: pagination.offset,
+		}),
+		countProducts(),
+	]);
+
+	return {
+		items: items.map(mapProductListItem),
+		pagination: buildPaginationMeta(totalItems, pagination),
+	};
 }
 
 export async function fetchCatalogProducts(filters: ProductCatalogFilters = {}): Promise<PaginatedProductsResult> {

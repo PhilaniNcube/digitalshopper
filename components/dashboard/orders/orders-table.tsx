@@ -1,0 +1,231 @@
+"use client";
+
+import { useState } from "react";
+import {
+	type ColumnDef,
+	type ColumnFiltersState,
+	flexRender,
+	getCoreRowModel,
+	getFilteredRowModel,
+	getPaginationRowModel,
+	useReactTable,
+} from "@tanstack/react-table";
+import type { OrderListItem } from "@/dal/queries/orders";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
+import {
+	Table,
+	TableBody,
+	TableCell,
+	TableHead,
+	TableHeader,
+	TableRow,
+} from "@/components/ui/table";
+
+const statusVariant: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
+	paid: "default",
+	pending: "outline",
+	failed: "destructive",
+	cancelled: "secondary",
+};
+
+function formatCurrency(amount: number, currency: string) {
+	return new Intl.NumberFormat("en-ZA", {
+		style: "currency",
+		currency,
+	}).format(amount / 100);
+}
+
+const columns: ColumnDef<OrderListItem>[] = [
+	{
+		accessorKey: "firstName",
+		header: "Customer",
+		cell: ({ row }) => {
+			return `${row.original.firstName} ${row.original.lastName}`;
+		},
+		filterFn: (row, _columnId, filterValue) => {
+			const fullName = `${row.original.firstName} ${row.original.lastName}`.toLowerCase();
+			return fullName.includes((filterValue as string).toLowerCase());
+		},
+	},
+	{
+		accessorKey: "email",
+		header: "Email",
+	},
+	{
+		accessorKey: "total",
+		header: "Total",
+		cell: ({ row }) => formatCurrency(row.original.total, row.original.currency),
+	},
+	{
+		accessorKey: "status",
+		header: "Status",
+		cell: ({ row }) => {
+			const status = row.getValue<string>("status");
+			return (
+				<Badge variant={statusVariant[status] ?? "secondary"}>
+					{status}
+				</Badge>
+			);
+		},
+		filterFn: (row, columnId, filterValue) => {
+			if (filterValue === "all") return true;
+			return row.getValue<string>(columnId) === filterValue;
+		},
+	},
+	{
+		accessorKey: "city",
+		header: "City",
+	},
+	{
+		accessorKey: "province",
+		header: "Province",
+	},
+	{
+		accessorKey: "createdAt",
+		header: "Date",
+		cell: ({ row }) => {
+			const date = row.getValue<Date>("createdAt");
+			return new Date(date).toLocaleDateString();
+		},
+	},
+];
+
+export function OrdersTable({ orders }: { orders: OrderListItem[] }) {
+	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+
+	const table = useReactTable({
+		data: orders,
+		columns,
+		state: { columnFilters },
+		onColumnFiltersChange: setColumnFilters,
+		getCoreRowModel: getCoreRowModel(),
+		getFilteredRowModel: getFilteredRowModel(),
+		getPaginationRowModel: getPaginationRowModel(),
+	});
+
+	return (
+		<div className="space-y-4">
+			{/* Filters */}
+			<div className="flex flex-wrap items-center gap-3">
+				<Input
+					placeholder="Search by customer..."
+					value={(table.getColumn("firstName")?.getFilterValue() as string) ?? ""}
+					onChange={(e) =>
+						table.getColumn("firstName")?.setFilterValue(e.target.value)
+					}
+					className="max-w-xs h-12 placeholder:text-slate-100"
+				/>
+				<Input
+					placeholder="Search by email..."
+					value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
+					onChange={(e) =>
+						table.getColumn("email")?.setFilterValue(e.target.value)
+					}
+					className="max-w-xs h-12 placeholder:text-slate-100"
+				/>
+				<Select
+					value={
+						(table.getColumn("status")?.getFilterValue() as string) ?? "all"
+					}
+					onValueChange={(value) =>
+						table.getColumn("status")?.setFilterValue(value)
+					}
+				>
+					<SelectTrigger className="max-w-xs h-12! text-slate-100">
+						<SelectValue placeholder="Status" />
+					</SelectTrigger>
+					<SelectContent>
+						<SelectItem value="all">All statuses</SelectItem>
+						<SelectItem value="pending">Pending</SelectItem>
+						<SelectItem value="paid">Paid</SelectItem>
+						<SelectItem value="failed">Failed</SelectItem>
+						<SelectItem value="cancelled">Cancelled</SelectItem>
+					</SelectContent>
+				</Select>
+			</div>
+
+			{/* Table */}
+			<Table className="text-slate-100">
+				<TableHeader>
+					{table.getHeaderGroups().map((headerGroup) => (
+						<TableRow key={headerGroup.id}>
+							{headerGroup.headers.map((header) => (
+								<TableHead key={header.id} className="text-slate-100">
+									{header.isPlaceholder
+										? null
+										: flexRender(
+												header.column.columnDef.header,
+												header.getContext(),
+											)}
+								</TableHead>
+							))}
+						</TableRow>
+					))}
+				</TableHeader>
+				<TableBody>
+					{table.getRowModel().rows.length ? (
+						table.getRowModel().rows.map((row) => (
+							<TableRow key={row.id}>
+								{row.getVisibleCells().map((cell) => (
+									<TableCell key={cell.id}>
+										{flexRender(
+											cell.column.columnDef.cell,
+											cell.getContext(),
+										)}
+									</TableCell>
+								))}
+							</TableRow>
+						))
+					) : (
+						<TableRow>
+							<TableCell
+								colSpan={columns.length}
+								className="h-24 text-center text-white"
+							>
+								No orders found.
+							</TableCell>
+						</TableRow>
+					)}
+				</TableBody>
+			</Table>
+
+			{/* Pagination */}
+			<div className="flex items-center justify-between">
+				<p className="text-sm text-white">
+					{table.getFilteredRowModel().rows.length} order(s) total
+				</p>
+				<div className="flex items-center gap-2">
+					<Button
+						variant="outline"
+						size="sm"
+						onClick={() => table.previousPage()}
+						disabled={!table.getCanPreviousPage()}
+					>
+						Previous
+					</Button>
+					<span className="text-sm text-white">
+						Page {table.getState().pagination.pageIndex + 1} of{" "}
+						{table.getPageCount()}
+					</span>
+					<Button
+						variant="outline"
+						size="sm"
+						onClick={() => table.nextPage()}
+						disabled={!table.getCanNextPage()}
+					>
+						Next
+					</Button>
+				</div>
+			</div>
+		</div>
+	);
+}
