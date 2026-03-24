@@ -1,10 +1,7 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 
-const currencyFormatter = new Intl.NumberFormat("en-ZA", {
-  style: "currency",
-  currency: "ZAR",
-})
+
 
 const htmlNamedEntities: Record<string, string> = {
   amp: "&",
@@ -20,7 +17,10 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function formatCurrency(value: number) {
-  return currencyFormatter.format(value)
+  return new Intl.NumberFormat("en-ZA", {
+    style: "currency",
+    currency: "ZAR",
+  }).format(value)
 }
 
 export function decodeHtmlEntities(value: string) {

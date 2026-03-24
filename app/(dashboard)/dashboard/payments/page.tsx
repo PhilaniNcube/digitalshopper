@@ -1,10 +1,25 @@
-import { DashboardRouteStub } from "@/components/dashboard/dashboard-route-stub";
+import { Suspense } from "react";
+import PaymentsData from "@/components/dashboard/payments/payments-data";
 
-export default function DashboardPaymentsPage() {
+type DashboardPaymentsPageProps = {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+};
+
+export default function DashboardPaymentsPage({ searchParams }: DashboardPaymentsPageProps) {
   return (
-    <DashboardRouteStub
-      title="Payments"
-      description="Payment operations and reconciliation tools will live here."
-    />
+    <div className="container">
+      <Suspense
+        fallback={
+          <div className="space-y-6">
+            <div>
+              <h1 className="text-2xl font-bold tracking-tight">Payments</h1>
+              <p className="text-white">Loading payments...</p>
+            </div>
+          </div>
+        }
+      >
+        <PaymentsData searchParams={searchParams} />
+      </Suspense>
+    </div>
   );
 }

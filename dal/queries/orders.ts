@@ -1,6 +1,6 @@
 import "server-only";
 
-import { count, desc } from "drizzle-orm";
+import { count, desc, eq, inArray, type SQL } from "drizzle-orm";
 import { orders } from "@/db/schema";
 import { db } from "@/lib/db";
 import { requireAdmin } from "@/lib/session";
@@ -25,38 +25,89 @@ export type PaginatedOrdersResult = {
 	pagination: OrderPaginationMeta;
 };
 
+type OrderPaginationOptions = {
+	page?: number;
+	pageSize?: number;
+};
+
+const SHIPPING_ORDER_FILTER = eq(orders.status, "paid");
+
+const PAYMENT_ORDER_FILTER = inArray(orders.status, ["pending", "paid", "failed"]);
+
+function normalizePagination(options: OrderPaginationOptions = {}) {
+	const rawPage = Number(options.page ?? DEFAULT_PAGE);
+	const rawPageSize = Number(options.pageSize ?? DEFAULT_PAGE_SIZE);
+
+	const page = Number.isFinite(rawPage) && rawPage > 0 ? Math.floor(rawPage) : DEFAULT_PAGE;
+	const pageSize = Number.isFinite(rawPageSize) && rawPageSize > 0
+		? Math.min(Math.floor(rawPageSize), MAX_PAGE_SIZE)
+		: DEFAULT_PAGE_SIZE;
+
+	return {
+		page,
+		pageSize,
+		offset: (page - 1) * pageSize,
+	};
+}
+
+function buildPaginationMeta(totalItems: number, page: number, pageSize: number): OrderPaginationMeta {
+	const totalPages = Math.ceil(totalItems / pageSize);
+
+	return {
+		page,
+		pageSize,
+		totalItems,
+		totalPages,
+		hasPreviousPage: page > 1,
+		hasNextPage: page < totalPages,
+	};
+}
+
+async function getPaginatedOrders(
+	filter: SQL<unknown> | undefined,
+	options: OrderPaginationOptions = {},
+): Promise<PaginatedOrdersResult> {
+	await requireAdmin();
+
+	const pagination = normalizePagination(options);
+
+	const ordersQuery = db
+		.select()
+		.from(orders)
+		.orderBy(desc(orders.createdAt))
+		.limit(pagination.pageSize)
+		.offset(pagination.offset);
+
+	const totalQuery = db.select({ total: count() }).from(orders);
+
+	const [items, [{ total }]] = await Promise.all([
+		filter ? ordersQuery.where(filter) : ordersQuery,
+		filter ? totalQuery.where(filter) : totalQuery,
+	]);
+
+	return {
+		items,
+		pagination: buildPaginationMeta(total, pagination.page, pagination.pageSize),
+	};
+}
+
 export async function getOrders(
 	page = DEFAULT_PAGE,
 	pageSize = DEFAULT_PAGE_SIZE,
 ): Promise<PaginatedOrdersResult> {
-	await requireAdmin();
+	return getPaginatedOrders(undefined, { page, pageSize });
+}
 
-	const safePage = Math.max(1, Math.floor(page));
-	const safePageSize = Math.max(1, Math.min(Math.floor(pageSize), MAX_PAGE_SIZE));
-	const offset = (safePage - 1) * safePageSize;
+export async function getShippingOrders(
+	page = DEFAULT_PAGE,
+	pageSize = DEFAULT_PAGE_SIZE,
+): Promise<PaginatedOrdersResult> {
+	return getPaginatedOrders(SHIPPING_ORDER_FILTER, { page, pageSize });
+}
 
-	const [items, [{ total }]] = await Promise.all([
-		db
-			.select()
-			.from(orders)
-			.orderBy(desc(orders.createdAt))
-			.limit(safePageSize)
-			.offset(offset),
-		db.select({ total: count() }).from(orders),
-	]);
-
-	const totalItems = total;
-	const totalPages = Math.ceil(totalItems / safePageSize);
-
-	return {
-		items,
-		pagination: {
-			page: safePage,
-			pageSize: safePageSize,
-			totalItems,
-			totalPages,
-			hasPreviousPage: safePage > 1,
-			hasNextPage: safePage < totalPages,
-		},
-	};
+export async function getPaymentOrders(
+	page = DEFAULT_PAGE,
+	pageSize = DEFAULT_PAGE_SIZE,
+): Promise<PaginatedOrdersResult> {
+	return getPaginatedOrders(PAYMENT_ORDER_FILTER, { page, pageSize });
 }

@@ -208,7 +208,7 @@ export function ProductsTable({ products, pagination }: ProductsTableProps) {
 						: `${pagination.totalItems} product(s) total`}
 				</p>
 				<div className="flex items-center gap-2">
-					<Button variant="outline" size="sm" asChild disabled={!pagination.hasPreviousPage}>
+					<Button className='bg-primary-strong text-white! border-primary-strong hover:border-white!' size="sm" asChild disabled={!pagination.hasPreviousPage}>
 						<Link href={previousPageHref} aria-disabled={!pagination.hasPreviousPage} tabIndex={pagination.hasPreviousPage ? undefined : -1}>
 							Previous
 						</Link>
@@ -216,7 +216,7 @@ export function ProductsTable({ products, pagination }: ProductsTableProps) {
 					<span className="text-sm text-white">
 						Page {currentPage} of {totalPages}
 					</span>
-					<Button variant="outline" size="sm" asChild disabled={!pagination.hasNextPage}>
+					<Button className='bg-primary-strong text-white! border-primary-strong hover:border-white!' size="sm" asChild disabled={!pagination.hasNextPage}>
 						<Link href={nextPageHref} aria-disabled={!pagination.hasNextPage} tabIndex={pagination.hasNextPage ? undefined : -1}>
 							Next
 						</Link>

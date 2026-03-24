@@ -29,6 +29,7 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table";
+import { formatCurrency } from "@/lib/utils";
 
 const statusVariant: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
 	paid: "default",
@@ -37,12 +38,6 @@ const statusVariant: Record<string, "default" | "secondary" | "destructive" | "o
 	cancelled: "secondary",
 };
 
-function formatCurrency(amount: number, currency: string) {
-	return new Intl.NumberFormat("en-ZA", {
-		style: "currency",
-		currency,
-	}).format(amount / 100);
-}
 
 const columns: ColumnDef<OrderListItem>[] = [
 	{
@@ -63,7 +58,7 @@ const columns: ColumnDef<OrderListItem>[] = [
 	{
 		accessorKey: "total",
 		header: "Total",
-		cell: ({ row }) => formatCurrency(row.original.total, row.original.currency),
+		cell: ({ row }) => formatCurrency(row.original.total),
 	},
 	{
 		accessorKey: "status",
@@ -216,7 +211,7 @@ export function OrdersTable({ orders, pagination }: OrdersTableProps) {
 						: `${pagination.totalItems} order(s) total`}
 				</p>
 				<div className="flex items-center gap-2">
-					<Button variant="outline" size="sm" asChild disabled={!pagination.hasPreviousPage}>
+					<Button className='bg-primary-strong text-white! border-primary-strong hover:border-white!' size="sm" asChild disabled={!pagination.hasPreviousPage}>
 						<Link
 							href={previousPageHref}
 							aria-disabled={!pagination.hasPreviousPage}
@@ -228,7 +223,7 @@ export function OrdersTable({ orders, pagination }: OrdersTableProps) {
 					<span className="text-sm text-white">
 						Page {currentPage} of {totalPages}
 					</span>
-					<Button variant="outline" size="sm" asChild disabled={!pagination.hasNextPage}>
+					<Button className='bg-primary-strong text-white! border-primary-strong hover:border-white!' size="sm" asChild disabled={!pagination.hasNextPage}>
 						<Link
 							href={nextPageHref}
 							aria-disabled={!pagination.hasNextPage}

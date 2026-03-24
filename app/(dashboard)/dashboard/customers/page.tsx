@@ -1,10 +1,25 @@
-import { DashboardRouteStub } from "@/components/dashboard/dashboard-route-stub";
+import { Suspense } from "react";
+import CustomersData from "@/components/dashboard/customers/customers-data";
 
-export default function DashboardCustomersPage() {
+type DashboardCustomersPageProps = {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+};
+
+export default function DashboardCustomersPage({ searchParams }: DashboardCustomersPageProps) {
   return (
-    <DashboardRouteStub
-      title="Customers"
-      description="Customer management tools will live here."
-    />
+    <div className="container">
+      <Suspense
+        fallback={
+          <div className="space-y-6">
+            <div>
+              <h1 className="text-2xl font-bold tracking-tight">Customers</h1>
+              <p className="text-white">Loading customers...</p>
+            </div>
+          </div>
+        }
+      >
+        <CustomersData searchParams={searchParams} />
+      </Suspense>
+    </div>
   );
 }
