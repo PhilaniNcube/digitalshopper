@@ -1,6 +1,6 @@
 import * as schema from "@/db/schema";
 import { db } from "@/lib/db";
-import { sendResetPasswordEmail } from "@/lib/email";
+import { sendResetPasswordEmail, sendVerificationEmail } from "@/lib/email";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { betterAuth } from "better-auth";
 import { nextCookies } from "better-auth/next-js";
@@ -23,10 +23,23 @@ export const auth = betterAuth({
 	}),
 	emailAndPassword: {
 		enabled: true,
+		requireEmailVerification: true,
 		sendResetPassword: async ({ user, url }) => {
 			void sendResetPasswordEmail({
 				to: user.email,
 				resetUrl: url,
+				userName: user.name,
+			});
+		},
+	},
+	emailVerification: {
+		sendOnSignUp: true,
+		sendOnSignIn: true,
+		autoSignInAfterVerification: false,
+		sendVerificationEmail: async ({ user, url }) => {
+			void sendVerificationEmail({
+				to: user.email,
+				verificationUrl: url,
 				userName: user.name,
 			});
 		},

@@ -33,7 +33,7 @@ export function SignUpForm() {
 			name: values.name,
 			email: values.email,
 			password: values.password,
-			callbackURL: "/",
+			callbackURL: "/sign-in?verification=verified",
 		});
 
 		if (result.error) {
@@ -41,8 +41,8 @@ export function SignUpForm() {
 			return;
 		}
 
-		toast.success("Account created. You can sign in now.");
-		router.push("/sign-in");
+		toast.success("Account created. Check your inbox to verify your email.");
+		router.push(`/sign-in?verification=sent&email=${encodeURIComponent(values.email)}`);
 		router.refresh();
 	});
 

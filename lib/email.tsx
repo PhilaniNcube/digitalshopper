@@ -1,6 +1,7 @@
 import { OrderConfirmationEmail } from "@/emails/order-confirmation-email";
 import { AdminOrderNotificationEmail } from "@/emails/admin-order-notification-email";
 import { ResetPasswordEmail } from "@/emails/reset-password-email";
+import { VerifyEmail } from "@/emails/verify-email";
 import type { StoredOrderItem } from "@/db/schema";
 import { Resend } from "resend";
 
@@ -29,6 +30,27 @@ export async function sendResetPasswordEmail({
 		to,
 		subject: "Reset your Digital Shopper password",
 		react: <ResetPasswordEmail resetUrl={resetUrl} userName={userName} />,
+	});
+}
+
+export async function sendVerificationEmail({
+	to,
+	verificationUrl,
+	userName,
+}: {
+	to: string;
+	verificationUrl: string;
+	userName?: string;
+}) {
+	if (!resend) {
+		return;
+	}
+
+	await resend.emails.send({
+		from: resendFrom,
+		to,
+		subject: "Verify your Digital Shopper account",
+		react: <VerifyEmail verificationUrl={verificationUrl} userName={userName} />,
 	});
 }
 

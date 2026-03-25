@@ -17,6 +17,9 @@ export default function SignUpPage() {
 					<CardTitle className="text-white">Create account</CardTitle>
 				</CardHeader>
 				<CardContent className="space-y-6">
+					<p className="text-sm text-muted-foreground">
+						We&apos;ll send a verification link to your email after you create your account.
+					</p>
 					<SignUpForm />
 					<p className="text-sm text-muted-foreground">
 						Already have an account? <Link href="/sign-in" className="text-foreground">Sign in</Link>
