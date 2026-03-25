@@ -66,14 +66,21 @@ export function SignInForm() {
 				typeof result.error.code === "string"
 					? result.error.code
 					: undefined;
+			const errorMessage =
+				typeof result.error === "object" &&
+				result.error !== null &&
+				"message" in result.error &&
+				typeof result.error.message === "string"
+					? result.error.message
+					: "Unable to sign in.";
 
-			if (errorCode === "EMAIL_NOT_VERIFIED" || /not verified/i.test(result.error.message)) {
+			if (errorCode === "EMAIL_NOT_VERIFIED" || /not verified/i.test(errorMessage)) {
 				setUnverifiedEmail(values.email);
 				toast.error("Verify your email before signing in. A verification link has been sent.");
 				return;
 			}
 
-			toast.error(result.error.message);
+			toast.error(errorMessage);
 			return;
 		}
 
@@ -100,7 +107,15 @@ export function SignInForm() {
 		setIsResendingVerification(false);
 
 		if (result.error) {
-			toast.error(result.error.message);
+			const errorMessage =
+				typeof result.error === "object" &&
+				result.error !== null &&
+				"message" in result.error &&
+				typeof result.error.message === "string"
+					? result.error.message
+					: "Unable to resend verification email.";
+
+			toast.error(errorMessage);
 			return;
 		}
 
