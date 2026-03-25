@@ -293,7 +293,7 @@ const ProductDetails = async ({
             Description
           </h2>
           <div
-            className="prose prose-invert prose-sm max-w-none prose-headings:font-display prose-headings:tracking-tight prose-p:text-white! prose-a:text-primary-strong! prose-strong:text-white"
+            className="prose prose-invert prose-sm max-w-none prose-headings:font-display text-white! prose-headings:tracking-tight prose-p:text-white! prose-a:text-primary-strong! prose-strong:text-white!"
             dangerouslySetInnerHTML={{ __html: product.descriptionHtml }}
           />
         </section>
