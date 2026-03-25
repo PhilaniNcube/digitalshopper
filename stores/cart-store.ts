@@ -69,7 +69,14 @@ export const useCartStore = create<CartState>()(
 				set((state) => ({
 					items: state.items.filter((item) => item.product.id !== productId),
 				})),
-			clear: () => set({ items: [], open: false }),
+			clear: () =>
+				set((state) => {
+					if (state.items.length === 0 && !state.open) {
+						return state;
+					}
+
+					return { items: [], open: false };
+				}),
 			openCart: () => set({ open: true }),
 			closeCart: () => set({ open: false }),
 			toggleCart: () => set((state) => ({ open: !state.open })),

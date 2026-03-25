@@ -109,7 +109,7 @@ export function CheckoutForm() {
             data-invalid={!!(errors.firstName || state.fieldErrors?.firstName)}
           >
             <FieldLabel htmlFor="firstName" className='text-slate-100'>First name</FieldLabel>
-            <Input id="firstName" className='h-12 rounded-none' {...register("firstName")} />
+            <Input id="firstName" className='h-12 rounded-none bg-white text-gray-900' {...register("firstName")} />
             <FieldError>
               {errors.firstName?.message ?? state.fieldErrors?.firstName?.[0]}
             </FieldError>
@@ -118,7 +118,7 @@ export function CheckoutForm() {
             data-invalid={!!(errors.lastName || state.fieldErrors?.lastName)}
           >
             <FieldLabel htmlFor="lastName" className='text-slate-100'>Last name</FieldLabel>
-            <Input id="lastName" className='h-12 rounded-none' {...register("lastName")} />
+            <Input id="lastName" className='h-12 rounded-none bg-white text-gray-900' {...register("lastName")} />
             <FieldError>
               {errors.lastName?.message ?? state.fieldErrors?.lastName?.[0]}
             </FieldError>
@@ -128,14 +128,14 @@ export function CheckoutForm() {
         <div className="grid gap-2 md:grid-cols-2">
           <Field data-invalid={!!(errors.email || state.fieldErrors?.email)}>
             <FieldLabel htmlFor="email" className='text-slate-100'>Email</FieldLabel>
-            <Input id="email" type="email" className='h-12 rounded-none' {...register("email")} />
+            <Input id="email" type="email" className='h-12 rounded-none bg-white text-gray-900' {...register("email")} />
             <FieldError>
               {errors.email?.message ?? state.fieldErrors?.email?.[0]}
             </FieldError>
           </Field>
           <Field data-invalid={!!(errors.phone || state.fieldErrors?.phone)}>
             <FieldLabel htmlFor="phone" className='text-slate-100'>Phone</FieldLabel>
-            <Input id="phone" className='h-12 rounded-none' {...register("phone")} />
+            <Input id="phone" className='h-12 rounded-none bg-white text-gray-900' {...register("phone")} />
             <FieldError>
               {errors.phone?.message ?? state.fieldErrors?.phone?.[0]}
             </FieldError>
@@ -148,7 +148,7 @@ export function CheckoutForm() {
           }
         >
           <FieldLabel htmlFor="addressLine1" className='text-slate-100'>Address line 1</FieldLabel>
-          <Input id="addressLine1" className='h-12 rounded-none' {...register("addressLine1")} />
+          <Input id="addressLine1" className='h-12 rounded-none bg-white text-gray-900' {...register("addressLine1")} />
           <FieldError>
             {errors.addressLine1?.message ??
               state.fieldErrors?.addressLine1?.[0]}
@@ -157,13 +157,13 @@ export function CheckoutForm() {
 
         <Field>
           <FieldLabel htmlFor="addressLine2" className='text-slate-100'>Address line 2</FieldLabel>
-          <Input id="addressLine2" className='h-12 rounded-none' {...register("addressLine2")} />
+          <Input id="addressLine2" className='h-12 rounded-none bg-white text-gray-900' {...register("addressLine2")} />
         </Field>
 
         <div className="grid gap-2 md:grid-cols-3">
           <Field data-invalid={!!(errors.city || state.fieldErrors?.city)}>
             <FieldLabel htmlFor="city" className='text-slate-100'>City</FieldLabel>
-            <Input id="city" className='h-12 rounded-none' {...register("city")} />
+            <Input id="city" className='h-12 rounded-none bg-white text-gray-900' {...register("city")} />
             <FieldError>
               {errors.city?.message ?? state.fieldErrors?.city?.[0]}
             </FieldError>
@@ -172,7 +172,7 @@ export function CheckoutForm() {
             data-invalid={!!(errors.province || state.fieldErrors?.province)}
           >
             <FieldLabel htmlFor="province" className='text-slate-100'>Province</FieldLabel>
-            <Input id="province" className='h-12 rounded-none' {...register("province")} />
+            <Input id="province" className='h-12 rounded-none bg-white text-gray-900' {...register("province")} />
             <FieldError>
               {errors.province?.message ?? state.fieldErrors?.province?.[0]}
             </FieldError>
@@ -183,7 +183,7 @@ export function CheckoutForm() {
             }
           >
             <FieldLabel htmlFor="postalCode" className='text-slate-100'>Postal code</FieldLabel>
-            <Input id="postalCode" className='h-12 rounded-none' {...register("postalCode")} />
+            <Input id="postalCode" className='h-12 rounded-none bg-white text-gray-900' {...register("postalCode")} />
             <FieldError>
               {errors.postalCode?.message ?? state.fieldErrors?.postalCode?.[0]}
             </FieldError>
