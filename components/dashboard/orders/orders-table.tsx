@@ -10,6 +10,7 @@ import {
 	getFilteredRowModel,
 	useReactTable,
 } from "@tanstack/react-table";
+import { DeleteOrderButton } from "@/components/dashboard/orders/delete-order-button";
 import type { OrderListItem, OrderPaginationMeta } from "@/dal/queries/orders";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -91,6 +92,15 @@ const columns: ColumnDef<OrderListItem>[] = [
 			const date = row.getValue<Date>("createdAt");
 			return new Date(date).toLocaleDateString();
 		},
+	},
+	{
+		id: "actions",
+		header: () => <div className="text-right">Actions</div>,
+		cell: ({ row }) => (
+			<div className="flex justify-end">
+				<DeleteOrderButton order={row.original} />
+			</div>
+		),
 	},
 ];
 
