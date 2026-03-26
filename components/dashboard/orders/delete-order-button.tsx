@@ -62,8 +62,7 @@ export function DeleteOrderButton({ order }: DeleteOrderButtonProps) {
 				<AlertDialogHeader>
 					<AlertDialogTitle>Delete this order?</AlertDialogTitle>
 					<AlertDialogDescription>
-						This will permanently remove the order for {customerName} and any dependent records tied to it.
-						 This action cannot be undone.
+						This will permanently remove the order for {customerName}. This action cannot be undone.
 					</AlertDialogDescription>
 				</AlertDialogHeader>
 				<AlertDialogFooter>
