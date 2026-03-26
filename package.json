@@ -6,6 +6,12 @@
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
+    "test:e2e": "playwright test",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:debug": "playwright test --debug",
+    "test:e2e:payfast": "playwright test tests/e2e/checkout/checkout-payfast.spec.ts",
+    "test:e2e:ci:payfast": "node scripts/run-playwright-ci-payfast.cjs",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "auth:generate": "npx auth@latest generate",
@@ -51,6 +57,7 @@
     "zustand": "^5.0.12"
   },
   "devDependencies": {
+    "@playwright/test": "^1.58.2",
     "@tailwindcss/postcss": "^4.2.2",
     "@types/node": "^24.5.2",
     "@types/react": "^19.2.2",

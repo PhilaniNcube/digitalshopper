@@ -37,7 +37,7 @@ export function CartSheet() {
       onOpenChange={(nextOpen) => (nextOpen ? openCart() : closeCart())}
     >
       <SheetTrigger asChild>
-        <Button className="relative">
+        <Button className="relative" aria-label="Open cart" data-testid="cart-trigger">
           <ShoppingBag className="size-4" />
 
           {count > 0 ? (
@@ -50,6 +50,7 @@ export function CartSheet() {
       <SheetContent
         side="right"
         showCloseButton={false}
+        data-testid="cart-sheet"
         className="w-full max-w-md gap-0 border-l border-white/5 bg-surface px-6 py-6 shadow-[0_0_80px_rgba(0,0,0,0.5)] sm:max-w-md"
       >
         <div className="flex h-full flex-col">
@@ -63,7 +64,7 @@ export function CartSheet() {
               </SheetDescription>
             </SheetHeader>
             <SheetClose asChild>
-              <Button size="icon" variant="ghost">
+              <Button size="icon" variant="ghost" aria-label="Close cart">
                 <X className="size-4" />
               </Button>
             </SheetClose>
@@ -98,7 +99,7 @@ export function CartSheet() {
                         <div className="flex items-center gap-2">
                           <Button
                             size="icon"
-                            
+                            aria-label={`Decrease quantity for ${item.product.title}`}
                             onClick={() => decrement(item.product.id)}
                           >
                             <Minus className="size-4" />
@@ -108,7 +109,7 @@ export function CartSheet() {
                           </span>
                           <Button
                             size="icon"
-                            
+                            aria-label={`Increase quantity for ${item.product.title}`}
                             onClick={() => increment(item.product.id)}
                           >
                             <Plus className="size-4" />
@@ -117,6 +118,7 @@ export function CartSheet() {
                         <Button
                           size="icon"
                           variant="ghost"
+                          aria-label={`Remove ${item.product.title} from cart`}
                           onClick={() => removeItem(item.product.id)}
                         >
                           <Trash2 className="size-4 text-red-300" />
