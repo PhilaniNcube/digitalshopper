@@ -1,17 +1,36 @@
+import { auth } from "@/lib/auth";
 import { syncSyntechStockUpdateFeed } from "@/lib/syntech-stock-sync";
 
-function isAuthorized(request: Request) {
+type SessionRoleUser = {
+	role?: string | string[] | null;
+};
+
+function hasAdminRole(roleValue: SessionRoleUser["role"]) {
+	const roles = Array.isArray(roleValue)
+		? roleValue
+		: typeof roleValue === "string"
+			? roleValue.split(",").map((role) => role.trim())
+			: [];
+
+	return roles.includes("admin");
+}
+
+async function isAuthorized(request: Request) {
 	const cronSecret = process.env.CRON_SECRET;
-	if (!cronSecret) {
+	const authHeader = request.headers.get("authorization");
+
+	if (cronSecret && authHeader === `Bearer ${cronSecret}`) {
 		return true;
 	}
 
-	const authHeader = request.headers.get("authorization");
-	return authHeader === `Bearer ${cronSecret}`;
+	const session = await auth.api.getSession({ headers: request.headers });
+	const roleValue = (session?.user as SessionRoleUser | undefined)?.role;
+
+	return hasAdminRole(roleValue);
 }
 
 export async function GET(request: Request) {
-	if (!isAuthorized(request)) {
+	if (!(await isAuthorized(request))) {
 		return Response.json({ ok: false, message: "Unauthorized" }, { status: 401 });
 	}
 
