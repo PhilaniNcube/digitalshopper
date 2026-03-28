@@ -1,58 +1,10 @@
 import { productSearchCache } from "@/app/(public)/products/search-params";
 import { ProductCard } from "@/components/products/product-card";
+import { ProductGridPagination } from "@/components/products/product-grid-pagination";
 import { Badge } from "@/components/ui/badge";
-import {
-	Pagination,
-	PaginationContent,
-	PaginationEllipsis,
-	PaginationItem,
-	PaginationLink,
-	PaginationNext,
-	PaginationPrevious,
-} from "@/components/ui/pagination";
 import { fetchCatalogProducts } from "@/dal/queries/products";
 import { TrackViewItemList } from "@/components/products/track-view-item-list";
 import { Boxes, PackageCheck, SearchX } from "lucide-react";
-
-function buildProductsHref({
-	q,
-	category,
-	sort,
-	stock,
-	page,
-}: {
-	q: string;
-	category: string;
-	sort: "featured" | "price-asc" | "price-desc";
-	stock: "all" | "in-stock";
-	page: number;
-}) {
-	const params = new URLSearchParams();
-
-	if (q) {
-		params.set("q", q);
-	}
-
-	if (category !== "all") {
-		params.set("category", category);
-	}
-
-	if (sort !== "featured") {
-		params.set("sort", sort);
-	}
-
-	if (stock !== "all") {
-		params.set("stock", stock);
-	}
-
-	if (page > 1) {
-		params.set("page", String(page));
-	}
-
-	const query = params.toString();
-
-	return query ? `/products?${query}` : "/products";
-}
 
 function getVisiblePages(currentPage: number, totalPages: number) {
 	if (totalPages <= 7) {
@@ -96,7 +48,7 @@ export async function ProductGrid({ searchParamsPromise }: { searchParamsPromise
 	const visiblePages = getVisiblePages(currentPage, totalPages);
 
 	return (
-		<div className="grid gap-6">
+		<div id="products-results-top" className="grid gap-6">
 			<section className="rounded-[2rem] bg-surface-low p-5 ring-1 ring-white/6 sm:p-6">
 				<div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
 					
@@ -165,41 +117,13 @@ export async function ProductGrid({ searchParamsPromise }: { searchParamsPromise
 						<p className="text-xs text-slate-400 w-full">
 							Page <span className="font-medium text-white">{currentPage}</span> of <span className="font-medium text-white">{products.pagination.totalPages}</span>
 						</p>
-						<Pagination className="mx-0 justify-start sm:justify-end">
-							<PaginationContent >
-								<PaginationItem>
-									<PaginationPrevious
-										href={buildProductsHref({ q, category, sort, stock, page: Math.max(1, currentPage - 1) })}
-										aria-disabled={!products.pagination.hasPreviousPage}
-										tabIndex={products.pagination.hasPreviousPage ? undefined : -1}
-										className={!products.pagination.hasPreviousPage ? "pointer-events-none bg-white!" : " bg-white! text-slate-200 hover:bg-surface-elevated hover:text-white"}
-									/>
-								</PaginationItem>
-								{visiblePages.map((pageItem, index) => (
-									<PaginationItem key={`${pageItem}-${index}`}>
-										{pageItem === "ellipsis" ? (
-											<PaginationEllipsis className="text-slate-500" />
-										) : (
-											<PaginationLink
-												href={buildProductsHref({ q, category, sort, stock, page: pageItem })}
-												isActive={pageItem === currentPage}
-												className={pageItem === currentPage ? "border-primary-strong bg-primary-strong text-primary-strong hover:bg-primary-strong/16 hover:text-primary-strong" : "border-white/8 bg-primary text-slate-100! hover:bg-surface-elevated hover:text-white"}
-											>
-												{pageItem}
-											</PaginationLink>
-										)}
-									</PaginationItem>
-								))}
-								<PaginationItem>
-									<PaginationNext
-										href={buildProductsHref({ q, category, sort, stock, page: Math.min(products.pagination.totalPages, currentPage + 1) })}
-										aria-disabled={!products.pagination.hasNextPage}
-										tabIndex={products.pagination.hasNextPage ? undefined : -1}
-										className={!products.pagination.hasNextPage ? "pointer-events-none opacity-40" : "border-white/8 bg-surface-high text-slate-200 hover:bg-surface-elevated hover:text-white"}
-									/>
-								</PaginationItem>
-							</PaginationContent>
-						</Pagination>
+						<ProductGridPagination
+							currentPage={currentPage}
+							totalPages={products.pagination.totalPages}
+							hasPreviousPage={products.pagination.hasPreviousPage}
+							hasNextPage={products.pagination.hasNextPage}
+							visiblePages={visiblePages}
+						/>
 					</div>
 				</section>
 			) : null}
