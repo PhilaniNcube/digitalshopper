@@ -1,9 +1,5 @@
 import { syncSyntechStockUpdateFeed } from "@/lib/syntech-stock-sync";
 
-export const runtime = "nodejs";
-export const dynamic = "force-dynamic";
-export const maxDuration = 300;
-
 function isAuthorized(request: Request) {
 	const cronSecret = process.env.CRON_SECRET;
 	if (!cronSecret) {
