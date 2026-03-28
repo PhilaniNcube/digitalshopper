@@ -40,6 +40,85 @@ To seed your `todos` table with some dummy data, run the contents of the [seed.s
 
 Please file feedback and issues over on the [Supabase GitHub org](https://github.com/supabase/supabase/issues/new/choose).
 
+## Supplier stock sync (Syntech)
+
+The project includes a dedicated stock-only sync script that pulls from the Syntech update feed and updates:
+
+- `products.totalStock`
+- `products.inStock`
+- `products.nextShipmentEta`
+- `product_inventory.quantity` per warehouse (`CPT`, `JHB`, `DBN`)
+
+### One-off run
+
+```bash
+pnpm run stock:sync
+```
+
+Useful options:
+
+```bash
+# Validate feed load without DB writes
+pnpm run stock:sync -- --dry-run
+
+# Use a local feed file
+pnpm run stock:sync -- --feed-path ./syntech-feed.json
+
+# Process a subset
+pnpm run stock:sync -- --limit 100
+```
+
+### Continuous periodic run (single process)
+
+```bash
+pnpm run stock:sync:watch
+```
+
+This runs the sync every 15 minutes. To change frequency:
+
+```bash
+pnpm run stock:sync -- --interval-minutes 5
+```
+
+### Scheduler examples
+
+Windows Task Scheduler action:
+
+```powershell
+pnpm --dir C:\Users\ncbph\Documents\Development\digitalshopper run stock:sync
+```
+
+Linux cron (every 15 minutes):
+
+```cron
+*/15 * * * * cd /path/to/digitalshopper && pnpm run stock:sync >> /var/log/digitalshopper-stock-sync.log 2>&1
+```
+
+Optional environment overrides:
+
+- `SYNTECH_STOCK_FEED_URL` (defaults to Syntech `syntech-json-update` feed)
+- `SYNTECH_STOCK_FEED_PATH` (path to a local JSON file, mainly for testing)
+
+### Vercel cron integration (every 2 days)
+
+This project includes a Vercel cron definition in `vercel.json`:
+
+- Path: `/api/cron/syntech-stock`
+- Schedule: `0 3 */2 * *` (03:00 UTC every 2 days)
+
+The route handler lives in `app/api/cron/syntech-stock/route.ts` and runs the same stock sync logic used by the CLI command.
+
+Security recommendation:
+
+1. Set a `CRON_SECRET` environment variable in Vercel.
+1. Redeploy after setting the secret.
+
+When `CRON_SECRET` is set, the route requires:
+
+- `Authorization: Bearer <CRON_SECRET>`
+
+This allows Vercel Cron to call the route securely while blocking unauthorized requests.
+
 ## More Supabase examples
 
 - [Next.js Subscription Payments Starter](https://github.com/vercel/nextjs-subscription-payments)

@@ -15,7 +15,9 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "auth:generate": "npx auth@latest generate",
-    "catalog:sync": "tsx scripts/sync-syntech-feed.ts"
+    "catalog:sync": "tsx scripts/sync-syntech-feed.ts",
+    "stock:sync": "tsx scripts/sync-syntech-stock.ts",
+    "stock:sync:watch": "tsx scripts/sync-syntech-stock.ts --interval-minutes=15"
   },
   "dependencies": {
     "@better-auth/drizzle-adapter": "^1.5.5",
