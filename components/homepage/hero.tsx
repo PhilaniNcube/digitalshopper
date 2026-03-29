@@ -124,7 +124,7 @@ export function Hero() {
                 <div className="absolute inset-x-[9%] bottom-[16%] h-0.5 bg-[linear-gradient(90deg,transparent,rgba(255,231,204,0.45),transparent)] blur-[1px]" />
                 <div className="absolute inset-x-[8%] bottom-[8%] h-[18%] rounded-t-[40%] bg-[linear-gradient(180deg,rgba(110,76,48,0.05),rgba(110,76,48,0.16))]" />
                 <Image
-                  src="/images/banner.webp"
+                  src="/images/tech.jpg"
                   alt="Featured wearable technology selection"
                   width={2048}
                   height={1152}

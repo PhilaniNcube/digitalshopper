@@ -65,7 +65,7 @@ const FeaturedCategories = () => {
                   className="relative block h-full overflow-hidden border group rounded-xl bg-zinc-900 border-border/50"
                 >
                     <Image
-                        src="https://images.unsplash.com/photo-1650785652040-5a2fc88ce902?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                        src="/images/gizzu-news.jpg"
                         alt="Power"
                         fill
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
