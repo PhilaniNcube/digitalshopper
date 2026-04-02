@@ -4,6 +4,7 @@ import { formatCurrency } from "@/lib/utils";
 import { ShoppingCart, Star } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { ViewTransition } from "react";
 
 function getDisplayPrice(product: ProductListItem) {
   return product.promoPrice ?? product.rrpIncl ?? product.price * 1.14 * 1.15;
@@ -64,17 +65,23 @@ export function ProductCard({ product }: { product: ProductListItem }) {
   return (
     <Link
       href={`/products/${product.slug}`}
+      transitionTypes={["nav-forward"]}
       className="group flex h-full flex-col bg-surface-low ring-1 ring-white/6 transition duration-300 hover:-translate-y-1 hover:bg-surface-high hover:shadow-[0_24px_50px_rgba(0,0,0,0.28)]"
     >
       <article className="group flex h-full flex-col bg-surface-low ring-1 ring-white/6 transition duration-300 hover:-translate-y-1 hover:bg-surface-high hover:shadow-[0_24px_50px_rgba(0,0,0,0.28)]">
         <div className="relative aspect-square overflow-hidden p-0">
-          <Image
-            src={imageSrc}
-            alt={product.title}
-            fill
-            sizes="(min-width: 1536px) 18vw, (min-width: 1280px) 22vw, (min-width: 768px) 28vw, 90vw"
-            className="object-cover"
-          />
+          <ViewTransition
+            name={`product-image-${product.slug}`}
+            share="product-image-morph"
+          >
+            <Image
+              src={imageSrc}
+              alt={product.title}
+              fill
+              sizes="(min-width: 1536px) 18vw, (min-width: 1280px) 22vw, (min-width: 768px) 28vw, 90vw"
+              className="object-cover"
+            />
+          </ViewTransition>
         </div>
         <div className="mt-5 flex flex-1 flex-col gap-4 p-5">
           <div className="space-y-2.5">

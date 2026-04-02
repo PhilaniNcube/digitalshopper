@@ -2,28 +2,50 @@
 
 import Image from "next/image";
 import { useState } from "react";
+import { ViewTransition } from "react";
 import { cn } from "@/lib/utils";
 
 type ProductImageGalleryProps = {
   images: { url: string; isPrimary: boolean }[];
   title: string;
+  transitionName?: string;
 };
 
-export function ProductImageGallery({ images, title }: ProductImageGalleryProps) {
+export function ProductImageGallery({
+  images,
+  title,
+  transitionName,
+}: ProductImageGalleryProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const activeImage = images[activeIndex]?.url ?? "/images/banner.webp";
 
   return (
     <div className="flex flex-col gap-3">
       <div className="relative aspect-square overflow-hidden bg-surface-low ring-1 ring-white/6">
-        <Image
-          src={activeImage}
-          alt={title}
-          fill
-          sizes="(min-width: 1024px) 50vw, 100vw"
-          className="object-contain"
-          priority
-        />
+        {transitionName ? (
+          <ViewTransition
+            name={transitionName}
+            share="product-image-morph"
+          >
+            <Image
+              src={activeImage}
+              alt={title}
+              fill
+              sizes="(min-width: 1024px) 50vw, 100vw"
+              className="object-contain"
+              priority
+            />
+          </ViewTransition>
+        ) : (
+          <Image
+            src={activeImage}
+            alt={title}
+            fill
+            sizes="(min-width: 1024px) 50vw, 100vw"
+            className="object-contain"
+            priority
+          />
+        )}
       </div>
       {images.length > 1 && (
         <div className="flex gap-2 overflow-x-auto pb-1">

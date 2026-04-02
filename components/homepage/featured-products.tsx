@@ -5,6 +5,7 @@ import { formatCurrency } from "@/lib/utils";
 import { Check } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { ViewTransition } from "react";
 
 import React from "react";
 
@@ -32,13 +33,18 @@ const FeaturedProducts = async () => {
               className="block transition-shadow group bg-surface-low hover:shadow-lg"
             >
               <div className="relative w-full overflow-hidden aspect-square">
-                <Image
-                  src={product.mainImage!}
-                  alt={product.title}
-                  width={400}
-                  height={400}
-                  className="object-cover object-center w-full h-full transition-transform aspect-square group-hover:scale-105"
-                />
+                <ViewTransition
+                  name={`product-image-${product.slug}`}
+                  share="product-image-morph"
+                >
+                  <Image
+                    src={product.mainImage!}
+                    alt={product.title}
+                    width={400}
+                    height={400}
+                    className="object-cover object-center w-full h-full transition-transform aspect-square group-hover:scale-105"
+                  />
+                </ViewTransition>
               </div>
               <div className="flex flex-col p-4 md:flex-row md:justify-between md:items-start">
                 <h3 className="text-sm text-white! font-medium ">

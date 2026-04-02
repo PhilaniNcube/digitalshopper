@@ -181,3 +181,27 @@ img {
 		@apply font-display;
 	}
 }
+
+::view-transition-group(.product-image-morph) {
+	animation-duration: 360ms;
+	animation-timing-function: ease;
+}
+
+::view-transition-image-pair(.product-image-morph) {
+	animation-name: product-image-via-blur;
+}
+
+@keyframes product-image-via-blur {
+	30% {
+		filter: blur(2px);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	::view-transition-old(*),
+	::view-transition-new(*),
+	::view-transition-group(*) {
+		animation-duration: 0s !important;
+		animation-delay: 0s !important;
+	}
+}

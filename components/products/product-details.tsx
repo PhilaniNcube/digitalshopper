@@ -156,7 +156,11 @@ const ProductDetails = async ({
       {/* ── Hero Section ── */}
       <div className="grid gap-10 lg:grid-cols-2 lg:gap-16">
         {/* Left: Image Gallery */}
-        <ProductImageGallery images={galleryImages} title={product.title} />
+        <ProductImageGallery
+          images={galleryImages}
+          title={product.title}
+          transitionName={`product-image-${product.slug}`}
+        />
 
         {/* Right: Product Info */}
         <div className="flex flex-col gap-6">
