@@ -67,6 +67,58 @@ function SpecItem({ label, value }: { label: string; value: string }) {
   );
 }
 
+const EMBED_RE = /\[embed\](https?:\/\/(?:www\.)?youtube\.com\/watch\?v=([\w-]+)[^\[]*)\[\/embed\]/gi;
+
+function DescriptionHtml({ html }: { html: string }) {
+  const parts: React.ReactNode[] = [];
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+
+  // Reset regex state
+  EMBED_RE.lastIndex = 0;
+
+  while ((match = EMBED_RE.exec(html)) !== null) {
+    // Static HTML before this embed
+    if (match.index > lastIndex) {
+      parts.push(
+        <div
+          key={`html-${lastIndex}`}
+          className="prose prose-invert prose-sm max-w-none prose-headings:font-display text-white! prose-headings:tracking-tight prose-p:text-white! prose-p:text-xs! prose-a:text-primary-strong! prose-strong:text-white!"
+          dangerouslySetInnerHTML={{ __html: html.slice(lastIndex, match.index) }}
+        />,
+      );
+    }
+
+    const videoId = match[2];
+    parts.push(
+      <div key={`yt-${videoId}-${match.index}`} className="my-6 aspect-video w-full max-w-2xl">
+        <iframe
+          className="h-full w-full rounded"
+          src={`https://www.youtube-nocookie.com/embed/${videoId}`}
+          title="YouTube video"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+        />
+      </div>,
+    );
+
+    lastIndex = match.index + match[0].length;
+  }
+
+  // Remaining HTML after the last embed (or entire string if no embeds)
+  if (lastIndex < html.length) {
+    parts.push(
+      <div
+        key={`html-${lastIndex}`}
+        className="prose prose-invert prose-sm max-w-none prose-headings:font-display text-white! prose-headings:tracking-tight prose-p:text-white! prose-p:text-xs! prose-a:text-primary-strong! prose-strong:text-white!"
+        dangerouslySetInnerHTML={{ __html: html.slice(lastIndex) }}
+      />,
+    );
+  }
+
+  return <>{parts}</>;
+}
+
 const ProductDetails = async ({
   paramsPromise,
 }: {
@@ -296,10 +348,7 @@ const ProductDetails = async ({
           <h2 className="mb-6 font-display text-xl font-bold uppercase tracking-[-0.02em] text-white md:text-2xl">
             Description
           </h2>
-          <div
-            className="prose prose-invert prose-sm max-w-none prose-headings:font-display text-white! prose-headings:tracking-tight prose-p:text-white! prose-p:text-xs! prose-a:text-primary-strong! prose-strong:text-white!"
-            dangerouslySetInnerHTML={{ __html: product.descriptionHtml }}
-          />
+          <DescriptionHtml html={product.descriptionHtml} />
         </section>
       )}
     </>
