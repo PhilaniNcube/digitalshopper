@@ -39,9 +39,9 @@ function ProductDetailsSkeleton() {
     <div className="animate-pulse">
       {/* Breadcrumb */}
       <div className="mb-8 flex items-center gap-2">
-        <div className="h-3 w-16 rounded bg-white/8" />
+        <div className="h-3 w-16 rounded bg-white/7" />
         <span className="text-slate-700">/</span>
-        <div className="h-3 w-24 rounded bg-white/8" />
+        <div className="h-3 w-24 rounded bg-white/7" />
       </div>
 
       {/* Hero */}
