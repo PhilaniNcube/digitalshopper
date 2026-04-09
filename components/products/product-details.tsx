@@ -68,11 +68,11 @@ function SpecItem({ label, value }: { label: string; value: string }) {
 }
 
 const ProductDetails = async ({
-  searchParamsPromise,
+  paramsPromise,
 }: {
-  searchParamsPromise: Promise<{ slug: string }>;
+  paramsPromise: Promise<{ slug: string }>;
 }) => {
-  const { slug } = await searchParamsPromise;
+  const { slug } = await paramsPromise;
   const product = await fetchProductBySlug(slug);
 
   if (!product) {

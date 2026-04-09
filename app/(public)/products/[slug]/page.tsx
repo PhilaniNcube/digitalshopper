@@ -96,7 +96,7 @@ export default function ProductPage({
   return (
     <div className="mx-auto w-full max-w-7xl px-4 py-10 lg:px-8">
       <Suspense fallback={<ProductDetailsSkeleton />}>
-        <ProductDetails searchParamsPromise={params} />
+        <ProductDetails paramsPromise={params} />
       </Suspense>
     </div>
   );

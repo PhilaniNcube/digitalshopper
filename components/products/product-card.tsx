@@ -65,6 +65,7 @@ export function ProductCard({ product }: { product: ProductListItem }) {
   return (
     <Link
       href={`/products/${product.slug}`}
+      prefetch={false}
       transitionTypes={["nav-forward"]}
       className="group flex h-full flex-col bg-surface-low ring-1 ring-white/6 transition duration-300 hover:-translate-y-1 hover:bg-surface-high hover:shadow-[0_24px_50px_rgba(0,0,0,0.28)]"
     >

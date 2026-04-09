@@ -30,6 +30,7 @@ const FeaturedProducts = async () => {
             <Link
               key={product.id}
               href={`/products/${product.slug}`}
+              prefetch={false}
               className="block transition-shadow group bg-surface-low hover:shadow-lg"
             >
               <div className="relative w-full overflow-hidden aspect-square">
