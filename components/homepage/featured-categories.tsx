@@ -26,6 +26,7 @@ const FeaturedCategories = () => {
             src="https://images.unsplash.com/photo-1603302576837-37561b2e2302?q=80&w=2068&auto=format&fit=crop"
             alt="Notebooks"
             fill
+            sizes="(max-width: 1024px) 100vw, 50vw"
             className="object-cover transition-transform duration-700 group-hover:scale-105 opacity-80 group-hover:opacity-60"
           />
           <div className="absolute inset-0 flex flex-col justify-end p-6 bg-linear-to-t from-black/90 via-black/20 to-transparent md:p-8">

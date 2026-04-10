@@ -126,9 +126,10 @@ export function Hero() {
                 <Image
                   src="/images/tech.jpg"
                   alt="Featured wearable technology selection"
-                  width={2048}
-                  height={1152}
+                  width={800}
+                  height={450}
                   priority
+                  sizes="(max-width: 1024px) 90vw, 500px"
                   className="absolute inset-x-[6%] bottom-0 w-[88%] translate-y-[5%] drop-shadow-[0_18px_28px_rgba(0,0,0,0.6)]"
                 />
               </div>
