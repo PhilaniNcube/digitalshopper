@@ -13,7 +13,6 @@ import {
 import { formatCurrency } from "@/lib/utils";
 import { Metadata } from "next";
 
-
 function getDisplayPrice(product: ProductWithImagesAndInventory) {
   return product.promoPrice ?? product.rrpIncl ?? product.price * 1.14 * 1.15;
 }
@@ -47,7 +46,9 @@ function getStockLabel(product: ProductWithImagesAndInventory) {
   return "In stock";
 }
 
-function getWarehouseLabel(inventory: ProductWithImagesAndInventory["inventory"]) {
+function getWarehouseLabel(
+  inventory: ProductWithImagesAndInventory["inventory"],
+) {
   const stocked = inventory.filter((w) => w.quantity > 0);
   if (stocked.length === 0) return null;
 
@@ -67,7 +68,8 @@ function SpecItem({ label, value }: { label: string; value: string }) {
   );
 }
 
-const EMBED_RE = /\[embed\](https?:\/\/(?:www\.)?youtube\.com\/watch\?v=([\w-]+)[^\[]*)\[\/embed\]/gi;
+const EMBED_RE =
+  /\[embed\](https?:\/\/(?:www\.)?youtube\.com\/watch\?v=([\w-]+)[^\[]*)\[\/embed\]/gi;
 
 function DescriptionHtml({ html }: { html: string }) {
   const parts: React.ReactNode[] = [];
@@ -84,14 +86,19 @@ function DescriptionHtml({ html }: { html: string }) {
         <div
           key={`html-${lastIndex}`}
           className="prose prose-invert prose-sm max-w-none prose-headings:font-display text-white! prose-headings:tracking-tight prose-p:text-white! prose-p:text-xs! prose-a:text-primary-strong! prose-strong:text-white!"
-          dangerouslySetInnerHTML={{ __html: html.slice(lastIndex, match.index) }}
+          dangerouslySetInnerHTML={{
+            __html: html.slice(lastIndex, match.index),
+          }}
         />,
       );
     }
 
     const videoId = match[2];
     parts.push(
-      <div key={`yt-${videoId}-${match.index}`} className="my-6 aspect-video w-full max-w-2xl">
+      <div
+        key={`yt-${videoId}-${match.index}`}
+        className="my-6 aspect-video w-full max-w-2xl"
+      >
         <iframe
           className="h-full w-full rounded"
           src={`https://www.youtube-nocookie.com/embed/${videoId}`}
@@ -134,12 +141,19 @@ const ProductDetails = async ({
   const price = getDisplayPrice(product);
   const cartProduct = getCartProduct(product);
   const warehouseLabel = getWarehouseLabel(product.inventory);
-  const hasPromo = product.promoPrice != null && product.promoPrice < (product.rrpIncl ?? product.price * 1.14 * 1.15);
+  const hasPromo =
+    product.promoPrice != null &&
+    product.promoPrice < (product.rrpIncl ?? product.price * 1.14 * 1.15);
 
   const galleryImages =
     product.images.length > 0
       ? product.images.map((i) => ({ url: i.url, isPrimary: i.isPrimary }))
-      : [{ url: product.featuredImage ?? "/images/banner.webp", isPrimary: true }];
+      : [
+          {
+            url: product.featuredImage ?? "/images/banner.webp",
+            isPrimary: true,
+          },
+        ];
 
   const highlightSpecs = product.specs.slice(0, 4);
 
@@ -226,6 +240,16 @@ const ProductDetails = async ({
               </span>
             )}
           </p>
+          <div className="flex items-baseline gap-3">
+            <span className="font-display text-3xl lg:text-5xl font-bold tracking-tight text-white">
+              {formatCurrency(price)}
+            </span>
+            {hasPromo && product.rrpIncl != null && (
+              <span className="text-sm text-slate-500 line-through">
+                {formatCurrency(product.rrpIncl)}
+              </span>
+            )}
+          </div>
 
           {/* Product Title */}
           <h1 className="font-display text-3xl font-bold leading-[1.05] tracking-[-0.04em] text-white md:text-4xl lg:text-5xl">
@@ -248,6 +272,8 @@ const ProductDetails = async ({
             </div>
           )}
 
+          {/* Price */}
+
           {/* CTA Button */}
           <div className="mt-2 space-y-3">
             <AddToCartButton
@@ -256,7 +282,7 @@ const ProductDetails = async ({
               className="w-full rounded-none bg-primary-strong py-6 text-sm font-bold uppercase tracking-[0.2em] text-black transition hover:bg-primary-strong/90"
             >
               <ShoppingCart className="mr-2 size-4" />
-              Add to cart — {formatCurrency(price)}
+              Add to cart
             </AddToCartButton>
 
             {/* Stock indicator */}
@@ -272,9 +298,7 @@ const ProductDetails = async ({
                 {getStockLabel(product)}
               </span>
               {warehouseLabel && (
-                <span className="text-slate-600">
-                  · {warehouseLabel}
-                </span>
+                <span className="text-slate-600">· {warehouseLabel}</span>
               )}
             </div>
           </div>
@@ -333,9 +357,7 @@ const ProductDetails = async ({
                 <span className="w-36 shrink-0 text-[11px] font-medium uppercase tracking-[0.2em] text-slate-500">
                   {key}
                 </span>
-                <span className="text-sm text-slate-300">
-                  {String(value)}
-                </span>
+                <span className="text-sm text-slate-300">{String(value)}</span>
               </div>
             ))}
           </div>
