@@ -8,7 +8,7 @@
   "crons": [
     {
       "path": "/api/cron/syntech-stock",
-      "schedule": "0 3 */2 * *"
+      "schedule": "0 3 * * 1"
     }
   ]
 }
