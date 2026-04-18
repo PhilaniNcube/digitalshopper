@@ -14,6 +14,7 @@
     "test:e2e:ci:payfast": "node scripts/run-playwright-ci-payfast.cjs",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
+    "payload:generate": "payload generate:types",
     "auth:generate": "npx auth@latest generate",
     "catalog:sync": "tsx scripts/sync-syntech-feed.ts",
     "stock:sync": "tsx scripts/sync-syntech-stock.ts",

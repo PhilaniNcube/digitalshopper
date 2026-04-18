@@ -1,5 +1,4 @@
 import path from "path";
-import { fileURLToPath } from "url";
 import sharp from "sharp";
 import { lexicalEditor } from "@payloadcms/richtext-lexical";
 import { postgresAdapter } from "@payloadcms/db-postgres";
@@ -12,9 +11,6 @@ import { Categories } from "./collections/Categories";
 import { Tags } from "./collections/Tags";
 import { Authors } from "./collections/Authors";
 import { Media } from "./collections/Media";
-
-const filename = fileURLToPath(import.meta.url);
-const dirname = path.dirname(filename);
 
 export default buildConfig({
   admin: {
@@ -43,6 +39,6 @@ export default buildConfig({
   }),
   sharp,
   typescript: {
-    outputFile: path.resolve(dirname, "payload-types.ts"),
+    outputFile: path.resolve(process.cwd(), "payload-types.ts"),
   },
 });
