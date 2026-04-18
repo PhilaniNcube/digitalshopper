@@ -1,8 +1,10 @@
+import { withPayload } from "@payloadcms/next/withPayload";
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactCompiler: true,
   cacheComponents: true,
-   experimental: {
+  experimental: {
     viewTransition: true,
   },
   images: {
@@ -31,4 +33,4 @@ const nextConfig = {
   },
 };
 
-module.exports = nextConfig;
+export default withPayload(nextConfig);

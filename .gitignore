@@ -37,3 +37,7 @@ yarn-error.log*
 next-env.d.ts
 # next-agents-md
 .next-docs/
+
+# payload
+/public/media
+/payload-types.ts

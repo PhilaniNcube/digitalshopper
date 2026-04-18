@@ -23,9 +23,9 @@ const BrandGrid = () => {
               <Image
                 src={brand.src}
                 alt={brand.alt}
-                className="object-cover h-auto"
+                className="object-contain"
                 width={100}
-                height={48}
+                height={100}
                 loading="lazy"
                 sizes="100px"
               />
