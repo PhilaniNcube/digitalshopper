@@ -2,12 +2,13 @@ import type { MetadataRoute } from "next";
 import { db } from "@/lib/db";
 import { products, categories } from "@/db/schema";
 import { eq } from "drizzle-orm";
+import { fetchPublishedPosts } from "@/dal/queries/posts";
 
 const BASE_URL =
 	process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.digitalshopper.co.za";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-	const [allProducts, allCategories] = await Promise.all([
+	const [allProducts, allCategories, allPosts] = await Promise.all([
 		db
 			.select({ slug: products.slug, updatedAt: products.updatedAt })
 			.from(products)
@@ -15,6 +16,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 		db
 			.select({ slug: categories.slug, updatedAt: categories.updatedAt })
 			.from(categories),
+		fetchPublishedPosts(),
 	]);
 
 	const staticRoutes: MetadataRoute.Sitemap = [
@@ -48,6 +50,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 			changeFrequency: "monthly",
 			priority: 0.3,
 		},
+		{
+			url: `${BASE_URL}/blogs`,
+			lastModified: new Date(),
+			changeFrequency: "weekly",
+			priority: 0.7,
+		},
 	];
 
 	const productRoutes: MetadataRoute.Sitemap = allProducts.map((p) => ({
@@ -64,5 +72,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 		priority: 0.6,
 	}));
 
-	return [...staticRoutes, ...productRoutes, ...categoryRoutes];
+	const blogRoutes: MetadataRoute.Sitemap = allPosts.map((post) => ({
+		url: `${BASE_URL}/blogs/${post.slug}`,
+		lastModified: post.publishedAt ? new Date(post.publishedAt) : new Date(),
+		changeFrequency: "monthly",
+		priority: 0.6,
+	}));
+
+	return [...staticRoutes, ...productRoutes, ...categoryRoutes, ...blogRoutes];
 }
