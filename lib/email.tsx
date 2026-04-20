@@ -1,5 +1,6 @@
 import { OrderConfirmationEmail } from "@/emails/order-confirmation-email";
 import { AdminOrderNotificationEmail } from "@/emails/admin-order-notification-email";
+import { AbandonedCartEmail } from "@/emails/abandoned-cart-email";
 import { ResetPasswordEmail } from "@/emails/reset-password-email";
 import { VerifyEmail } from "@/emails/verify-email";
 import type { StoredOrderItem } from "@/db/schema";
@@ -114,6 +115,46 @@ export async function sendAdminOrderNotificationEmail({
 				customerEmail={customerEmail}
 				total={total}
 				items={items}
+			/>
+		),
+	});
+}
+
+export async function sendAbandonedCartEmail({
+	to,
+	customerName,
+	orderId,
+	items,
+	subtotal,
+	total,
+	checkoutUrl,
+}: {
+	to: string;
+	customerName: string;
+	orderId: string;
+	items: StoredOrderItem[];
+	subtotal: number;
+	total: number;
+	checkoutUrl: string;
+}) {
+	if (!resend) {
+		return;
+	}
+
+	await resend.emails.send({
+		from: resendFrom,
+		to,
+		replyTo: resendFrom,
+		subject: "You left something behind — your cart is waiting 🛒",
+		react: (
+			<AbandonedCartEmail
+				customerName={customerName}
+				orderId={orderId}
+				items={items}
+				subtotal={subtotal}
+				total={total}
+				checkoutUrl={checkoutUrl}
+				supportEmail="info@digitalshopper.co.za"
 			/>
 		),
 	});

@@ -2,8 +2,12 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { eq } from "drizzle-orm";
 import { sql } from "@/lib/db";
+import { db } from "@/lib/db";
+import { orders } from "@/db/schema";
 import { requireAdmin } from "@/lib/session";
+import { sendAbandonedCartEmail } from "@/lib/email";
 
 const deleteOrderSchema = z.object({
 	orderId: z.string().uuid("Invalid order id."),
@@ -59,6 +63,71 @@ export async function deleteOrderAction(orderId: string): Promise<DeleteOrderAct
 		return {
 			success: false,
 			message: "Unable to delete the order right now.",
+		};
+	}
+}
+
+const sendAbandonedCartSchema = z.object({
+	orderId: z.string().uuid("Invalid order id."),
+});
+
+export type SendAbandonedCartActionResult = {
+	success: boolean;
+	message: string;
+};
+
+export async function sendAbandonedCartAction(
+	orderId: string,
+): Promise<SendAbandonedCartActionResult> {
+	await requireAdmin();
+
+	const parsed = sendAbandonedCartSchema.safeParse({ orderId });
+	if (!parsed.success) {
+		return {
+			success: false,
+			message: parsed.error.issues[0]?.message ?? "Invalid order id.",
+		};
+	}
+
+	const [order] = await db
+		.select()
+		.from(orders)
+		.where(eq(orders.id, parsed.data.orderId))
+		.limit(1);
+
+	if (!order) {
+		return { success: false, message: "Order not found." };
+	}
+
+	if (order.status !== "pending") {
+		return {
+			success: false,
+			message: "Abandoned cart emails can only be sent for pending orders.",
+		};
+	}
+
+	const checkoutUrl = `${process.env.NEXT_PUBLIC_APP_URL ?? "https://digitalshopper.co.za"}/checkout`;
+
+	try {
+		await sendAbandonedCartEmail({
+			to: order.email,
+			customerName: `${order.firstName} ${order.lastName}`,
+			orderId: order.id,
+			items: order.items,
+			subtotal: order.subtotal,
+			total: order.total,
+			checkoutUrl,
+		});
+
+		return {
+			success: true,
+			message: `Recovery email sent to ${order.email}.`,
+		};
+	} catch (error) {
+		console.error("Failed to send abandoned cart email", error);
+		return {
+			success: false,
+			message: "Failed to send the recovery email. Please try again.",
 		};
 	}
 }
