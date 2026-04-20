@@ -111,3 +111,11 @@ export async function getPaymentOrders(
 ): Promise<PaginatedOrdersResult> {
 	return getPaginatedOrders(PAYMENT_ORDER_FILTER, { page, pageSize });
 }
+
+export async function getOrderById(id: string): Promise<OrderListItem | null> {
+	await requireAdmin();
+
+	const [order] = await db.select().from(orders).where(eq(orders.id, id)).limit(1);
+
+	return order ?? null;
+}

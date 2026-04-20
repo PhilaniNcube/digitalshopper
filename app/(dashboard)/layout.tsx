@@ -8,6 +8,8 @@ import { AdminGuard } from "@/components/dashboard/admin-guard";
 import { Separator } from "@/components/ui/separator";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Suspense } from "react";
+import { DashboardSidebarSkeleton } from "@/components/dashboard/dashboard-sidebar-skeleton";
+
 
 type DashboardLayoutProps = {
   children: React.ReactNode;
@@ -20,7 +22,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 		<Suspense fallback={null}>
           <AdminGuard />
 		</Suspense>
-        <DashboardSidebar />
+        <Suspense fallback={<DashboardSidebarSkeleton />}>
+          <DashboardSidebar />
+        </Suspense>
         <SidebarInset>
           <header className="flex h-14 items-center gap-3 border-b border-surface-elevated px-6">
             <SidebarTrigger className="-ml-2 text-white" />

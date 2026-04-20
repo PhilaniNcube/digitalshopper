@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
 	type ColumnDef,
 	type ColumnFiltersState,
@@ -97,7 +98,11 @@ const columns: ColumnDef<OrderListItem>[] = [
 		id: "actions",
 		header: () => <div className="text-right">Actions</div>,
 		cell: ({ row }) => (
-			<div className="flex justify-end">
+			// biome-ignore lint/a11y/useKeyWithClickEvents: stop propagation only
+			<div
+				className="flex justify-end gap-2"
+				onClick={(e) => e.stopPropagation()}
+			>
 				<DeleteOrderButton order={row.original} />
 			</div>
 		),
@@ -110,6 +115,7 @@ type OrdersTableProps = {
 };
 
 export function OrdersTable({ orders, pagination }: OrdersTableProps) {
+	const router = useRouter();
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 
 	const table = useReactTable({
@@ -189,7 +195,13 @@ export function OrdersTable({ orders, pagination }: OrdersTableProps) {
 				<TableBody>
 					{table.getRowModel().rows.length ? (
 						table.getRowModel().rows.map((row) => (
-							<TableRow key={row.id}>
+							<TableRow
+								key={row.id}
+								className="cursor-pointer"
+								onClick={() =>
+									router.push(`/dashboard/orders/${row.original.id}`)
+								}
+							>
 								{row.getVisibleCells().map((cell) => (
 									<TableCell key={cell.id}>
 										{flexRender(
