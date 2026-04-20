@@ -56,15 +56,15 @@ export default async function OrderDetail({ params }: OrderDetailProps) {
 				</div>
 				<div className="flex items-center gap-3">
 					<Badge
-						variant={statusVariant[order.status] ?? "secondary"}
-						className="capitalize text-sm px-3 py-1"
+						
+						className="capitalize bg-white text-sm px-3 py-1"
 					>
 						{order.status}
 					</Badge>
 					{order.status === "pending" && (
 						<SendAbandonedCartButton orderId={order.id} />
 					)}
-					<Button asChild variant="outline" size="sm">
+					<Button asChild className="bg-white text-stone-900" size="sm">
 						<Link href="/dashboard/orders">← Back to orders</Link>
 					</Button>
 				</div>

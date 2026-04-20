@@ -29,11 +29,11 @@ export function SendAbandonedCartButton({ orderId }: SendAbandonedCartButtonProp
 
 	return (
 		<Button
-			variant="outline"
+			
 			size="sm"
 			onClick={handleClick}
 			disabled={loading}
-			className="gap-2"
+			className="gap-2 bg-white text-sm text-black hover:bg-gray-100"
 		>
 			<Mail className="size-4" />
 			{loading ? "Sending…" : "Send recovery email"}
