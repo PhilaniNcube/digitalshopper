@@ -57,7 +57,7 @@ export default async function OrderDetail({ params }: OrderDetailProps) {
 				<div className="flex items-center gap-3">
 					<Badge
 						
-						className="capitalize bg-white text-sm px-3 py-1"
+						className="capitalize bg-white text-black text-sm px-3 py-1"
 					>
 						{order.status}
 					</Badge>
