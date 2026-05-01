@@ -1,4 +1,4 @@
-import { and, eq, notInArray } from "drizzle-orm";
+import { and, eq, inArray, notInArray, sql } from "drizzle-orm";
 import { readFile } from "node:fs/promises";
 import {
 	brands,
@@ -9,6 +9,7 @@ import {
 	type ProductAttributes,
 	type SupplierProductPayload,
 } from "../db/schema";
+import { poolDb, poolSql } from "../lib/db";
 
 const SYNTECH_FEED_URL =
 	"https://www.syntech.co.za/feeds/feedhandler.php?key=AF530A9A-22AE-4465-9F0D-B99D45E12E34&feed=syntech-json-full";
@@ -413,7 +414,7 @@ function isMissingRelationError(error: unknown) {
 	return withCause.cause?.code === "42P01";
 }
 
-async function ensureCatalogSchema(db: Awaited<typeof import("../lib/db")>["db"]) {
+async function ensureCatalogSchema(db: { select: any }) {
 	try {
 		await db.select({ id: brands.id }).from(brands).limit(1);
 		await db.select({ id: categories.id }).from(categories).limit(1);
@@ -430,7 +431,7 @@ async function ensureCatalogSchema(db: Awaited<typeof import("../lib/db")>["db"]
 }
 
 async function syncCatalog(loadedFeed: LoadedFeed) {
-	const { db } = await import("../lib/db");
+	const db = poolDb;
 	const { declaredCount, feedProducts } = loadedFeed;
 	const categorySeeds = collectCategorySeeds(feedProducts);
 	const brandNames = [...new Set(feedProducts.map(extractBrandName).filter((brand): brand is string => Boolean(brand)))].sort(
@@ -496,34 +497,34 @@ async function syncCatalog(loadedFeed: LoadedFeed) {
 
 	const seenSkus: string[] = [];
 
-	for (let index = 0; index < feedProducts.length; index += 1) {
-		const product = feedProducts[index];
-		const sku = asNullableString(product.sku);
-		const title = asNullableString(product.name);
+	const BATCH_SIZE = 50;
+	for (let i = 0; i < feedProducts.length; i += BATCH_SIZE) {
+		const chunk = feedProducts.slice(i, i + BATCH_SIZE);
+		const productValues: any[] = [];
+		const allImageValues: any[] = [];
+		const allInventoryValues: any[] = [];
 
-		if (!sku || !title) {
-			console.warn(`Skipping product at position ${index + 1} because sku or name is missing.`);
-			continue;
-		}
+		for (const product of chunk) {
+			const sku = asNullableString(product.sku);
+			const title = asNullableString(product.name);
+			if (!sku || !title) continue;
 
-		seenSkus.push(sku);
+			seenSkus.push(sku);
 
-		const categorySegments = buildCategorySegments(product);
-		const categoryPath = categorySegments.length > 0 ? categorySegments.map(slugify).join("/") : null;
-		const brandName = extractBrandName(product);
-		const imageUrls = extractImageUrls(product);
-		const descriptionHtml = asNullableString(product.description) ?? "";
-		const descriptionText = stripHtml(descriptionHtml);
-		const rawAttributes = buildRawAttributes(product);
-		const totalStock = WAREHOUSE_CODES.reduce((sum, warehouse) => {
-			return sum + (asNullableInteger(product[warehouse.field]) ?? 0);
-		}, 0);
-		const promoPrice = asNullableInteger(product.promo_price);
-		const basePrice = asNullableInteger(product.price);
+			const categorySegments = buildCategorySegments(product);
+			const categoryPath = categorySegments.length > 0 ? categorySegments.map(slugify).join("/") : null;
+			const brandName = extractBrandName(product);
+			const imageUrls = extractImageUrls(product);
+			const descriptionHtml = asNullableString(product.description) ?? "";
+			const descriptionText = stripHtml(descriptionHtml);
+			const rawAttributes = buildRawAttributes(product);
+			const totalStock = WAREHOUSE_CODES.reduce((sum, warehouse) => {
+				return sum + (asNullableInteger(product[warehouse.field]) ?? 0);
+			}, 0);
+			const promoPrice = asNullableInteger(product.promo_price);
+			const basePrice = asNullableInteger(product.price);
 
-		const [storedProduct] = await db
-			.insert(products)
-			.values({
+			productValues.push({
 				supplier: SUPPLIER_NAME,
 				supplierSku: sku,
 				slug: buildProductSlug(title, sku),
@@ -568,81 +569,99 @@ async function syncCatalog(loadedFeed: LoadedFeed) {
 				rawPayload: product as SupplierProductPayload,
 				supplierLastModified: asNullableTimestamp(product.last_modified),
 				lastSyncedAt: new Date(),
-			})
-			.onConflictDoUpdate({
-				target: [products.supplier, products.supplierSku],
-				set: {
-					slug: buildProductSlug(title, sku),
-					title,
-					summary: buildSummary(product, descriptionText),
-					shortDescription: asNullableString(stripHtml(product.shortdesc ?? "")),
-					descriptionHtml,
-					sourceUrl: asNullableString(product.url),
-					brandId: brandName ? brandIdByName.get(brandName) ?? null : null,
-					categoryId: categoryPath ? categoryIdByPath.get(categoryPath) ?? null : null,
-					featuredImage: imageUrls[0] ?? null,
-					price: basePrice ?? 0,
-					rrpIncl: asNullableInteger(product.rrp_incl),
-					promoPrice,
-					recommendedMargin: asNullableNumber(product.recommended_margin),
-					promoStartsAt: asNullableTimestamp(product.promo_starts),
-					promoEndsAt: asNullableTimestamp(product.promo_ends),
-					weightGrams: asNullableInteger(product.weight),
-					lengthCm: asNullableNumber(product.length),
-					widthCm: asNullableNumber(product.width),
-					heightCm: asNullableNumber(product.height),
-					ean:
-						product.attributes?.ean === undefined || product.attributes?.ean === null
-							? null
-							: normalizeWhitespace(String(product.attributes.ean)),
-					colour:
-						product.attributes?.colour === undefined || product.attributes?.colour === null
-							? null
-							: asNullableString(String(product.attributes.colour)),
-					warranty:
-						product.attributes?.warranty === undefined || product.attributes?.warranty === null
-							? null
-							: asNullableString(String(product.attributes.warranty)),
-					supplierFlags: promoPrice ? ["promo"] : [],
-					totalStock,
-					inStock: totalStock > 0,
-					nextShipmentEta: asNullableString(typeof product.nextshipmenteta === "string" ? product.nextshipmenteta : ""),
-					featured: promoPrice !== null,
-					active: true,
-					specs: extractSpecs(descriptionHtml),
-					rawAttributes,
-					rawPayload: product as SupplierProductPayload,
-					supplierLastModified: asNullableTimestamp(product.last_modified),
-					lastSyncedAt: new Date(),
-					updatedAt: new Date(),
-				},
-			})
-			.returning({ id: products.id });
+			});
 
-		await db.delete(productImages).where(eq(productImages.productId, storedProduct.id));
-		if (imageUrls.length > 0) {
-			await db.insert(productImages).values(
-				imageUrls.map((url, position) => ({
-					productId: storedProduct.id,
-					url,
-					position,
-					isPrimary: position === 0,
-				})),
-			);
+			// We'll handle images and inventory after we get the IDs back
 		}
 
-		await db.delete(productInventory).where(eq(productInventory.productId, storedProduct.id));
-		await db.insert(productInventory).values(
-			WAREHOUSE_CODES.map((warehouse) => ({
-				productId: storedProduct.id,
-				warehouseCode: warehouse.code,
-				quantity: asNullableInteger(product[warehouse.field]) ?? 0,
-			})),
-		);
+		if (productValues.length > 0) {
+			const storedProducts = await db
+				.insert(products)
+				.values(productValues)
+				.onConflictDoUpdate({
+					target: [products.supplier, products.supplierSku],
+					set: {
+						slug: sql`excluded.slug`,
+						title: sql`excluded.title`,
+						summary: sql`excluded.summary`,
+						shortDescription: sql`excluded.short_description`,
+						descriptionHtml: sql`excluded.description_html`,
+						sourceUrl: sql`excluded.source_url`,
+						brandId: sql`excluded.brand_id`,
+						categoryId: sql`excluded.category_id`,
+						featuredImage: sql`excluded.featured_image`,
+						price: sql`excluded.price`,
+						rrpIncl: sql`excluded.rrp_incl`,
+						promoPrice: sql`excluded.promo_price`,
+						recommendedMargin: sql`excluded.recommended_margin`,
+						promoStartsAt: sql`excluded.promo_starts_at`,
+						promoEndsAt: sql`excluded.promo_ends_at`,
+						weightGrams: sql`excluded.weight_grams`,
+						lengthCm: sql`excluded.length_cm`,
+						widthCm: sql`excluded.width_cm`,
+						heightCm: sql`excluded.height_cm`,
+						ean: sql`excluded.ean`,
+						colour: sql`excluded.colour`,
+						warranty: sql`excluded.warranty`,
+						supplierFlags: sql`excluded.supplier_flags`,
+						totalStock: sql`excluded.total_stock`,
+						inStock: sql`excluded.in_stock`,
+						nextShipmentEta: sql`excluded.next_shipment_eta`,
+						featured: sql`excluded.featured`,
+						active: sql`excluded.active`,
+						specs: sql`excluded.specs`,
+						rawAttributes: sql`excluded.raw_attributes`,
+						rawPayload: sql`excluded.raw_payload`,
+						supplierLastModified: sql`excluded.supplier_last_modified`,
+						updatedAt: new Date(),
+						lastSyncedAt: new Date(),
+					},
+				})
+				.returning({ id: products.id, supplierSku: products.supplierSku });
 
-		if ((index + 1) % 100 === 0 || index === feedProducts.length - 1) {
-			console.log(`Synced ${index + 1}/${feedProducts.length} products.`);
+			const productBySku = new Map(storedProducts.map((p) => [p.supplierSku, p.id]));
+
+			for (const product of chunk) {
+				const sku = asNullableString(product.sku);
+				if (!sku) continue;
+				const productId = productBySku.get(sku);
+				if (!productId) continue;
+
+				const imageUrls = extractImageUrls(product);
+				imageUrls.forEach((url, position) => {
+					allImageValues.push({
+						productId,
+						url,
+						position,
+						isPrimary: position === 0,
+					});
+				});
+
+				WAREHOUSE_CODES.forEach((warehouse) => {
+					allInventoryValues.push({
+						productId,
+						warehouseCode: warehouse.code,
+						quantity: asNullableInteger(product[warehouse.field]) ?? 0,
+					});
+				});
+			}
+
+			// Batch related tables
+			const productIds = storedProducts.map((p) => p.id);
+			if (productIds.length > 0) {
+				await db.delete(productImages).where(inArray(productImages.productId, productIds));
+				if (allImageValues.length > 0) {
+					await db.insert(productImages).values(allImageValues);
+				}
+
+				await db.delete(productInventory).where(inArray(productInventory.productId, productIds));
+				if (allInventoryValues.length > 0) {
+					await db.insert(productInventory).values(allInventoryValues);
+				}
+			}
 		}
+
+		console.log(`Synced ${Math.min(i + BATCH_SIZE, feedProducts.length)}/${feedProducts.length} products.`);
 	}
 
 	if (seenSkus.length > 0) {
@@ -685,9 +704,11 @@ async function main() {
 	}
 
 	await syncCatalog(loadedFeed);
+	await poolSql.end();
 }
 
-main().catch((error) => {
+main().catch(async (error) => {
 	console.error(error);
+	await poolSql.end();
 	process.exitCode = 1;
-});
+});

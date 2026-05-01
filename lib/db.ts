@@ -1,6 +1,8 @@
 import { existsSync, readFileSync } from "node:fs";
 import * as schema from "@/db/schema";
-import { drizzle } from "drizzle-orm/postgres-js";
+import { neon } from "@neondatabase/serverless";
+import { drizzle as drizzleHttp } from "drizzle-orm/neon-http";
+import { drizzle as drizzlePool } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 
 function parseEnvFile(filePath: string) {
@@ -64,11 +66,40 @@ if (!connectionString) {
 	throw new Error("Missing Neon/Postgres connection string.");
 }
 
-export const sql = postgres(connectionString, {
-	prepare: false,
-	max: 10,
-	idle_timeout: 20,
-	connect_timeout: 15,
-});
+/**
+ * Stateless HTTP-based database client.
+ * Best for Next.js Server Components, Route Handlers, and serverless environments.
+ * Does not maintain persistent TCP connections.
+ */
+const httpClient = neon(connectionString);
+export const db = drizzleHttp(httpClient, { schema });
 
-export const db = drizzle(sql, { schema });
+let internalPoolSql: ReturnType<typeof postgres> | undefined;
+let internalPoolDb: ReturnType<typeof drizzlePool> | undefined;
+
+export function getPoolSql() {
+	if (!internalPoolSql) {
+		internalPoolSql = postgres(connectionString, {
+			prepare: false,
+			max: 1,
+			idle_timeout: 10,
+			connect_timeout: 15,
+		});
+	}
+	return internalPoolSql;
+}
+
+export function getPoolDb() {
+	if (!internalPoolDb) {
+		internalPoolDb = drizzlePool(getPoolSql(), { schema });
+	}
+	return internalPoolDb;
+}
+
+/** @deprecated Use getPoolSql() instead */
+export const sql = getPoolSql();
+/** @deprecated Use getPoolDb() instead */
+export const poolDb = getPoolDb();
+/** @deprecated Use getPoolSql() instead */
+export const poolSql = getPoolSql();
+

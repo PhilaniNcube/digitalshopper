@@ -1,4 +1,4 @@
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq, inArray, sql } from "drizzle-orm";
 import { readFile } from "node:fs/promises";
 import { productInventory, products } from "@/db/schema";
 import { db } from "@/lib/db";
@@ -186,12 +186,11 @@ export async function syncSyntechStockUpdateFeed(input: StockSyncInput = {}): Pr
 
 	const productIdBySku = new Map(existingProducts.map((product) => [product.supplierSku, product.id]));
 
-	let updatedProductCount = 0;
-	let updatedInventoryRows = 0;
+	const productUpdates: any[] = [];
+	const inventoryValues: any[] = [];
 	let unmatchedSkuCount = 0;
 
-	for (let index = 0; index < rowsToProcess.length; index += 1) {
-		const row = rowsToProcess[index];
+	for (const row of rowsToProcess) {
 		const productId = productIdBySku.get(row.sku);
 
 		if (!productId) {
@@ -199,49 +198,61 @@ export async function syncSyntechStockUpdateFeed(input: StockSyncInput = {}): Pr
 			continue;
 		}
 
-		await db
-			.update(products)
-			.set({
-				totalStock: row.totalStock,
-				inStock: row.inStock,
-				nextShipmentEta: row.nextShipmentEta,
-				supplierLastModified: row.supplierLastModified,
-				lastSyncedAt: new Date(),
-				updatedAt: new Date(),
-			})
-			.where(eq(products.id, productId));
-
-		updatedProductCount += 1;
+		productUpdates.push(
+			db
+				.update(products)
+				.set({
+					totalStock: row.totalStock,
+					inStock: row.inStock,
+					nextShipmentEta: row.nextShipmentEta,
+					supplierLastModified: row.supplierLastModified,
+					lastSyncedAt: new Date(),
+					updatedAt: new Date(),
+				})
+				.where(eq(products.id, productId)),
+		);
 
 		for (const warehouse of row.warehouseQuantities) {
-			await db
-				.insert(productInventory)
-				.values({
-					productId,
-					warehouseCode: warehouse.warehouseCode,
-					quantity: warehouse.quantity,
-				})
-				.onConflictDoUpdate({
-					target: [productInventory.productId, productInventory.warehouseCode],
-					set: {
-						quantity: warehouse.quantity,
-						updatedAt: new Date(),
-					},
-				});
-
-			updatedInventoryRows += 1;
+			inventoryValues.push({
+				productId,
+				warehouseCode: warehouse.warehouseCode,
+				quantity: warehouse.quantity,
+			});
 		}
+	}
 
-		if ((index + 1) % 250 === 0 || index === rowsToProcess.length - 1) {
-			console.log(`Processed ${index + 1}/${rowsToProcess.length} stock rows.`);
-		}
+	// Process product updates in batches to avoid massive single request
+	const BATCH_SIZE = 100;
+	for (let i = 0; i < productUpdates.length; i += BATCH_SIZE) {
+		const batch = productUpdates.slice(i, i + BATCH_SIZE);
+		// @ts-ignore - Drizzle batch support
+		await db.batch(batch as any);
+		console.log(`Updated ${Math.min(i + BATCH_SIZE, productUpdates.length)}/${productUpdates.length} product rows.`);
+	}
+
+	// Process inventory in batches
+	for (let i = 0; i < inventoryValues.length; i += BATCH_SIZE * 3) {
+		const batchValues = inventoryValues.slice(i, i + BATCH_SIZE * 3);
+		await db
+			.insert(productInventory)
+			.values(batchValues)
+			.onConflictDoUpdate({
+				target: [productInventory.productId, productInventory.warehouseCode],
+				set: {
+					quantity: sql`excluded.quantity`,
+					updatedAt: new Date(),
+				},
+			});
+		console.log(
+			`Updated ${Math.min(i + BATCH_SIZE * 3, inventoryValues.length)}/${inventoryValues.length} inventory rows.`,
+		);
 	}
 
 	return {
 		declaredCount,
 		loadedProducts: feedProducts.length,
-		updatedProductCount,
-		updatedInventoryRows,
+		updatedProductCount: productUpdates.length,
+		updatedInventoryRows: inventoryValues.length,
 		unmatchedSkuCount,
 	};
-}
+}
