@@ -23,9 +23,12 @@ function getRequiredValue(...values: Array<string | undefined>) {
  * PHP urlencode keeps only A-Z a-z 0-9 - _ . unchanged and encodes
  * everything else (spaces become +). JS encodeURIComponent additionally
  * leaves ! ~ * ' ( ) untouched, so we encode those manually.
+ *
+ * IMPORTANT: We do NOT trim here. Trimming should happen at the data
+ * source to ensure the signed string matches the posted form data.
  */
 function encode(value: string) {
-	return encodeURIComponent(value.trim())
+	return encodeURIComponent(value)
 		.replace(/%20/g, "+")
 		.replace(/!/g, "%21")
 		.replace(/~/g, "%7E")
@@ -63,8 +66,8 @@ export function getPayfastConfig() {
 
 function buildSignatureSource(fields: PayfastFields, passphrase: string) {
 	const pairs = Object.entries(fields)
-		.filter(([, value]) => value.length > 0)
-		.map(([key, value]) => `${key}=${encode(value)}`);
+		.filter(([, value]) => value !== undefined && value !== null && value.toString().length > 0)
+		.map(([key, value]) => `${key}=${encode(value.toString())}`);
 
 	if (passphrase) {
 		pairs.push(`passphrase=${encode(passphrase)}`);
@@ -138,32 +141,46 @@ export function validatePayfastSignature(postedFields: PayfastFields): boolean {
 export function buildPayfastFormFields(order: Order) {
 	const { merchantId, merchantKey, paymentUrl, siteUrl } = getPayfastConfig();
 
-	const fields: PayfastFields = {
-		merchant_id: merchantId,
-		merchant_key: merchantKey,
-		return_url: `${siteUrl}/orders/${order.id}/success`,
-		cancel_url: `${siteUrl}/orders/${order.id}/cancel`,
-		notify_url: `${siteUrl}/api/payfast/notify`,
-		name_first: order.firstName,
-		name_last: order.lastName,
-		email_address: order.email,
-		cell_number: order.phone,
+	// Prepare raw fields, ensuring all are trimmed and strings
+	const rawFields: Record<string, string> = {
+		merchant_id: merchantId.trim(),
+		merchant_key: merchantKey.trim(),
+		return_url: `${siteUrl}/orders/${order.id}/success`.trim(),
+		cancel_url: `${siteUrl}/orders/${order.id}/cancel`.trim(),
+		notify_url: `${siteUrl}/api/payfast/notify`.trim(),
+		name_first: (order.firstName ?? "").trim(),
+		name_last: (order.lastName ?? "").trim(),
+		email_address: (order.email ?? "").trim(),
+		cell_number: (order.phone ?? "").trim(),
+		m_payment_id: order.id.trim(),
 		amount: Number(order.total).toFixed(2),
-		item_name: order.id,
-		custom_str1: order.addressLine1,
-		custom_str2: order.city,
+		item_name: `Order #${order.id.slice(0, 8)}`.trim(),
+		custom_str1: (order.addressLine1 ?? "").trim(),
+		custom_str2: (order.city ?? "").trim(),
 	};
+
+	// Filter out empty fields BEFORE signing
+	// Payfast signature generation rules: "Remove any empty variables"
+	const fields = Object.entries(rawFields)
+		.filter(([, value]) => value.length > 0)
+		.reduce<PayfastFields>((acc, [key, value]) => {
+			acc[key] = value;
+			return acc;
+		}, {});
+
+	const signature = signPayfastFields(fields);
 
 	debugPayfast("build-form-fields", {
 		orderId: order.id,
 		fields,
+		signature,
 	});
 
 	return {
 		paymentUrl,
 		fields: {
 			...fields,
-			signature: signPayfastFields(fields),
+			signature,
 		},
 	};
 }
