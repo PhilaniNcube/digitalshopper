@@ -27,6 +27,11 @@ type SyntechStockProduct = {
 	dbnstock?: number | string | false;
 	nextshipmenteta?: string | false;
 	last_modified?: string | false;
+	price?: number | string | false;
+	rrp_incl?: number | string | false;
+	promo_price?: number | string | false;
+	promo_starts?: string | false;
+	promo_ends?: string | false;
 	[key: string]: unknown;
 };
 
@@ -158,6 +163,11 @@ export async function syncSyntechStockUpdateFeed(input: StockSyncInput = {}): Pr
 				sku,
 				totalStock,
 				inStock: totalStock > 0,
+				price: asNullableInteger(product.price) ?? 0,
+				rrpIncl: asNullableInteger(product.rrp_incl),
+				promoPrice: asNullableInteger(product.promo_price),
+				promoStartsAt: asNullableTimestamp(product.promo_starts),
+				promoEndsAt: asNullableTimestamp(product.promo_ends),
 				nextShipmentEta: asNullableString(typeof product.nextshipmenteta === "string" ? product.nextshipmenteta : ""),
 				supplierLastModified: asNullableTimestamp(product.last_modified),
 				warehouseQuantities,
@@ -204,6 +214,11 @@ export async function syncSyntechStockUpdateFeed(input: StockSyncInput = {}): Pr
 				.set({
 					totalStock: row.totalStock,
 					inStock: row.inStock,
+					price: row.price,
+					rrpIncl: row.rrpIncl,
+					promoPrice: row.promoPrice,
+					promoStartsAt: row.promoStartsAt,
+					promoEndsAt: row.promoEndsAt,
 					nextShipmentEta: row.nextShipmentEta,
 					supplierLastModified: row.supplierLastModified,
 					lastSyncedAt: new Date(),
