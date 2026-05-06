@@ -56,7 +56,7 @@ export default async function OrderDetail({ params }: OrderDetailProps) {
 				</div>
 				<div className="flex items-center gap-3">
 					<Badge
-						
+
 						className="capitalize bg-white text-black text-sm px-3 py-1"
 					>
 						{order.status}
@@ -218,7 +218,9 @@ export default async function OrderDetail({ params }: OrderDetailProps) {
 												</div>
 											)}
 											<span className="text-sm text-slate-100 line-clamp-2">
-												{item.title}
+												<Link href={`/dashboard/products/${item.id}`}>
+													{item.title}
+												</Link>
 											</span>
 										</div>
 									</TableCell>

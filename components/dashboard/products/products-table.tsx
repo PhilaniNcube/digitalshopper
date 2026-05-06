@@ -38,14 +38,14 @@ const columns: ColumnDef<ProductListItem>[] = [
 	{
 		accessorKey: "title",
 		header: "Product",
-        cell: ({ row }) => {
-            const product = row.original;
-            return (
-                <div className="flex items-center gap-2">
-                    <p className='max-w-[28ch] truncate'>{product.title}</p>
-                </div>
-            );
-        }
+		cell: ({ row }) => {
+			const product = row.original;
+			return (
+				<div className="flex items-center gap-2">
+					<p className='max-w-[28ch] truncate'>{product.title}</p>
+				</div>
+			);
+		}
 	},
 	{
 		accessorKey: "supplierSku",
@@ -157,13 +157,13 @@ export function ProductsTable({ products, pagination }: ProductsTableProps) {
 					placeholder="Search by product..."
 					value={q}
 					onChange={(event) => setQ(event.target.value)}
-					className="max-w-xs h-12 placeholder:text-slate-100"
+					className="max-w-xs h-12 placeholder:text-slate-100 text-white"
 				/>
 				<Input
 					placeholder="Search by SKU..."
 					value={sku}
 					onChange={(event) => setSku(event.target.value)}
-					className="max-w-xs h-12 placeholder:text-slate-100"
+					className="max-w-xs h-12 placeholder:text-slate-100 text-white"
 				/>
 				<Select
 					value={(table.getColumn("active")?.getFilterValue() as string) ?? "all"}
