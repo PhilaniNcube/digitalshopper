@@ -4,7 +4,7 @@ import { Separator } from "@/components/ui/separator";
 
 export function ProductDetailSkeleton() {
     return (
-        <div className="space-y-6 text-white max-w-5xl mx-auto">
+        <div className="space-y-6 text-white mx-auto">
             <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                 <div>
                     <Skeleton className="h-9 w-64 md:w-96" />

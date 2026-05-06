@@ -20,7 +20,7 @@ export default async function ProductDetail({ paramsPromise }: Props) {
     }
 
     return (
-        <div className="space-y-6 text-white max-w-5xl mx-auto">
+        <div className="space-y-6 text-white mx-auto">
             <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                 <div>
                     <h1 className="text-3xl font-bold tracking-tight">{product.title}</h1>
@@ -91,7 +91,7 @@ export default async function ProductDetail({ paramsPromise }: Props) {
                             <CardTitle>Description</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <div 
+                            <div
                                 className="prose prose-invert max-w-none text-sm text-slate-300 prose-p:leading-relaxed prose-a:text-primary-strong"
                                 dangerouslySetInnerHTML={{ __html: product.descriptionHtml }}
                             />
