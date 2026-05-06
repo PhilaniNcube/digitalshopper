@@ -8,7 +8,7 @@ export default async function ProductPage({
     params: Promise<{ productId: string }>
 }) {
     return (
-        <div className="container py-8">
+        <div className=" py-8">
             <Suspense fallback={<ProductDetailSkeleton />}>
                 <ProductDetail paramsPromise={params} />
             </Suspense>
