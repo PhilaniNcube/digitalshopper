@@ -5,6 +5,8 @@ type ProductDataProps = {
 	searchParams: Promise<{
 		page?: string | string[];
 		pageSize?: string | string[];
+		q?: string | string[];
+		sku?: string | string[];
 	}>;
 };
 
@@ -18,10 +20,12 @@ export default async function ProductData({
 	const resolvedSearchParams = await searchParams;
 	const pageValue = Number(getSingleParam(resolvedSearchParams.page) ?? "1");
 	const pageSizeValue = Number(getSingleParam(resolvedSearchParams.pageSize) ?? "20");
+	const q = getSingleParam(resolvedSearchParams.q);
+	const sku = getSingleParam(resolvedSearchParams.sku);
 	const page = Number.isFinite(pageValue) && pageValue > 0 ? Math.floor(pageValue) : 1;
 	const pageSize = Number.isFinite(pageSizeValue) && pageSizeValue > 0 ? Math.floor(pageSizeValue) : 20;
 
-	const { items, pagination } = await getAdminProducts({ page, pageSize });
+	const { items, pagination } = await getAdminProducts({ page, pageSize, q, sku });
 
 	return (
 		<div className="space-y-6">

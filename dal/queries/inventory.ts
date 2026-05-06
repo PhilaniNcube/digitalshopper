@@ -1,6 +1,6 @@
 import "server-only";
 
-import { and, asc, count, eq, gt, lte, sql, sum } from "drizzle-orm";
+import { and, asc, count, eq, gt, ilike, lte, or, sql, sum } from "drizzle-orm";
 import { productInventory, products } from "@/db/schema";
 import { db } from "@/lib/db";
 import { requireAdmin } from "@/lib/session";
@@ -131,3 +131,54 @@ export async function getLowStockProducts(): Promise<LowStockProduct[]> {
 		dbn: Number(r.dbn),
 	}));
 }
+
+export async function searchInventoryProducts(
+	q: string,
+): Promise<LowStockProduct[]> {
+	await requireAdmin();
+
+	if (!q.trim()) return [];
+
+	const searchPattern = `%${q.trim()}%`;
+
+	const rows = await db
+		.select({
+			id: products.id,
+			title: products.title,
+			supplierSku: products.supplierSku,
+			featuredImage: products.featuredImage,
+			totalStock: products.totalStock,
+			inStock: products.inStock,
+			nextShipmentEta: products.nextShipmentEta,
+			cpt: sql<number>`coalesce(max(case when ${productInventory.warehouseCode} = 'CPT' then ${productInventory.quantity} end), 0)`,
+			jhb: sql<number>`coalesce(max(case when ${productInventory.warehouseCode} = 'JHB' then ${productInventory.quantity} end), 0)`,
+			dbn: sql<number>`coalesce(max(case when ${productInventory.warehouseCode} = 'DBN' then ${productInventory.quantity} end), 0)`,
+		})
+		.from(products)
+		.leftJoin(productInventory, eq(products.id, productInventory.productId))
+		.where(
+			or(
+				ilike(products.title, searchPattern),
+				ilike(products.supplierSku, searchPattern),
+			),
+		)
+		.groupBy(
+			products.id,
+			products.title,
+			products.supplierSku,
+			products.featuredImage,
+			products.totalStock,
+			products.inStock,
+			products.nextShipmentEta,
+		)
+		.orderBy(asc(products.title))
+		.limit(20);
+
+	return rows.map((r) => ({
+		...r,
+		cpt: Number(r.cpt),
+		jhb: Number(r.jhb),
+		dbn: Number(r.dbn),
+	}));
+}
+

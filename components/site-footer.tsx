@@ -4,8 +4,9 @@ import Link from "next/link";
 import { Image as ImageIcon, Code, Settings } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
+
+import { NewsletterForm } from "./newsletter-form";
 
 export async function SiteFooter() {
   return (
@@ -146,19 +147,7 @@ export async function SiteFooter() {
                 Priority access to limited retail allocations and partner
                 product launches.
               </p>
-              <div className="flex flex-col gap-2">
-                <Input
-                  type="email"
-                  placeholder="YOUR_EMAIL"
-                  className="bg-background/50 border-border/50 text-xs placeholder:text-muted-foreground/50 rounded-none h-9"
-                />
-                <Button
-                  size="sm"
-                  className="w-full h-9 px-4 text-xs font-bold tracking-wider bg-primary-strong rounded-none text-primary-foreground hover:bg-primary/90"
-                >
-                  SUBMIT
-                </Button>
-              </div>
+              <NewsletterForm />
             </div>
           </div>
         </div>

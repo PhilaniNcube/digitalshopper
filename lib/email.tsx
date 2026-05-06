@@ -7,11 +7,41 @@ import type { StoredOrderItem } from "@/db/schema";
 import { Resend } from "resend";
 
 const resendApiKey = process.env.RESEND_API_KEY ?? process.env.NEXT_PUBLIC_RESEND_API_KEY;
+const resendAudienceId = process.env.RESEND_AUDIENCE_ID;
 const resendFrom = "Digital Shopper <info@digitalshopper.co.za>";
 
 const ADMIN_EMAILS = ["info@digitalshopper.co.za", "ncbphi001@gmail.com"];
 
 const resend = resendApiKey ? new Resend(resendApiKey) : null;
+
+export async function subscribeToNewsletter(email: string) {
+	if (!resend) {
+		console.error("Resend API key missing");
+		throw new Error("Newsletter service unavailable. Please try again later.");
+	}
+
+	if (!resendAudienceId) {
+		console.error("RESEND_AUDIENCE_ID missing");
+		throw new Error("Newsletter service misconfigured. Please contact support.");
+	}
+
+	try {
+		const { data, error } = await resend.contacts.create({
+			email,
+			audienceId: resendAudienceId,
+		});
+
+		if (error) {
+			console.error("Resend error:", error);
+			throw new Error(error.message || "Failed to subscribe.");
+		}
+
+		return data;
+	} catch (err) {
+		console.error("Subscription error:", err);
+		throw err instanceof Error ? err : new Error("An unexpected error occurred.");
+	}
+}
 
 export async function sendResetPasswordEmail({
 	to,

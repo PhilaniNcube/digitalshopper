@@ -239,14 +239,34 @@ export async function fetchProducts(options: ProductPaginationOptions = {}): Pro
 }
 
 export async function getAdminProducts(
-	options: ProductPaginationOptions = {},
+	options: ProductPaginationOptions & { q?: string; sku?: string } = {},
 ): Promise<PaginatedProductsResult> {
 	await requireAdmin();
 
 	const pagination = normalizePagination(options);
+	const searchPattern = options.q?.trim() ? `%${options.q.trim()}%` : undefined;
+	const skuPattern = options.sku?.trim() ? `%${options.sku.trim()}%` : undefined;
+
+	const conditions: (SQL<unknown> | undefined)[] = [];
+
+	if (searchPattern) {
+		conditions.push(
+			or(
+				ilike(products.title, searchPattern),
+				ilike(products.slug, searchPattern),
+			),
+		);
+	}
+
+	if (skuPattern) {
+		conditions.push(ilike(products.supplierSku, skuPattern));
+	}
+
+	const where = combineFilters(...conditions);
 
 	const [items, totalItems] = await Promise.all([
 		db.query.products.findMany({
+			where,
 			with: {
 				brand: true,
 				category: true,
@@ -255,14 +275,16 @@ export async function getAdminProducts(
 			limit: pagination.pageSize,
 			offset: pagination.offset,
 		}),
-		countProducts(),
+		countProducts(where),
 	]);
+
 
 	return {
 		items: items.map(mapProductListItem),
 		pagination: buildPaginationMeta(totalItems, pagination),
 	};
 }
+
 
 export async function fetchCatalogProducts(filters: ProductCatalogFilters = {}): Promise<PaginatedProductsResult> {
 	const normalizedQuery = normalizeSearchTerm(filters.q);

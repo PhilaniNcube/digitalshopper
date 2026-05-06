@@ -31,7 +31,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           
            
           </header>
-          <main className="flex-1 px-6 ">{children}</main>
+          <main className="flex-1 px-6 ">
+            <Suspense fallback={<div className="flex h-full items-center justify-center text-white/60">Loading...</div>}>
+              {children}
+            </Suspense>
+          </main>
         </SidebarInset>
       </TooltipProvider>
     </SidebarProvider>

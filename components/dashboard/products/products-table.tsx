@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { useQueryState, parseAsString } from "nuqs";
+
 import {
 	type ColumnDef,
 	type ColumnFiltersState,
@@ -107,6 +109,20 @@ type ProductsTableProps = {
 
 export function ProductsTable({ products, pagination }: ProductsTableProps) {
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+	const [q, setQ] = useQueryState(
+		"q",
+		parseAsString.withDefault("").withOptions({
+			shallow: false,
+			throttleMs: 300,
+		}),
+	);
+	const [sku, setSku] = useQueryState(
+		"sku",
+		parseAsString.withDefault("").withOptions({
+			shallow: false,
+			throttleMs: 300,
+		}),
+	);
 
 	const table = useReactTable({
 		data: products,
@@ -120,22 +136,33 @@ export function ProductsTable({ products, pagination }: ProductsTableProps) {
 	const filteredCount = table.getFilteredRowModel().rows.length;
 	const currentPage = pagination.page;
 	const totalPages = Math.max(1, pagination.totalPages);
-	const previousPageHref = `?page=${Math.max(1, currentPage - 1)}&pageSize=${pagination.pageSize}`;
-	const nextPageHref = `?page=${currentPage + 1}&pageSize=${pagination.pageSize}`;
+
+	const baseParams = new URLSearchParams();
+	if (q) baseParams.set("q", q);
+	if (sku) baseParams.set("sku", sku);
+	baseParams.set("pageSize", pagination.pageSize.toString());
+
+	const prevParams = new URLSearchParams(baseParams);
+	prevParams.set("page", Math.max(1, currentPage - 1).toString());
+	const previousPageHref = `?${prevParams.toString()}`;
+
+	const nextParams = new URLSearchParams(baseParams);
+	nextParams.set("page", (currentPage + 1).toString());
+	const nextPageHref = `?${nextParams.toString()}`;
 
 	return (
 		<div className="space-y-4">
 			<div className="flex flex-wrap items-center gap-3">
 				<Input
 					placeholder="Search by product..."
-					value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
-					onChange={(event) => table.getColumn("title")?.setFilterValue(event.target.value)}
+					value={q}
+					onChange={(event) => setQ(event.target.value)}
 					className="max-w-xs h-12 placeholder:text-slate-100"
 				/>
 				<Input
 					placeholder="Search by SKU..."
-					value={(table.getColumn("supplierSku")?.getFilterValue() as string) ?? ""}
-					onChange={(event) => table.getColumn("supplierSku")?.setFilterValue(event.target.value)}
+					value={sku}
+					onChange={(event) => setSku(event.target.value)}
 					className="max-w-xs h-12 placeholder:text-slate-100"
 				/>
 				<Select
