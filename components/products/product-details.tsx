@@ -10,12 +10,9 @@ import {
   fetchProductBySlug,
   type ProductWithImagesAndInventory,
 } from "@/dal/queries/products";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, getDisplayPrice } from "@/lib/utils";
 import { Metadata } from "next";
 
-function getDisplayPrice(product: ProductWithImagesAndInventory) {
-  return product.promoPrice ?? product.rrpIncl ?? product.price * 1.14 * 1.15;
-}
 
 function getCartProduct(product: ProductWithImagesAndInventory) {
   const mainImage =
@@ -142,8 +139,8 @@ const ProductDetails = async ({
   const cartProduct = getCartProduct(product);
   const warehouseLabel = getWarehouseLabel(product.inventory);
   const hasPromo =
-    product.promoPrice != null &&
-    product.promoPrice < (product.rrpIncl ?? product.price * 1.14 * 1.15);
+    product.rrpIncl != null &&
+    price < product.rrpIncl;
 
   const galleryImages =
     product.images.length > 0

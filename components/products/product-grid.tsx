@@ -4,6 +4,7 @@ import { ProductGridPagination } from "@/components/products/product-grid-pagina
 import { Badge } from "@/components/ui/badge";
 import { fetchCatalogProducts } from "@/dal/queries/products";
 import { TrackViewItemList } from "@/components/products/track-view-item-list";
+import { getDisplayPrice } from "@/lib/utils";
 import { Boxes, PackageCheck, SearchX } from "lucide-react";
 
 function getVisiblePages(currentPage: number, totalPages: number) {
@@ -97,7 +98,7 @@ export async function ProductGrid({ searchParamsPromise }: { searchParamsPromise
 							slug: p.slug,
 							title: p.title,
 							category: p.category?.slug ?? "uncategorized",
-							price: Math.round(p.promoPrice ?? p.rrpIncl ?? p.price * 1.14 * 1.15),
+							price: Math.round(getDisplayPrice(p)),
 							image: p.mainImage ?? "/images/banner.webp",
 							summary: p.summary ?? p.shortDescription ?? "",
 							specs: p.specs.slice(0, 3),

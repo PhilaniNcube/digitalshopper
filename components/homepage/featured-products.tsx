@@ -1,7 +1,7 @@
 "use cache";
 
 import { fetchFeaturedProducts } from "@/dal/queries/products";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, getDisplayPrice } from "@/lib/utils";
 import { Check } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -52,7 +52,7 @@ const FeaturedProducts = async () => {
                   {product.title}
                 </h3>
                 <p className="text-sm md:text-lg font-semibold text-primary-strong!">
-                  {product.rrpIncl ? formatCurrency(product.rrpIncl) : formatCurrency((product.price * 1.14) * 1.15)} {/* Fallback to price with tax if rrpIncl is not available */}
+                  {formatCurrency(getDisplayPrice(product))}
                 </p>
               </div>
               <div className="px-4 pb-4">

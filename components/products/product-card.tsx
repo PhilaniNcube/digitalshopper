@@ -1,14 +1,12 @@
 import { AddToCartButton } from "@/components/products/add-to-cart-button";
 import type { ProductListItem } from "@/dal/queries/products";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, getDisplayPrice } from "@/lib/utils";
 import { ShoppingCart, Star } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { ViewTransition } from "react";
 
-function getDisplayPrice(product: ProductListItem) {
-  return product.promoPrice ?? product.rrpIncl ?? product.price * 1.14 * 1.15;
-}
+
 
 function getAvailabilityLabel(product: ProductListItem) {
   if (!product.inStock) {

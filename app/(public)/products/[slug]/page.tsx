@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { fetchProductBySlug } from "@/dal/queries/products";
 import ProductDetails from "@/components/products/product-details";
+import { getDisplayPrice } from "@/lib/utils";
 import { Suspense } from "react";
 
 export async function generateMetadata({
@@ -15,7 +16,7 @@ export async function generateMetadata({
     return { title: "Product Not Found | Digital Shopper" };
   }
 
-  const price = product.rrpIncl ?? product.price * 1.14 * 1.15;
+  const price = getDisplayPrice(product);
 
   return {
     title: `${product.title} | Digital Shopper`,
