@@ -19,17 +19,8 @@ export function cn(...inputs: ClassValue[]) {
 /**
  * Computes the customer-facing display price for a product.
  *
- * - `promoPrice` is the **supplier's promotional buy price** (your cost), not a
- *   customer-facing price. When present it is used as the base cost instead of `price`.
- * - `recommendedMargin` is a whole-number percentage (e.g. 14.95 = 14.95%).
- * - The result is always capped at `rrpIncl` (recommended retail price) so we
- *   never charge the customer more than the market rate.
- *
- * Priority:
- * 1. Cost × (1 + margin%) capped at RRP  — when margin is known.
- *    Cost = promoPrice (supplier promo buy price) if available, else price.
- * 2. rrpIncl — when no margin is available, sell at RRP.
- * 3. Fallback — price × 1.14 (VAT) × 1.15 (15% default margin).
+ * To keep it simple, we display the rrpIncl (recommended retail price) to the customer.
+ * If rrpIncl is not available, we fall back to a margin-based calculation.
  */
 export function getDisplayPrice(product: {
   price: number;
@@ -37,25 +28,18 @@ export function getDisplayPrice(product: {
   promoPrice?: number | null;   // supplier promo buy/cost price
   recommendedMargin?: number | null; // percentage, e.g. 14.95 = 14.95%
 }): number {
-  // The base cost is the promo buy price when the supplier offers one,
-  // otherwise fall back to the regular cost price.
-  const costPrice = product.promoPrice ?? product.price;
-
-  // 1. Apply recommended margin and cap at RRP
-  if (product.recommendedMargin != null) {
-    const markedUp = Math.round(costPrice * (1 + product.recommendedMargin / 100));
-    if (product.rrpIncl != null) {
-      return Math.min(markedUp, product.rrpIncl);
-    }
-    return markedUp;
-  }
-
-  // 2. No margin info — use RRP directly
+  // 1. Display RRP directly if available
   if (product.rrpIncl != null) {
     return product.rrpIncl;
   }
 
-  // 3. Fallback: estimated VAT + 15% default margin on the regular cost price
+  // 2. Fallback calculations if RRP is missing
+  const costPrice = product.promoPrice ?? product.price;
+
+  if (product.recommendedMargin != null) {
+    return Math.round(costPrice * (1 + product.recommendedMargin / 100));
+  }
+
   return Math.round(product.price * 1.14 * 1.15);
 }
 
