@@ -27,13 +27,32 @@ export function getDisplayPrice(product: {
   rrpIncl?: number | null;
   promoPrice?: number | null;   // supplier promo buy/cost price
   recommendedMargin?: number | null; // percentage, e.g. 14.95 = 14.95%
+  promoStartsAt?: Date | string | null;
+  promoEndsAt?: Date | string | null;
 }): number {
-  // 1. Display RRP directly if available
+  // 1. Check for active promotion first
+  if (product.promoPrice != null && product.promoStartsAt && product.promoEndsAt) {
+    const now = new Date();
+    const start = new Date(product.promoStartsAt);
+    const end = new Date(product.promoEndsAt);
+    
+    if (now >= start && now <= end) {
+      // promoPrice is cost excluding VAT, so we add VAT (15%)
+      const promoCostWithVat = product.promoPrice * 1.15;
+      const marginMultiplier = product.recommendedMargin != null 
+        ? 1 + product.recommendedMargin / 100 
+        : 1.15; // default 15% margin if no recommended margin
+        
+      return Math.round(promoCostWithVat * marginMultiplier);
+    }
+  }
+
+  // 2. Display RRP directly if available
   if (product.rrpIncl != null) {
     return product.rrpIncl;
   }
 
-  // 2. Fallback calculations if RRP is missing
+  // 3. Fallback calculations if RRP is missing
   const costPrice = product.promoPrice ?? product.price;
 
   if (product.recommendedMargin != null) {
