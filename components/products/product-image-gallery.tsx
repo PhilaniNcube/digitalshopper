@@ -20,8 +20,8 @@ export function ProductImageGallery({
   const activeImage = images[activeIndex]?.url ?? "/images/banner.webp";
 
   return (
-    <div className="flex flex-col gap-3">
-      <div className="relative aspect-square overflow-hidden bg-surface-low ring-1 ring-white/6">
+    <div className="flex w-full flex-col gap-3">
+      <div className="relative aspect-square w-full overflow-hidden bg-surface-low ring-1 ring-white/6">
         {transitionName ? (
           <ViewTransition
             name={transitionName}

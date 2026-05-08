@@ -217,16 +217,18 @@ const ProductDetails = async ({
       </nav>
 
       {/* ── Hero Section ── */}
-      <div className="grid gap-10 lg:grid-cols-2 lg:gap-16">
+      <div className="grid min-w-0 gap-10 lg:grid-cols-2 lg:gap-16">
         {/* Left: Image Gallery */}
-        <ProductImageGallery
-          images={galleryImages}
-          title={product.title}
-          transitionName={`product-image-${product.slug}`}
-        />
+        <div className="min-w-0">
+          <ProductImageGallery
+            images={galleryImages}
+            title={product.title}
+            transitionName={`product-image-${product.slug}`}
+          />
+        </div>
 
         {/* Right: Product Info */}
-        <div className="flex flex-col gap-6">
+        <div className="flex min-w-0 flex-col gap-6">
           {/* Category / Brand label */}
           <p className="text-[10px] font-medium uppercase tracking-[0.34em] text-primary-strong">
             {product.brand?.name ?? "Digital Shopper"}
@@ -255,14 +257,14 @@ const ProductDetails = async ({
 
           {/* Summary */}
           {product.summary && (
-            <p className="max-w-lg text-sm leading-relaxed text-slate-400">
+            <p className="text-sm leading-relaxed text-slate-400">
               {product.summary}
             </p>
           )}
 
           {/* Highlight Specs Grid */}
           {highlightSpecs.length > 0 && (
-            <div className="grid grid-cols-2 gap-x-8 gap-y-4">
+            <div className="grid grid-cols-2 gap-x-4 gap-y-4">
               {highlightSpecs.map((spec) => (
                 <SpecItem key={spec} label="" value={spec} />
               ))}
