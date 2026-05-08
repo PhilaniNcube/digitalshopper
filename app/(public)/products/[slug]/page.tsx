@@ -95,7 +95,7 @@ export default function ProductPage({
   params: Promise<{ slug: string }>;
 }) {
   return (
-    <div className="mx-auto w-full max-w-7xl px-4 py-10 lg:px-8">
+    <div className="mx-auto w-full max-w-7xl overflow-x-hidden px-4 py-10 lg:px-8">
       <Suspense fallback={<ProductDetailsSkeleton />}>
         <ProductDetails paramsPromise={params} />
       </Suspense>

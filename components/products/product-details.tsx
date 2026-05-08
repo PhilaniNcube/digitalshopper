@@ -197,23 +197,23 @@ const ProductDetails = async ({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       {/* ── Breadcrumb ── */}
-      <nav className="mb-8 flex items-center gap-2 text-xs text-slate-500">
-        <Link href="/products" className="transition hover:text-white">
+      <nav className="mb-8 flex min-w-0 items-center gap-2 text-xs text-slate-500">
+        <Link href="/products" className="shrink-0 transition hover:text-white">
           Products
         </Link>
         {product.category && (
           <>
-            <span>/</span>
+            <span className="shrink-0">/</span>
             <Link
               href={`/products?category=${product.category.slug}`}
-              className="transition hover:text-white"
+              className="shrink-0 transition hover:text-white"
             >
               {product.category.name}
             </Link>
           </>
         )}
-        <span>/</span>
-        <span className="text-slate-400">{product.title}</span>
+        <span className="shrink-0">/</span>
+        <span className="min-w-0 truncate text-slate-400">{product.title}</span>
       </nav>
 
       {/* ── Hero Section ── */}
@@ -237,8 +237,8 @@ const ProductDetails = async ({
               </span>
             )}
           </p>
-          <div className="flex items-baseline gap-3">
-            <span className="font-display text-3xl lg:text-5xl font-bold tracking-tight text-white">
+          <div className="flex min-w-0 flex-wrap items-baseline gap-3">
+            <span className="font-display text-3xl font-bold tracking-tight text-white lg:text-5xl">
               {formatCurrency(price)}
             </span>
             {hasPromo && product.rrpIncl != null && (
@@ -249,7 +249,7 @@ const ProductDetails = async ({
           </div>
 
           {/* Product Title */}
-          <h1 className="font-display text-3xl font-bold leading-[1.05] tracking-[-0.04em] text-white md:text-4xl lg:text-5xl">
+          <h1 className="font-display break-words text-2xl font-bold leading-[1.05] tracking-[-0.04em] text-white sm:text-3xl lg:text-5xl">
             {product.title}
           </h1>
 
@@ -345,16 +345,16 @@ const ProductDetails = async ({
             )}
           </div>
 
-          <div className="grid gap-px bg-white/4 sm:grid-cols-2">
+          <div className="grid gap-px overflow-hidden bg-white/4 sm:grid-cols-2">
             {specEntries.map(([key, value]) => (
               <div
                 key={key}
-                className="flex items-baseline gap-6 bg-site-background px-5 py-3.5"
+                className="flex min-w-0 flex-wrap items-baseline gap-x-6 gap-y-1 bg-site-background px-5 py-3.5"
               >
-                <span className="w-36 shrink-0 text-[11px] font-medium uppercase tracking-[0.2em] text-slate-500">
+                <span className="w-32 shrink-0 text-[11px] font-medium uppercase tracking-[0.2em] text-slate-500">
                   {key}
                 </span>
-                <span className="text-sm text-slate-300">{String(value)}</span>
+                <span className="min-w-0 break-words text-sm text-slate-300">{String(value)}</span>
               </div>
             ))}
           </div>
