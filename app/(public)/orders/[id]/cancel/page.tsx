@@ -19,7 +19,7 @@ export default function OrderCancelPage() {
 					Your cart remains available so you can review the order and try again.
 				</p>
 				<div className="mt-8 flex justify-center gap-4">
-					<Button size="lg" className="rounded-none bg-white" asChild>
+					<Button size="lg" className="rounded-none bg-white hover:text-white!" asChild>
 						<Link href="/checkout">Back to checkout</Link>
 					</Button>
 				</div>
