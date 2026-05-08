@@ -52,7 +52,7 @@ export async function ProductGrid({ searchParamsPromise }: { searchParamsPromise
 		<div id="products-results-top" className="grid gap-6">
 			<section className="rounded-[2rem] bg-surface-low p-5 ring-1 ring-white/6 sm:p-6">
 				<div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
-					
+
 					<div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
 						<div className="rounded-[1.3rem] bg-black/20 px-4 py-4">
 							<p className="flex items-center gap-2 text-[11px] uppercase tracking-[0.28em] text-slate-500">
@@ -91,7 +91,7 @@ export async function ProductGrid({ searchParamsPromise }: { searchParamsPromise
 					</div>
 				</section>
 			) : (
-				<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 ">
+				<div className="grid gap-4 grid-cols-2 lg:grid-cols-3 ">
 					<TrackViewItemList
 						products={products.items.map((p) => ({
 							id: p.id,
