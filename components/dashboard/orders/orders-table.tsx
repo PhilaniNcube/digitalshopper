@@ -68,7 +68,7 @@ const columns: ColumnDef<OrderListItem>[] = [
 		cell: ({ row }) => {
 			const status = row.getValue<string>("status");
 			return (
-				<Badge variant={statusVariant[status] ?? "secondary"}>
+				<Badge variant={statusVariant[status] ?? "secondary"} className="text-white">
 					{status}
 				</Badge>
 			);
@@ -184,9 +184,9 @@ export function OrdersTable({ orders, pagination }: OrdersTableProps) {
 									{header.isPlaceholder
 										? null
 										: flexRender(
-												header.column.columnDef.header,
-												header.getContext(),
-											)}
+											header.column.columnDef.header,
+											header.getContext(),
+										)}
 								</TableHead>
 							))}
 						</TableRow>
