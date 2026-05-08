@@ -1,7 +1,7 @@
 import { CATEGORIES_CACHE_TAG, getCategories } from "@/dal/queries/categories";
 import { decodeHtmlEntities } from "@/lib/utils";
 import { cacheLife, cacheTag } from "next/cache";
-import NavCategoriesMenu from "./nav-categories-menu";
+import NavCategoriesMenu, { NavMobileMenuSheet } from "./nav-categories-menu";
 
 type CategoryRecord = Awaited<ReturnType<typeof getCategories>>[number];
 
@@ -83,3 +83,10 @@ const NavCategories = async () => {
 };
 
 export default NavCategories;
+
+/** Server component — renders only the mobile hamburger Sheet. Place it in the header's right side so the button is always last/rightmost on mobile. */
+export const NavMobileCategories = async () => {
+  const categoryTree = await getNavCategoryTree();
+
+  return <NavMobileMenuSheet categories={categoryTree} />;
+};

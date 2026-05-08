@@ -35,12 +35,23 @@ const AuthButtons = async () => {
   if (!session) {
     return (
       <div className="flex items-center gap-2">
-        <Button asChild variant="ghost" className="rounded-full px-4 bg-primary text-white! hover:bg-primary-strong hover:text-slate-700!">
+        {/* Sign in: compact on mobile, full label on sm+ */}
+        <Button asChild variant="ghost" size="icon" className="sm:hidden rounded-full bg-primary text-white! hover:bg-primary-strong hover:text-slate-700!">
+          <Link href="/sign-in" aria-label="Sign in">
+            <svg xmlns="http://www.w3.org/2000/svg" className="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+              <polyline points="10 17 15 12 10 7" />
+              <line x1="15" y1="12" x2="3" y2="12" />
+            </svg>
+          </Link>
+        </Button>
+        <Button asChild variant="ghost" className="hidden sm:inline-flex rounded-full px-4 bg-primary text-white! hover:bg-primary-strong hover:text-slate-700!">
           <Link href="/sign-in">Sign in</Link>
         </Button>
+        {/* Sign up: hidden on mobile, visible on sm+ */}
         <Button
           asChild
-          className="rounded-full bg-primary-strong px-4 text-sm font-semibold text-black hover:bg-cyan-300 hover:text-white!"
+          className="hidden sm:inline-flex rounded-full bg-primary-strong px-4 text-sm font-semibold text-black hover:bg-cyan-300 hover:text-white!"
         >
           <Link href="/sign-up">Sign up</Link>
         </Button>

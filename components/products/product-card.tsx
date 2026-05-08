@@ -94,9 +94,9 @@ export function ProductCard({ product }: { product: ProductListItem }) {
               <span>{product.category?.name ?? "Catalog component"}</span>
             </div>
           </div>
-          <div className="mt-auto flex items-end justify-between gap-3 border-t border-white/6 pt-4">
+          <div className="mt-auto flex flex-col md:flex-row md:items-end justify-between gap-3 border-t border-white/6 pt-4">
             <div>
-              <p className="text-3xl font-semibold tracking-[-0.04em] text-white">
+              <p className="text-2xl md:text-3xl font-semibold tracking-[-0.04em] text-white">
                 {formatCurrency(price)}
               </p>
               <p className="mt-1 text-[10px] font-medium uppercase tracking-[0.28em] text-primary-strong">

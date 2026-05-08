@@ -247,85 +247,88 @@ export default function NavCategoriesMenu({ categories }: NavCategoriesMenuProps
 	const { primaryCategories, overflowCategories } = splitDesktopCategories(categories);
 
 	return (
-		<>
-			<div className="items-center hidden min-w-0 gap-3 lg:flex">
-				
-				<NavigationMenu viewport={false} className="max-w-full min-w-0">
-					<NavigationMenuList className="gap-1">
-						{primaryCategories.map((category) => (
-							<NavigationMenuItem key={category.id}>
-								<NavigationMenuTrigger className="px-3 text-sm font-medium bg-transparent rounded-none h-11 text-slate-300 hover:bg-transparent hover:text-white focus:bg-transparent focus:text-white data-open:bg-transparent data-open:text-white">
-									{category.name}
-								</NavigationMenuTrigger>
-								<NavigationMenuContent className="overflow-hidden rounded-[1.75rem] border border-white/10 bg-[#07101d]/95 p-0 text-white shadow-[0_32px_80px_rgba(0,0,0,0.55)] supports-backdrop-filter:backdrop-blur-2xl lg:fixed lg:inset-x-0 lg:top-20 lg:z-50 lg:mx-auto lg:w-[90vw] lg:max-w-[90vw]">
-									<CategoryPanel category={category} />
-								</NavigationMenuContent>
-							</NavigationMenuItem>
-						))}
-						{overflowCategories.length > 0 ? (
-							<NavigationMenuItem>
-								<NavigationMenuTrigger className="px-3 text-sm font-medium bg-transparent rounded-none h-11 text-slate-300 hover:bg-transparent hover:text-white focus:bg-transparent focus:text-white data-open:bg-transparent data-open:text-white">
-									More
-								</NavigationMenuTrigger>
-								<NavigationMenuContent className="overflow-hidden rounded-[1.75rem] border border-white/10 bg-[#07101d]/95 p-0 text-white shadow-[0_32px_80px_rgba(0,0,0,0.55)] supports-backdrop-filter:backdrop-blur-2xl lg:fixed lg:inset-x-0 lg:top-20 lg:z-50 lg:mx-auto lg:w-[90vw] lg:max-w-[90vw]">
-									<OverflowCategoryPanel categories={overflowCategories} />
-								</NavigationMenuContent>
-							</NavigationMenuItem>
-						) : null}
-					</NavigationMenuList>
-				</NavigationMenu>
-				
-			</div>
+		<div className="items-center hidden min-w-0 gap-3 lg:flex">
+			<NavigationMenu viewport={false} className="max-w-full min-w-0">
+				<NavigationMenuList className="gap-1">
+					{primaryCategories.map((category) => (
+						<NavigationMenuItem key={category.id}>
+							<NavigationMenuTrigger className="px-3 text-sm font-medium bg-transparent rounded-none h-11 text-slate-300 hover:bg-transparent hover:text-white focus:bg-transparent focus:text-white data-open:bg-transparent data-open:text-white">
+								{category.name}
+							</NavigationMenuTrigger>
+							<NavigationMenuContent className="overflow-hidden rounded-[1.75rem] border border-white/10 bg-[#07101d]/95 p-0 text-white shadow-[0_32px_80px_rgba(0,0,0,0.55)] supports-backdrop-filter:backdrop-blur-2xl lg:fixed lg:inset-x-0 lg:top-20 lg:z-50 lg:mx-auto lg:w-[90vw] lg:max-w-[90vw]">
+								<CategoryPanel category={category} />
+							</NavigationMenuContent>
+						</NavigationMenuItem>
+					))}
+					{overflowCategories.length > 0 ? (
+						<NavigationMenuItem>
+							<NavigationMenuTrigger className="px-3 text-sm font-medium bg-transparent rounded-none h-11 text-slate-300 hover:bg-transparent hover:text-white focus:bg-transparent focus:text-white data-open:bg-transparent data-open:text-white">
+								More
+							</NavigationMenuTrigger>
+							<NavigationMenuContent className="overflow-hidden rounded-[1.75rem] border border-white/10 bg-[#07101d]/95 p-0 text-white shadow-[0_32px_80px_rgba(0,0,0,0.55)] supports-backdrop-filter:backdrop-blur-2xl lg:fixed lg:inset-x-0 lg:top-20 lg:z-50 lg:mx-auto lg:w-[90vw] lg:max-w-[90vw]">
+								<OverflowCategoryPanel categories={overflowCategories} />
+							</NavigationMenuContent>
+						</NavigationMenuItem>
+					) : null}
+				</NavigationMenuList>
+			</NavigationMenu>
+		</div>
+	);
+}
 
-			<div className="lg:hidden">
-				<Sheet>
-					<SheetTrigger asChild>
-						<Button
-							variant="ghost"
-							size="icon"
-							className="text-white border rounded-full border-white/10 bg-white/4 hover:bg-white/8"
-							aria-label="Open category menu"
-						>
-							<MenuIcon className="size-5" />
-						</Button>
-					</SheetTrigger>
-					<SheetContent
-						side="right"
-						className={cn(
-							"w-[min(92vw,420px)] border-white/10 bg-[#050817]/95 p-0 text-white",
-							"supports-backdrop-filter:backdrop-blur-2xl",
-						)}
+/** Standalone mobile Sheet (trigger + drawer). Place this wherever the hamburger should appear in the header. Hidden on lg+. */
+export function NavMobileMenuSheet({ categories }: NavCategoriesMenuProps) {
+	if (categories.length === 0) return null;
+
+	return (
+		<div className="lg:hidden">
+			<Sheet>
+				<SheetTrigger asChild>
+					<Button
+						variant="ghost"
+						size="icon"
+						className="text-white border rounded-full border-white/10 bg-white/4 hover:bg-white/8"
+						aria-label="Open category menu"
 					>
-						<SheetHeader className="pb-5 pr-12 space-y-4 border-b border-white/8">
-							<div className="flex items-center gap-2 text-cyan-100">
-								<span className="size-2 rounded-full bg-cyan-300 shadow-[0_0_18px_rgba(34,211,238,0.75)]" />
-								<span className="text-[11px] uppercase tracking-[0.26em] text-cyan-100/75">Tech Lab Catalog</span>
-							</div>
-							<SheetTitle className="font-display text-3xl tracking-[-0.04em] text-white">Browse categories</SheetTitle>
-							<SheetDescription className="max-w-sm text-sm leading-6 text-slate-400">
-								A responsive megamenu shell generated from the live category hierarchy.
-							</SheetDescription>
-							<SheetClose asChild>
-								<Link
-									href="/products"
-									className="flex items-center justify-between rounded-[1.35rem] border border-cyan-300/15 bg-cyan-400/10 px-4 py-3 text-sm font-medium text-cyan-50"
-								>
-									<span>Open full catalog</span>
-									<ArrowRightIcon className="size-4" />
-								</Link>
-							</SheetClose>
-						</SheetHeader>
-
-						<div className="max-h-[calc(100vh-180px)] overflow-y-auto px-4 pb-6">
-							<Accordion type="multiple" className="w-full">
-								{categories.map((category) => (
-									<MobileCategorySection key={category.id} category={category} />
-								))}
-							</Accordion>
+						<MenuIcon className="size-5" />
+					</Button>
+				</SheetTrigger>
+				<SheetContent
+					side="right"
+					className={cn(
+						"w-[min(92vw,420px)] border-white/10 bg-[#050817]/95 p-0 text-white",
+						"supports-backdrop-filter:backdrop-blur-2xl",
+					)}
+				>
+					<SheetHeader className="pb-5 pr-12 space-y-4 border-b border-white/8">
+						<div className="flex items-center gap-2 text-cyan-100">
+							<span className="size-2 rounded-full bg-cyan-300 shadow-[0_0_18px_rgba(34,211,238,0.75)]" />
+							<span className="text-[11px] uppercase tracking-[0.26em] text-cyan-100/75">Tech Lab Catalog</span>
 						</div>
-					</SheetContent>
-				</Sheet>
-			</div>
-		</>
+						<SheetTitle className="font-display text-3xl tracking-[-0.04em] text-white">Browse categories</SheetTitle>
+						<SheetDescription className="max-w-sm text-sm leading-6 text-slate-400">
+							A responsive megamenu shell generated from the live category hierarchy.
+						</SheetDescription>
+						<SheetClose asChild>
+							<Link
+								href="/products"
+								className="flex items-center justify-between rounded-[1.35rem] border border-cyan-300/15 bg-cyan-400/10 px-4 py-3 text-sm font-medium text-cyan-50"
+							>
+								<span>Open full catalog</span>
+								<ArrowRightIcon className="size-4" />
+							</Link>
+						</SheetClose>
+					</SheetHeader>
+
+					<div className="max-h-[calc(100vh-180px)] overflow-y-auto px-4 pb-6">
+						<Accordion type="multiple" className="w-full">
+							{categories.map((category) => (
+								<MobileCategorySection key={category.id} category={category} />
+							))}
+						</Accordion>
+					</div>
+				</SheetContent>
+			</Sheet>
+		</div>
 	);
 }
