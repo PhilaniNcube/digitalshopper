@@ -38,20 +38,31 @@ export async function POST(request: Request) {
 	}
 
 	const paymentStatus = params.get("payment_status");
-	const orderId = params.get("item_name");
+	// m_payment_id holds the full order UUID; item_name is only a human-readable label
+	const orderId = params.get("m_payment_id") ?? params.get("item_name");
 	const payfastPaymentId = params.get("pf_payment_id");
 
 	if (!orderId) {
+		console.warn("[payfast] notify:missing-order-id", { postedFields });
 		return NextResponse.json({ received: true });
 	}
 
 	const [order] = await db.select().from(orders).where(eq(orders.id, orderId)).limit(1);
 
 	if (!order) {
+		console.warn("[payfast] notify:order-not-found", { orderId, paymentStatus });
 		return NextResponse.json({ received: true });
 	}
 
 	if (paymentStatus === "COMPLETE") {
+		// Idempotency guard: skip if already marked paid
+		if (order.status === "paid") {
+			if (payfastDebugEnabled) {
+				console.info("[payfast] notify:already-paid", { orderId });
+			}
+			return NextResponse.json({ received: true });
+		}
+
 		await db
 			.update(orders)
 			.set({
@@ -63,22 +74,30 @@ export async function POST(request: Request) {
 			.where(eq(orders.id, orderId));
 
 		// Send confirmation email to customer
-		await sendOrderConfirmationEmail({
-			to: order.email,
-			orderNumber: order.id,
-			customerName: `${order.firstName} ${order.lastName}`,
-			total: order.total,
-			items: order.items,
-		});
+		try {
+			await sendOrderConfirmationEmail({
+				to: order.email,
+				orderNumber: order.id,
+				customerName: `${order.firstName} ${order.lastName}`,
+				total: order.total,
+				items: order.items,
+			});
+		} catch (err) {
+			console.error("[payfast] notify:customer-email-failed", { orderId, err });
+		}
 
 		// Send notification email to admins
-		await sendAdminOrderNotificationEmail({
-			orderNumber: order.id,
-			customerName: `${order.firstName} ${order.lastName}`,
-			customerEmail: order.email,
-			total: order.total,
-			items: order.items,
-		});
+		try {
+			await sendAdminOrderNotificationEmail({
+				orderNumber: order.id,
+				customerName: `${order.firstName} ${order.lastName}`,
+				customerEmail: order.email,
+				total: order.total,
+				items: order.items,
+			});
+		} catch (err) {
+			console.error("[payfast] notify:admin-email-failed", { orderId, err });
+		}
 	}
 
 	return NextResponse.json({ received: true });
