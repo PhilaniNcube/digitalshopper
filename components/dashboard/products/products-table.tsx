@@ -32,7 +32,7 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, cn } from "@/lib/utils";
 
 
 const columns: ColumnDef<ProductListItem>[] = [
@@ -92,7 +92,9 @@ const columns: ColumnDef<ProductListItem>[] = [
 		accessorKey: "inStock",
 		header: "Availability",
 		cell: ({ row }) => (
-			<Badge variant={row.original.inStock ? "outline" : "destructive"}>
+			<Badge variant={row.original.inStock ? "outline" : "destructive"} className={cn(
+				row.original.inStock ? "text-white! border-white!" : "bg-destructive text-destructive-foreground"
+			)}>
 				{row.original.inStock ? "In stock" : "Out of stock"}
 			</Badge>
 		),
