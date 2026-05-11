@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { useQueryState, parseAsString } from "nuqs";
 
+import { useRouter } from "next/navigation";
 import {
 	type ColumnDef,
 	type ColumnFiltersState,
@@ -91,7 +92,7 @@ const columns: ColumnDef<ProductListItem>[] = [
 		accessorKey: "inStock",
 		header: "Availability",
 		cell: ({ row }) => (
-			<Badge variant={row.original.inStock ? "default" : "outline"}>
+			<Badge variant={row.original.inStock ? "outline" : "destructive"}>
 				{row.original.inStock ? "In stock" : "Out of stock"}
 			</Badge>
 		),
@@ -108,6 +109,7 @@ type ProductsTableProps = {
 };
 
 export function ProductsTable({ products, pagination }: ProductsTableProps) {
+	const router = useRouter();
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 	const [q, setQ] = useQueryState(
 		"q",
@@ -210,7 +212,11 @@ export function ProductsTable({ products, pagination }: ProductsTableProps) {
 				<TableBody>
 					{table.getRowModel().rows.length ? (
 						table.getRowModel().rows.map((row) => (
-							<TableRow key={row.id}>
+							<TableRow
+								key={row.id}
+								className="cursor-pointer"
+								onClick={() => router.push(`/dashboard/products/${row.original.id}`)}
+							>
 								{row.getVisibleCells().map((cell) => (
 									<TableCell key={cell.id}>
 										{flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -219,6 +225,7 @@ export function ProductsTable({ products, pagination }: ProductsTableProps) {
 							</TableRow>
 						))
 					) : (
+
 						<TableRow>
 							<TableCell colSpan={columns.length} className="h-24 text-center text-white">
 								No products found.
