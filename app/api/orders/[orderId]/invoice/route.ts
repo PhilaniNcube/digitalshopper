@@ -53,7 +53,7 @@ export async function POST(
 
     // Send email using Resend
     const { data, error } = await resend.emails.send({
-      from: "Digital Shopper <onboarding@resend.dev>", // Replace with your verified domain
+      from: "Digital Shopper <info@digitalshopper.co.za>",
       to: order.email,
       subject: `Your Invoice for Order #${order.id}`,
       text: `Hi ${order.firstName},\n\nPlease find attached the invoice for your recent order #${order.id}.\n\nThank you for shopping with us!\n\nBest regards,\nDigital Shopper Team`,
