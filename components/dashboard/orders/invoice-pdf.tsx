@@ -99,9 +99,9 @@ export const InvoiceDocument = ({ order }: { order: any }) => (
         </View>
         <View style={{ alignItems: "flex-end" }}>
           <Text style={{ fontWeight: "bold", fontSize: 16 }}>Digital Shopper</Text>
-          <Text>123 Store Address</Text>
-          <Text>City, Province, 1234</Text>
-          <Text>support@digitalshopper.com</Text>
+          <Text>9 Athlone Street</Text>
+          <Text>Mount Pleasant, 6070</Text>
+          <Text>Port Elizabeth, Eastern Cape</Text>
         </View>
       </View>
 
@@ -127,7 +127,7 @@ export const InvoiceDocument = ({ order }: { order: any }) => (
           <Text style={[styles.col3, styles.bold]}>Qty</Text>
           <Text style={[styles.col4, styles.bold]}>Line Total</Text>
         </View>
-        
+
         {order.items.map((item: any) => (
           <View key={item.id} style={styles.tableRow}>
             <Text style={styles.col1}>{item.title}</Text>
