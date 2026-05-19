@@ -1,6 +1,7 @@
 {
   "name": "digitalshopper",
   "private": true,
+  "packageManager": "pnpm@11.1.2",
   "scripts": {
     "dev": "next dev --no-server-fast-refresh",
     "build": "next build",
