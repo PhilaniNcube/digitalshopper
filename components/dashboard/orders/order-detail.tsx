@@ -21,6 +21,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { formatCurrency } from "@/lib/utils";
 import { SendAbandonedCartButton } from "@/components/dashboard/orders/send-abandoned-cart-button";
+import { InvoiceButtons } from "@/components/dashboard/orders/invoice-buttons";
 
 const statusVariant: Record<
 	string,
@@ -64,6 +65,7 @@ export default async function OrderDetail({ params }: OrderDetailProps) {
 					{order.status === "pending" && (
 						<SendAbandonedCartButton orderId={order.id} />
 					)}
+					<InvoiceButtons orderId={order.id} />
 					<Button asChild className="bg-white text-stone-900" size="sm">
 						<Link href="/dashboard/orders">← Back to orders</Link>
 					</Button>
