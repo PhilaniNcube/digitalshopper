@@ -66,7 +66,7 @@ export async function checkoutAction(
 
 	const items: StoredOrderItem[] = itemsParsed.data;
 	const subtotal = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
-	const shipping = subtotal >= 2500 ? 0 : 150;
+	const shipping = subtotal >= 5000 ? 0 : 220;
 	const total = subtotal + shipping;
 
 	const reqHeaders = await headers();

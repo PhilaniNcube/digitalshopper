@@ -52,7 +52,7 @@ export function CheckoutForm() {
   const items = useCartStore((state) => state.items);
   const closeCart = useCartStore((state) => state.closeCart);
   const subtotal = getCartSubtotal(items);
-  const shipping = subtotal >= 2500 ? 0 : 150;
+  const shipping = subtotal >= 5000 ? 0 : 220;
   const total = subtotal + shipping;
 
   const [state, formAction, isPending] = useActionState(

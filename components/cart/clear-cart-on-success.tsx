@@ -18,7 +18,7 @@ export function ClearCartOnSuccess() {
 
 		if (items.length > 0) {
 			const subtotal = getCartSubtotal(items);
-			const shipping = subtotal >= 2500 ? 0 : 150;
+			const shipping = subtotal >= 5000 ? 0 : 220;
 			trackPurchase(id, items, subtotal + shipping, shipping);
 			clear();
 		}
