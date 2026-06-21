@@ -28,6 +28,7 @@
     "@neondatabase/serverless": "^1.1.0",
     "@next/third-parties": "16.2.6",
     "@payloadcms/db-postgres": "^3.83.0",
+    "@payloadcms/db-vercel-postgres": "^3.83.0",
     "@payloadcms/next": "^3.83.0",
     "@payloadcms/richtext-lexical": "^3.83.0",
     "@payloadcms/storage-vercel-blob": "^3.83.0",
