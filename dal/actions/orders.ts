@@ -3,7 +3,6 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { eq } from "drizzle-orm";
-import { sql } from "@/lib/db";
 import { db } from "@/lib/db";
 import { orders } from "@/db/schema";
 import { requireAdmin } from "@/lib/session";
@@ -31,11 +30,10 @@ export async function deleteOrderAction(orderId: string): Promise<DeleteOrderAct
 	}
 
 	try {
-		const [deletedOrder] = await sql<{ id: string }[]>`
-			delete from "orders"
-			where "id" = ${parsedInput.data.orderId}
-			returning "id"
-		`;
+		const [deletedOrder] = await db
+			.delete(orders)
+			.where(eq(orders.id, parsedInput.data.orderId))
+			.returning({ id: orders.id });
 
 		if (!deletedOrder) {
 			throw new Error("ORDER_NOT_FOUND");

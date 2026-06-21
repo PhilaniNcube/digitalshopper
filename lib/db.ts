@@ -96,10 +96,5 @@ export function getPoolDb() {
 	return internalPoolDb;
 }
 
-/** @deprecated Use getPoolSql() instead */
-export const sql = getPoolSql();
-/** @deprecated Use getPoolDb() instead */
-export const poolDb = getPoolDb();
-/** @deprecated Use getPoolSql() instead */
-export const poolSql = getPoolSql();
+
 

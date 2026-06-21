@@ -31,6 +31,8 @@ export default buildConfig({
   db: postgresAdapter({
     pool: {
       connectionString: process.env.DATABASE_URL ?? "",
+      max: 1,
+      idleTimeoutMillis: 5000,
     },
     // All Payload tables are created in the 'payload' PostgreSQL schema,
     // keeping them completely isolated from the existing 'public' schema

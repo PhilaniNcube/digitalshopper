@@ -9,7 +9,7 @@ import {
 	type ProductAttributes,
 	type SupplierProductPayload,
 } from "../db/schema";
-import { poolDb, poolSql } from "../lib/db";
+import { getPoolDb, getPoolSql } from "../lib/db";
 
 const SYNTECH_FEED_URL =
 	"https://www.syntech.co.za/feeds/feedhandler.php?key=AF530A9A-22AE-4465-9F0D-B99D45E12E34&feed=syntech-json-full";
@@ -431,7 +431,7 @@ async function ensureCatalogSchema(db: { select: any }) {
 }
 
 async function syncCatalog(loadedFeed: LoadedFeed) {
-	const db = poolDb;
+	const db = getPoolDb();
 	const { declaredCount, feedProducts } = loadedFeed;
 	const categorySeeds = collectCategorySeeds(feedProducts);
 	const brandNames = [...new Set(feedProducts.map(extractBrandName).filter((brand): brand is string => Boolean(brand)))].sort(
@@ -704,11 +704,11 @@ async function main() {
 	}
 
 	await syncCatalog(loadedFeed);
-	await poolSql.end();
+	await getPoolSql().end();
 }
 
 main().catch(async (error) => {
 	console.error(error);
-	await poolSql.end();
+	await getPoolSql().end();
 	process.exitCode = 1;
 });
