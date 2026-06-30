@@ -1,7 +1,7 @@
 import path from "path";
 import sharp from "sharp";
 import { lexicalEditor } from "@payloadcms/richtext-lexical";
-import { vercelPostgresAdapter } from "@payloadcms/db-vercel-postgres";
+import { sqliteAdapter } from "@payloadcms/db-sqlite";
 import { vercelBlobStorage } from "@payloadcms/storage-vercel-blob";
 import { buildConfig } from "payload";
 
@@ -28,16 +28,14 @@ export default buildConfig({
     }),
   ],
   secret: process.env.PAYLOAD_SECRET ?? "",
-  db: vercelPostgresAdapter({
-    pool: {
-      connectionString: process.env.DATABASE_URL ?? "",
-      max: 1,
-      idleTimeoutMillis: 5000,
+  db: sqliteAdapter({
+    client: {
+      url: process.env.TURSO_PAYLOAD_DATABASE_URL ?? process.env.TURSO_DATABASE_URL ?? "",
+      authToken: process.env.TURSO_PAYLOAD_AUTH_TOKEN ?? process.env.TURSO_AUTH_TOKEN ?? "",
     },
-    // All Payload tables are created in the 'payload' PostgreSQL schema,
-    // keeping them completely isolated from the existing 'public' schema
-    // where your ecommerce/auth tables live. This option is experimental.
-    schemaName: "payload",
+    // Preserve existing numeric IDs from the previous Postgres Payload database
+    // so migrated rows keep their primary keys.
+    idType: "number",
   }),
   sharp,
   typescript: {

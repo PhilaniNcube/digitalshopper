@@ -39,30 +39,32 @@ const fileEnv = {
 	...parseEnvFile(".env.local"),
 };
 
-const connectionString =
+const url =
+	process.env.TURSO_DATABASE_URL ??
+	fileEnv.TURSO_DATABASE_URL ??
 	process.env.DATABASE_URL ??
-	process.env.POSTGRES_URL ??
-	process.env.POSTGRES_PRISMA_URL ??
-	process.env.POSTGRES_URL_NON_POOLING ??
-	process.env.NEON_DATABASE_URL ??
-	process.env.NEON_DATABASE_URL_UNPOOLED ??
-	fileEnv.DATABASE_URL ??
-	fileEnv.POSTGRES_URL ??
-	fileEnv.POSTGRES_PRISMA_URL ??
-	fileEnv.POSTGRES_URL_NON_POOLING ??
-	fileEnv.NEON_DATABASE_URL ??
-	fileEnv.NEON_DATABASE_URL_UNPOOLED;
+	fileEnv.DATABASE_URL;
 
-if (!connectionString) {
-	throw new Error("Missing Neon/Postgres connection string for Drizzle.");
+const authToken =
+	process.env.TURSO_AUTH_TOKEN ??
+	fileEnv.TURSO_AUTH_TOKEN ??
+	process.env.DATABASE_AUTH_TOKEN ??
+	fileEnv.DATABASE_AUTH_TOKEN;
+
+if (!url) {
+	throw new Error("Missing Turso connection string (TURSO_DATABASE_URL).");
+}
+if (!authToken) {
+	throw new Error("Missing Turso auth token (TURSO_AUTH_TOKEN).");
 }
 
 export default defineConfig({
 	out: "./drizzle",
 	schema: "./db/schema.ts",
-	dialect: "postgresql",
+	dialect: "turso",
 	dbCredentials: {
-		url: connectionString,
+		url,
+		authToken,
 	},
 	strict: true,
 	verbose: true,

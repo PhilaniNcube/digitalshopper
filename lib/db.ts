@@ -1,9 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import * as schema from "@/db/schema";
-import { neon } from "@neondatabase/serverless";
-import { drizzle as drizzleHttp } from "drizzle-orm/neon-http";
-import { drizzle as drizzlePool } from "drizzle-orm/postgres-js";
-import postgres from "postgres";
+import { createClient } from "@libsql/client";
+import { drizzle } from "drizzle-orm/libsql";
 
 function parseEnvFile(filePath: string) {
 	if (!existsSync(filePath)) {
@@ -38,63 +36,55 @@ function parseEnvFile(filePath: string) {
 	return Object.fromEntries(entries);
 }
 
-function resolveDatabaseUrl() {
+function resolveTursoUrl() {
 	const fileEnv = {
 		...parseEnvFile(".env"),
 		...parseEnvFile(".env.local"),
 	};
 
 	return (
+		process.env.TURSO_DATABASE_URL ??
 		process.env.DATABASE_URL ??
-		process.env.POSTGRES_URL ??
-		process.env.POSTGRES_PRISMA_URL ??
-		process.env.POSTGRES_URL_NON_POOLING ??
-		process.env.NEON_DATABASE_URL ??
-		process.env.NEON_DATABASE_URL_UNPOOLED ??
-		fileEnv.DATABASE_URL ??
-		fileEnv.POSTGRES_URL ??
-		fileEnv.POSTGRES_PRISMA_URL ??
-		fileEnv.POSTGRES_URL_NON_POOLING ??
-		fileEnv.NEON_DATABASE_URL ??
-		fileEnv.NEON_DATABASE_URL_UNPOOLED
+		fileEnv.TURSO_DATABASE_URL ??
+		fileEnv.DATABASE_URL
 	);
 }
 
-const connectionString = resolveDatabaseUrl();
+function resolveTursoAuthToken() {
+	const fileEnv = {
+		...parseEnvFile(".env"),
+		...parseEnvFile(".env.local"),
+	};
 
-if (!connectionString) {
-	throw new Error("Missing Neon/Postgres connection string.");
+	return (
+		process.env.TURSO_AUTH_TOKEN ??
+		process.env.DATABASE_AUTH_TOKEN ??
+		fileEnv.TURSO_AUTH_TOKEN ??
+		fileEnv.DATABASE_AUTH_TOKEN
+	);
+}
+
+const url = resolveTursoUrl();
+const authToken = resolveTursoAuthToken();
+
+if (!url) {
+	throw new Error("Missing Turso connection string (TURSO_DATABASE_URL).");
 }
 
 /**
- * Stateless HTTP-based database client.
- * Best for Next.js Server Components, Route Handlers, and serverless environments.
- * Does not maintain persistent TCP connections.
+ * libSQL/Turso client. HTTP-based, so there is no connection pool to manage —
+ * a single client is reused for all queries (stateless serverless friendly).
+ *
+ * Note: Turso enforces foreign keys server-side by default, so no
+ * `PRAGMA foreign_keys = ON` is needed (and HTTP connections don't persist
+ * connection-level PRAGMAs anyway).
  */
-const httpClient = neon(connectionString);
-export const db = drizzleHttp(httpClient, { schema });
+export const libsqlClient = createClient({
+	url,
+	authToken,
+});
 
-let internalPoolSql: ReturnType<typeof postgres> | undefined;
-let internalPoolDb: ReturnType<typeof drizzlePool> | undefined;
-
-export function getPoolSql() {
-	if (!internalPoolSql) {
-		internalPoolSql = postgres(connectionString, {
-			prepare: false,
-			max: 1,
-			idle_timeout: 10,
-			connect_timeout: 15,
-		});
-	}
-	return internalPoolSql;
-}
-
-export function getPoolDb() {
-	if (!internalPoolDb) {
-		internalPoolDb = drizzlePool(getPoolSql(), { schema });
-	}
-	return internalPoolDb;
-}
-
-
-
+/**
+ * Default Drizzle instance for Server Components, Route Handlers, and the DAL.
+ */
+export const db = drizzle({ client: libsqlClient, schema });

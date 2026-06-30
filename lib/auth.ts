@@ -18,7 +18,7 @@ export const auth = betterAuth({
 		process.env.AUTH_SECRET ??
 		"digitalshopper-local-secret-change-before-production-2026",
 	database: drizzleAdapter(db, {
-		provider: "pg",
+		provider: "sqlite",
 		schema,
 	}),
 	emailAndPassword: {

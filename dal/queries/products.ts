@@ -1,7 +1,7 @@
 import "server-only";
 
 import { cacheLife } from "next/cache";
-import { and, asc, desc, eq, ilike, inArray, like, or, sql, type SQL } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, like, or, sql, type SQL } from "drizzle-orm";
 import {
 	brands,
 	categories,
@@ -252,14 +252,14 @@ export async function getAdminProducts(
 	if (searchPattern) {
 		conditions.push(
 			or(
-				ilike(products.title, searchPattern),
-				ilike(products.slug, searchPattern),
+				like(products.title, searchPattern),
+				like(products.slug, searchPattern),
 			),
 		);
 	}
 
 	if (skuPattern) {
-		conditions.push(ilike(products.supplierSku, skuPattern));
+		conditions.push(like(products.supplierSku, skuPattern));
 	}
 
 	const where = combineFilters(...conditions);
@@ -316,11 +316,11 @@ export async function fetchCatalogProducts(filters: ProductCatalogFilters = {}):
 
 	const searchFilter = searchPattern
 		? or(
-				ilike(products.title, searchPattern),
-				ilike(products.summary, searchPattern),
-				ilike(products.shortDescription, searchPattern),
-				ilike(products.slug, searchPattern),
-				ilike(products.supplierSku, searchPattern),
+				like(products.title, searchPattern),
+				like(products.summary, searchPattern),
+				like(products.shortDescription, searchPattern),
+				like(products.slug, searchPattern),
+				like(products.supplierSku, searchPattern),
 			)
 		: undefined;
 

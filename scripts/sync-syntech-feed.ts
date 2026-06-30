@@ -9,7 +9,7 @@ import {
 	type ProductAttributes,
 	type SupplierProductPayload,
 } from "../db/schema";
-import { getPoolDb, getPoolSql } from "../lib/db";
+import { db, libsqlClient } from "../lib/db";
 
 const SYNTECH_FEED_URL =
 	"https://www.syntech.co.za/feeds/feedhandler.php?key=AF530A9A-22AE-4465-9F0D-B99D45E12E34&feed=syntech-json-full";
@@ -405,13 +405,8 @@ function isMissingRelationError(error: unknown) {
 		return false;
 	}
 
-	const withCause = error as Error & {
-		cause?: {
-			code?: string;
-		};
-	};
-
-	return withCause.cause?.code === "42P01";
+	const message = error.message.toLowerCase();
+	return message.includes("no such table") || message.includes("no such column");
 }
 
 async function ensureCatalogSchema(db: { select: any }) {
@@ -431,7 +426,6 @@ async function ensureCatalogSchema(db: { select: any }) {
 }
 
 async function syncCatalog(loadedFeed: LoadedFeed) {
-	const db = getPoolDb();
 	const { declaredCount, feedProducts } = loadedFeed;
 	const categorySeeds = collectCategorySeeds(feedProducts);
 	const brandNames = [...new Set(feedProducts.map(extractBrandName).filter((brand): brand is string => Boolean(brand)))].sort(
@@ -704,11 +698,11 @@ async function main() {
 	}
 
 	await syncCatalog(loadedFeed);
-	await getPoolSql().end();
+	await libsqlClient.close();
 }
 
 main().catch(async (error) => {
 	console.error(error);
-	await getPoolSql().end();
+	await libsqlClient.close();
 	process.exitCode = 1;
 });

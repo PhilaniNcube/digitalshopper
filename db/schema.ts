@@ -1,27 +1,15 @@
+import { randomUUID } from "node:crypto";
 import { relations, sql } from "drizzle-orm";
 import {
-	type AnyPgColumn,
-	boolean,
-	doublePrecision,
+	AnySQLiteColumn,
+	check,
 	index,
 	integer,
-	jsonb,
-	pgEnum,
-	pgTable,
+	real,
+	sqliteTable,
 	text,
-	timestamp,
 	uniqueIndex,
-	uuid,
-} from "drizzle-orm/pg-core";
-
-export const orderStatusEnum = pgEnum("order_status", [
-	"pending",
-	"paid",
-	"failed",
-	"cancelled",
-]);
-
-export const warehouseCodeEnum = pgEnum("warehouse_code", ["CPT", "JHB", "DBN"]);
+} from "drizzle-orm/sqlite-core";
 
 export type StoredOrderItem = {
 	id: string;
@@ -37,32 +25,32 @@ export type ProductAttributes = Record<string, ProductAttributeValue>;
 
 export type SupplierProductPayload = Record<string, unknown>;
 
-export const user = pgTable(
+export const user = sqliteTable(
 	"user",
 	{
 		id: text("id").primaryKey(),
 		name: text("name").notNull(),
 		email: text("email").notNull().unique(),
-		emailVerified: boolean("email_verified").notNull().default(false),
+		emailVerified: integer("email_verified", { mode: "boolean" }).notNull().default(false),
 		image: text("image"),
 		role: text("role").notNull().default("user"),
-		banned: boolean("banned").notNull().default(false),
+		banned: integer("banned", { mode: "boolean" }).notNull().default(false),
 		banReason: text("ban_reason"),
-		banExpires: timestamp("ban_expires"),
-		createdAt: timestamp("created_at").notNull().defaultNow(),
-		updatedAt: timestamp("updated_at")
+		banExpires: integer("ban_expires", { mode: "timestamp" }),
+		createdAt: integer("created_at", { mode: "timestamp" }).notNull().default(sql`(unixepoch())`),
+		updatedAt: integer("updated_at", { mode: "timestamp" })
 			.notNull()
-			.defaultNow()
+			.default(sql`(unixepoch())`)
 			.$onUpdate(() => new Date()),
 	},
 	(table) => [index("user_role_idx").on(table.role)],
 );
 
-export const session = pgTable(
+export const session = sqliteTable(
 	"session",
 	{
 		id: text("id").primaryKey(),
-		expiresAt: timestamp("expires_at").notNull(),
+		expiresAt: integer("expires_at", { mode: "timestamp" }).notNull(),
 		token: text("token").notNull().unique(),
 		ipAddress: text("ip_address"),
 		userAgent: text("user_agent"),
@@ -70,16 +58,16 @@ export const session = pgTable(
 		userId: text("user_id")
 			.notNull()
 			.references(() => user.id, { onDelete: "cascade" }),
-		createdAt: timestamp("created_at").notNull().defaultNow(),
-		updatedAt: timestamp("updated_at")
+		createdAt: integer("created_at", { mode: "timestamp" }).notNull().default(sql`(unixepoch())`),
+		updatedAt: integer("updated_at", { mode: "timestamp" })
 			.notNull()
-			.defaultNow()
+			.default(sql`(unixepoch())`)
 			.$onUpdate(() => new Date()),
 	},
 	(table) => [index("session_user_id_idx").on(table.userId)],
 );
 
-export const account = pgTable(
+export const account = sqliteTable(
 	"account",
 	{
 		id: text("id").primaryKey(),
@@ -91,14 +79,14 @@ export const account = pgTable(
 		accessToken: text("access_token"),
 		refreshToken: text("refresh_token"),
 		idToken: text("id_token"),
-		accessTokenExpiresAt: timestamp("access_token_expires_at"),
-		refreshTokenExpiresAt: timestamp("refresh_token_expires_at"),
+		accessTokenExpiresAt: integer("access_token_expires_at", { mode: "timestamp" }),
+		refreshTokenExpiresAt: integer("refresh_token_expires_at", { mode: "timestamp" }),
 		scope: text("scope"),
 		password: text("password"),
-		createdAt: timestamp("created_at").notNull().defaultNow(),
-		updatedAt: timestamp("updated_at")
+		createdAt: integer("created_at", { mode: "timestamp" }).notNull().default(sql`(unixepoch())`),
+		updatedAt: integer("updated_at", { mode: "timestamp" })
 			.notNull()
-			.defaultNow()
+			.default(sql`(unixepoch())`)
 			.$onUpdate(() => new Date()),
 	},
 	(table) => [
@@ -107,54 +95,58 @@ export const account = pgTable(
 	],
 );
 
-export const verification = pgTable(
+export const verification = sqliteTable(
 	"verification",
 	{
 		id: text("id").primaryKey(),
 		identifier: text("identifier").notNull(),
 		value: text("value").notNull(),
-		expiresAt: timestamp("expires_at").notNull(),
-		createdAt: timestamp("created_at").notNull().defaultNow(),
-		updatedAt: timestamp("updated_at")
+		expiresAt: integer("expires_at", { mode: "timestamp" }).notNull(),
+		createdAt: integer("created_at", { mode: "timestamp" }).notNull().default(sql`(unixepoch())`),
+		updatedAt: integer("updated_at", { mode: "timestamp" })
 			.notNull()
-			.defaultNow()
+			.default(sql`(unixepoch())`)
 			.$onUpdate(() => new Date()),
 	},
 	(table) => [index("verification_identifier_idx").on(table.identifier)],
 );
 
-export const brands = pgTable(
+export const brands = sqliteTable(
 	"brands",
 	{
-		id: uuid("id").defaultRandom().primaryKey(),
+		id: text("id")
+			.primaryKey()
+			.$defaultFn(() => randomUUID()),
 		name: text("name").notNull(),
 		slug: text("slug").notNull(),
-		createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-		updatedAt: timestamp("updated_at", { withTimezone: true })
+		createdAt: integer("created_at", { mode: "timestamp" }).notNull().default(sql`(unixepoch())`),
+		updatedAt: integer("updated_at", { mode: "timestamp" })
 			.notNull()
-			.defaultNow()
+			.default(sql`(unixepoch())`)
 			.$onUpdate(() => new Date()),
 	},
 	(table) => [uniqueIndex("brands_name_unique").on(table.name), uniqueIndex("brands_slug_unique").on(table.slug)],
 );
 
-export const categories = pgTable(
+export const categories = sqliteTable(
 	"categories",
 	{
-		id: uuid("id").defaultRandom().primaryKey(),
+		id: text("id")
+			.primaryKey()
+			.$defaultFn(() => randomUUID()),
 		name: text("name").notNull(),
 		slug: text("slug").notNull(),
 		path: text("path").notNull(),
 		depth: integer("depth").notNull(),
-		parentId: uuid("parent_id").references((): AnyPgColumn => categories.id, {
+		parentId: text("parent_id").references((): AnySQLiteColumn => categories.id, {
 			onDelete: "set null",
 		}),
 		sourcePath: text("source_path"),
 		sourcePathAlt: text("source_path_alt"),
-		createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-		updatedAt: timestamp("updated_at", { withTimezone: true })
+		createdAt: integer("created_at", { mode: "timestamp" }).notNull().default(sql`(unixepoch())`),
+		updatedAt: integer("updated_at", { mode: "timestamp" })
 			.notNull()
-			.defaultNow()
+			.default(sql`(unixepoch())`)
 			.$onUpdate(() => new Date()),
 	},
 	(table) => [
@@ -164,10 +156,12 @@ export const categories = pgTable(
 	],
 );
 
-export const products = pgTable(
+export const products = sqliteTable(
 	"products",
 	{
-		id: uuid("id").defaultRandom().primaryKey(),
+		id: text("id")
+			.primaryKey()
+			.$defaultFn(() => randomUUID()),
 		supplier: text("supplier").notNull().default("syntech"),
 		supplierSku: text("supplier_sku").notNull(),
 		slug: text("slug").notNull(),
@@ -176,37 +170,43 @@ export const products = pgTable(
 		shortDescription: text("short_description"),
 		descriptionHtml: text("description_html").notNull(),
 		sourceUrl: text("source_url"),
-		brandId: uuid("brand_id").references(() => brands.id, { onDelete: "set null" }),
-		categoryId: uuid("category_id").references(() => categories.id, { onDelete: "set null" }),
+		brandId: text("brand_id").references(() => brands.id, { onDelete: "set null" }),
+		categoryId: text("category_id").references(() => categories.id, { onDelete: "set null" }),
 		featuredImage: text("featured_image"),
 		price: integer("price").notNull(),
 		rrpIncl: integer("rrp_incl"),
 		promoPrice: integer("promo_price"),
-		recommendedMargin: doublePrecision("recommended_margin"),
-		promoStartsAt: timestamp("promo_starts_at"),
-		promoEndsAt: timestamp("promo_ends_at"),
+		recommendedMargin: real("recommended_margin"),
+		promoStartsAt: integer("promo_starts_at", { mode: "timestamp" }),
+		promoEndsAt: integer("promo_ends_at", { mode: "timestamp" }),
 		weightGrams: integer("weight_grams"),
-		lengthCm: doublePrecision("length_cm"),
-		widthCm: doublePrecision("width_cm"),
-		heightCm: doublePrecision("height_cm"),
+		lengthCm: real("length_cm"),
+		widthCm: real("width_cm"),
+		heightCm: real("height_cm"),
 		ean: text("ean"),
 		colour: text("colour"),
 		warranty: text("warranty"),
-		supplierFlags: text("supplier_flags").array().notNull().default(sql`'{}'::text[]`),
-		totalStock: integer("total_stock").notNull().default(0),
-		inStock: boolean("in_stock").notNull().default(false),
-		nextShipmentEta: text("next_shipment_eta"),
-		featured: boolean("featured").notNull().default(false),
-		active: boolean("active").notNull().default(true),
-		specs: jsonb("specs").$type<string[]>().notNull().default(sql`'[]'::jsonb`),
-		rawAttributes: jsonb("raw_attributes").$type<ProductAttributes>().notNull().default(sql`'{}'::jsonb`),
-		rawPayload: jsonb("raw_payload").$type<SupplierProductPayload>().notNull(),
-		supplierLastModified: timestamp("supplier_last_modified"),
-		lastSyncedAt: timestamp("last_synced_at", { withTimezone: true }),
-		createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-		updatedAt: timestamp("updated_at", { withTimezone: true })
+		supplierFlags: text("supplier_flags", { mode: "json" })
+			.$type<string[]>()
 			.notNull()
-			.defaultNow()
+			.default([]),
+		totalStock: integer("total_stock").notNull().default(0),
+		inStock: integer("in_stock", { mode: "boolean" }).notNull().default(false),
+		nextShipmentEta: text("next_shipment_eta"),
+		featured: integer("featured", { mode: "boolean" }).notNull().default(false),
+		active: integer("active", { mode: "boolean" }).notNull().default(true),
+		specs: text("specs", { mode: "json" }).$type<string[]>().notNull().default([]),
+		rawAttributes: text("raw_attributes", { mode: "json" })
+			.$type<ProductAttributes>()
+			.notNull()
+			.default({}),
+		rawPayload: text("raw_payload", { mode: "json" }).$type<SupplierProductPayload>().notNull(),
+		supplierLastModified: integer("supplier_last_modified", { mode: "timestamp" }),
+		lastSyncedAt: integer("last_synced_at", { mode: "timestamp" }),
+		createdAt: integer("created_at", { mode: "timestamp" }).notNull().default(sql`(unixepoch())`),
+		updatedAt: integer("updated_at", { mode: "timestamp" })
+			.notNull()
+			.default(sql`(unixepoch())`)
 			.$onUpdate(() => new Date()),
 	},
 	(table) => [
@@ -220,17 +220,19 @@ export const products = pgTable(
 	],
 );
 
-export const productImages = pgTable(
+export const productImages = sqliteTable(
 	"product_images",
 	{
-		id: uuid("id").defaultRandom().primaryKey(),
-		productId: uuid("product_id")
+		id: text("id")
+			.primaryKey()
+			.$defaultFn(() => randomUUID()),
+		productId: text("product_id")
 			.notNull()
 			.references(() => products.id, { onDelete: "cascade" }),
 		url: text("url").notNull(),
 		position: integer("position").notNull().default(0),
-		isPrimary: boolean("is_primary").notNull().default(false),
-		createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+		isPrimary: integer("is_primary", { mode: "boolean" }).notNull().default(false),
+		createdAt: integer("created_at", { mode: "timestamp" }).notNull().default(sql`(unixepoch())`),
 	},
 	(table) => [
 		index("product_images_product_id_idx").on(table.productId),
@@ -238,31 +240,36 @@ export const productImages = pgTable(
 	],
 );
 
-export const productInventory = pgTable(
+export const productInventory = sqliteTable(
 	"product_inventory",
 	{
-		id: uuid("id").defaultRandom().primaryKey(),
-		productId: uuid("product_id")
+		id: text("id")
+			.primaryKey()
+			.$defaultFn(() => randomUUID()),
+		productId: text("product_id")
 			.notNull()
 			.references(() => products.id, { onDelete: "cascade" }),
-		warehouseCode: warehouseCodeEnum("warehouse_code").notNull(),
+		warehouseCode: text("warehouse_code").$type<"CPT" | "JHB" | "DBN">().notNull(),
 		quantity: integer("quantity").notNull().default(0),
-		createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-		updatedAt: timestamp("updated_at", { withTimezone: true })
+		createdAt: integer("created_at", { mode: "timestamp" }).notNull().default(sql`(unixepoch())`),
+		updatedAt: integer("updated_at", { mode: "timestamp" })
 			.notNull()
-			.defaultNow()
+			.default(sql`(unixepoch())`)
 			.$onUpdate(() => new Date()),
 	},
 	(table) => [
 		uniqueIndex("product_inventory_product_warehouse_unique").on(table.productId, table.warehouseCode),
 		index("product_inventory_warehouse_code_idx").on(table.warehouseCode),
+		check("warehouse_code_check", sql`${table.warehouseCode} IN ('CPT', 'JHB', 'DBN')`),
 	],
 );
 
-export const orders = pgTable(
+export const orders = sqliteTable(
 	"orders",
 	{
-		id: uuid("id").defaultRandom().primaryKey(),
+		id: text("id")
+			.primaryKey()
+			.$defaultFn(() => randomUUID()),
 		userId: text("user_id").references(() => user.id, { onDelete: "set null" }),
 		firstName: text("first_name").notNull(),
 		lastName: text("last_name").notNull(),
@@ -273,21 +280,25 @@ export const orders = pgTable(
 		city: text("city").notNull(),
 		province: text("province").notNull(),
 		postalCode: text("postal_code").notNull(),
-		items: jsonb("items").$type<StoredOrderItem[]>().notNull().default(sql`'[]'::jsonb`),
+		items: text("items", { mode: "json" }).$type<StoredOrderItem[]>().notNull().default([]),
 		subtotal: integer("subtotal").notNull(),
 		shipping: integer("shipping").notNull().default(0),
 		total: integer("total").notNull(),
 		currency: text("currency").notNull().default("ZAR"),
-		status: orderStatusEnum("status").notNull().default("pending"),
+		status: text("status").$type<"pending" | "paid" | "failed" | "cancelled">().notNull().default("pending"),
 		payfastPaymentId: text("payfast_payment_id"),
-		paidAt: timestamp("paid_at", { withTimezone: true }),
-		createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-		updatedAt: timestamp("updated_at", { withTimezone: true })
+		paidAt: integer("paid_at", { mode: "timestamp" }),
+		createdAt: integer("created_at", { mode: "timestamp" }).notNull().default(sql`(unixepoch())`),
+		updatedAt: integer("updated_at", { mode: "timestamp" })
 			.notNull()
-			.defaultNow()
+			.default(sql`(unixepoch())`)
 			.$onUpdate(() => new Date()),
 	},
-	(table) => [index("orders_user_id_idx").on(table.userId), index("orders_status_idx").on(table.status)],
+	(table) => [
+		index("orders_user_id_idx").on(table.userId),
+		index("orders_status_idx").on(table.status),
+		check("order_status_check", sql`${table.status} IN ('pending', 'paid', 'failed', 'cancelled')`),
+	],
 );
 
 export const userRelations = relations(user, ({ many }) => ({

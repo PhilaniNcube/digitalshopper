@@ -1,12 +1,12 @@
 {
   "version": "7",
-  "dialect": "postgresql",
+  "dialect": "sqlite",
   "entries": [
     {
       "idx": 0,
-      "version": "7",
-      "when": 1774175113536,
-      "tag": "0000_parallel_cerebro",
+      "version": "6",
+      "when": 1782807171870,
+      "tag": "0000_bumpy_rumiko_fujikawa",
       "breakpoints": true
     }
   ]

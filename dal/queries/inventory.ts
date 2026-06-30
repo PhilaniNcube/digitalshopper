@@ -1,6 +1,6 @@
 import "server-only";
 
-import { and, asc, count, eq, gt, ilike, lte, or, sql, sum } from "drizzle-orm";
+import { and, asc, count, eq, gt, like, lte, or, sql, sum } from "drizzle-orm";
 import { productInventory, products } from "@/db/schema";
 import { db } from "@/lib/db";
 import { requireAdmin } from "@/lib/session";
@@ -158,8 +158,8 @@ export async function searchInventoryProducts(
 		.leftJoin(productInventory, eq(products.id, productInventory.productId))
 		.where(
 			or(
-				ilike(products.title, searchPattern),
-				ilike(products.supplierSku, searchPattern),
+				like(products.title, searchPattern),
+				like(products.supplierSku, searchPattern),
 			),
 		)
 		.groupBy(
