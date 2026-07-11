@@ -6,7 +6,6 @@ import { vercelBlobStorage } from "@payloadcms/storage-vercel-blob";
 import { buildConfig } from "payload";
 
 import { Users } from "./collections/Users";
-import { Posts } from "./collections/Posts";
 import { Categories } from "./collections/Categories";
 import { Tags } from "./collections/Tags";
 import { Authors } from "./collections/Authors";
@@ -17,7 +16,7 @@ export default buildConfig({
     user: Users.slug,
   },
   editor: lexicalEditor(),
-  collections: [Users, Posts, Categories, Tags, Authors, Media],
+  collections: [Users, Categories, Tags, Authors, Media],
   plugins: [
     vercelBlobStorage({
       enabled: true,
