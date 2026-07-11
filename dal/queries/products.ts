@@ -420,6 +420,8 @@ export async function fetchFeaturedProducts(limit: number): Promise<ProductListI
 }
 
 export async function fetchProductsByIds(ids: string[]): Promise<ProductListItem[]> {
+	"use cache";
+	cacheLife("hours");
 	if (ids.length === 0) return [];
 	const productsData = await db.query.products.findMany({
 		where: and(ACTIVE_PRODUCTS_FILTER, inArray(products.id, ids)),
