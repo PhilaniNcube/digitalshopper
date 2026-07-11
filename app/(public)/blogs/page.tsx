@@ -15,6 +15,17 @@ export const metadata: Metadata = {
 
 const BLOG_POSTS = [
   {
+    id: "best-desktop-computers-south-africa-2026-guide",
+    slug: "best-desktop-computers-south-africa-2026-guide",
+    title: "Best Desktop Computers for Home, Office, and Gaming in South Africa (2026 Guide)",
+    excerpt: "Finding the right desktop computer in South Africa can be overwhelming. In this guide, we break down the best desktop computers available right now based on exactly what you need them to do.",
+    publishedAt: "2026-07-11T16:00:00.000Z",
+    heroImage: {
+      url: "/images/desktop-computers-guide-hero.png",
+      alt: "Best Desktop Computers Guide 2026",
+    },
+  },
+  {
     id: "best-budget-anc-earbuds-and-wireless-headphones-under-R500",
     slug: "best-budget-anc-earbuds-and-wireless-headphones-under-R500",
     title: "Best Budget ANC Earbuds & Wireless Headphones under R500 in South Africa (2026 Guide)",

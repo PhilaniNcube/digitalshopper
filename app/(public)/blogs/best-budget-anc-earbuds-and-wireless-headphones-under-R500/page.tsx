@@ -8,6 +8,19 @@ export const metadata: Metadata = {
   title: "Best Budget ANC Earbuds & Wireless Headphones under R500 | Digital Shopper Blog",
   description:
     "You don’t have to compromise on build quality or sound. In this guide, we break down the best budget audio gear available right now in South Africa, focusing on the highly-rated WINX VIBE lineup.",
+  keywords: [
+    "budget ANC earbuds",
+    "wireless headphones under R500",
+    "active noise cancellation earbuds",
+    "best budget audio gear South Africa",
+    "WINX VIBE",
+    "affordable earbuds",
+    "TWS earbuds South Africa"
+  ],
+  authors: [{ name: "Admin" }],
+  alternates: {
+    canonical: "https://www.digitalshopper.co.za/blogs/best-budget-anc-earbuds-and-wireless-headphones-under-R500",
+  },
   openGraph: {
     title: "Best Budget ANC Earbuds & Wireless Headphones under R500 in South Africa (2026 Guide)",
     description:

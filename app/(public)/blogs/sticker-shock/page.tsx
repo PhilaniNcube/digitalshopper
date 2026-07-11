@@ -5,6 +5,19 @@ export const metadata: Metadata = {
   title: "Sticker Shock | Digital Shopper Blog",
   description:
     "If you’ve looked at the price of a RAM kit lately, you might have noticed a bit of \"sticker shock.\" What used to be one of the most affordable parts of a PC build has suddenly become a major investment.",
+  keywords: [
+    "RAM prices",
+    "PC memory shortage",
+    "DDR5 vs DDR4",
+    "PC components South Africa",
+    "sticker shock",
+    "AI memory demand",
+    "budget PC upgrades"
+  ],
+  authors: [{ name: "Admin" }],
+  alternates: {
+    canonical: "https://www.digitalshopper.co.za/blogs/sticker-shock",
+  },
   openGraph: {
     title: "Sticker Shock",
     description:

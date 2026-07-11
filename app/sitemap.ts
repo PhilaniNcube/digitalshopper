@@ -73,6 +73,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 	const staticBlogs = [
 		{ slug: "sticker-shock", lastModified: new Date("2026-04-18T13:30:00.000Z") },
 		{ slug: "best-budget-anc-earbuds-and-wireless-headphones-under-R500", lastModified: new Date("2026-07-11T14:00:00.000Z") },
+		{ slug: "best-desktop-computers-south-africa-2026-guide", lastModified: new Date("2026-07-11T16:00:00.000Z") },
 	];
 
 	const blogRoutes: MetadataRoute.Sitemap = staticBlogs.map((post) => ({
