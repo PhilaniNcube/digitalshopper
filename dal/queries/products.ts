@@ -418,3 +418,17 @@ export async function fetchFeaturedProducts(limit: number): Promise<ProductListI
 		mainImage: product.featuredImage,
 	}));
 }
+
+export async function fetchProductsByIds(ids: string[]): Promise<ProductListItem[]> {
+	if (ids.length === 0) return [];
+	const productsData = await db.query.products.findMany({
+		where: and(ACTIVE_PRODUCTS_FILTER, inArray(products.id, ids)),
+		with: {
+			brand: true,
+			category: true,
+		},
+	});
+
+	return productsData.map(mapProductListItem);
+}
+

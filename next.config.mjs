@@ -4,6 +4,7 @@ import { withPayload } from "@payloadcms/next/withPayload";
 const nextConfig = {
   reactCompiler: true,
   cacheComponents: true,
+  partialPrefetching: true,
   experimental: {
     viewTransition: true,
   },

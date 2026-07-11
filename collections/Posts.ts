@@ -71,6 +71,16 @@ export const Posts: CollectionConfig = {
       },
     },
     {
+      name: "featuredProducts",
+      type: "json",
+      admin: {
+        description: "Featured products linked to this article",
+        components: {
+          Field: "@/collections/components/FeaturedProductsField",
+        },
+      },
+    },
+    {
       name: "status",
       type: "select",
       options: [

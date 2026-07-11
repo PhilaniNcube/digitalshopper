@@ -5,6 +5,8 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { RichText } from "@payloadcms/richtext-lexical/react";
 import { fetchPostBySlug, fetchPublishedPosts } from "@/dal/queries/posts";
+import { fetchProductsByIds } from "@/dal/queries/products";
+import { ProductCard } from "@/components/products/product-card";
 
 type PayloadMedia = { url?: string | null; alt: string };
 type PayloadAuthor = { name: string };
@@ -71,6 +73,26 @@ function BlogPostSkeleton() {
   );
 }
 
+async function BlogFeaturedProducts({ productIds }: { productIds: string[] }) {
+  if (!productIds || productIds.length === 0) return null;
+
+  const products = await fetchProductsByIds(productIds);
+  if (products.length === 0) return null;
+
+  return (
+    <div className="mt-16 border-t border-white/8 pt-10">
+      <h2 className="text-2xl font-bold tracking-tight text-white mb-6">
+        Featured Products Mentioned
+      </h2>
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {products.map((product) => (
+          <ProductCard key={product.id} product={product} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 async function BlogPostContent({ slug }: { slug: string }) {
   const post = await fetchPostBySlug(slug);
 
@@ -128,13 +150,29 @@ async function BlogPostContent({ slug }: { slug: string }) {
       <div className="prose prose-invert text-white max-w-none">
         <RichText data={post.content} />
       </div>
+
+      {/* Featured Products */}
+      {post.featuredProducts && Array.isArray(post.featuredProducts) && post.featuredProducts.length > 0 && (
+        <Suspense fallback={
+          <div className="mt-16 border-t border-white/8 pt-10">
+            <h2 className="text-2xl font-bold tracking-tight text-white mb-6 animate-pulse">
+              Featured Products Mentioned
+            </h2>
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {Array.from({ length: Math.min(3, post.featuredProducts.length) }).map((_, i) => (
+                <div key={i} className="aspect-[4/5] w-full rounded-2xl bg-white/5 animate-pulse" />
+              ))}
+            </div>
+          </div>
+        }>
+          <BlogFeaturedProducts productIds={post.featuredProducts as string[]} />
+        </Suspense>
+      )}
     </>
   );
 }
 
-export default async function BlogPostPage({ params }: Props) {
-  const { slug } = await params;
-
+export default function BlogPostPage({ params }: Props) {
   return (
     <div className="mx-auto w-full max-w-3xl px-4 py-10 lg:px-8">
       {/* Breadcrumb */}
@@ -150,7 +188,9 @@ export default async function BlogPostPage({ params }: Props) {
       </nav>
 
       <Suspense fallback={<BlogPostSkeleton />}>
-        <BlogPostContent slug={slug} />
+        {params.then(({ slug }) => (
+          <BlogPostContent slug={slug} />
+        ))}
       </Suspense>
 
       {/* Back link */}
@@ -165,4 +205,5 @@ export default async function BlogPostPage({ params }: Props) {
     </div>
   );
 }
+
 

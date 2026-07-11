@@ -1,9 +1,10 @@
 import "server-only";
 
+import { cache } from "react";
 import { getPayload } from "payload";
 import config from "@payload-config";
 
-export async function fetchPublishedPosts() {
+export const fetchPublishedPosts = cache(async () => {
   const payload = await getPayload({ config });
 
   const result = await payload.find({
@@ -16,9 +17,9 @@ export async function fetchPublishedPosts() {
   });
 
   return result.docs;
-}
+});
 
-export async function fetchPostBySlug(slug: string) {
+export const fetchPostBySlug = cache(async (slug: string) => {
   const payload = await getPayload({ config });
 
   const result = await payload.find({
@@ -32,4 +33,5 @@ export async function fetchPostBySlug(slug: string) {
   });
 
   return result.docs[0] ?? null;
-}
+});
+

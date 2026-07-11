@@ -114,7 +114,7 @@ export default function BlogsPage() {
   return (
     <div className="mx-auto w-full max-w-7xl px-4 py-10 lg:px-8">
       <div className="mb-10">
-        <h1 className="text-3xl font-bold tracking-tight">Blog</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-white">Blog</h1>
         <p className="mt-2 text-muted-foreground">
           Tech tips, product guides, and the latest news.
         </p>
