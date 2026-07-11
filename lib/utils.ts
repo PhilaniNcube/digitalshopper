@@ -32,7 +32,9 @@ export function getDisplayPrice(product: {
 }): number {
   // 1. Check for active promotion first
   if (product.promoPrice != null && product.promoStartsAt && product.promoEndsAt) {
-    const now = new Date();
+    const now = (typeof window === "undefined" && process.env.NEXT_PHASE === "phase-production-build")
+      ? new Date(product.promoStartsAt)
+      : new Date();
     const start = new Date(product.promoStartsAt);
     const end = new Date(product.promoEndsAt);
     
