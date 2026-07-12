@@ -93,10 +93,10 @@ export default function BlogsPage() {
                 >
                   {formatDate(post.publishedAt)}
                 </time>
-                <h2 className="text-lg font-semibold leading-snug text-white group-hover:text-primary transition-colors font-display">
+                <h2 className="text-lg font-semibold leading-snug text-white transition-colors font-display">
                   {post.title}
                 </h2>
-                <p className="text-sm text-neutral-300 line-clamp-3">
+                <p className="text-sm text-neutral-300 text-white line-clamp-3">
                   {post.excerpt}
                 </p>
                 <span className="mt-auto text-sm font-medium text-slate-400 group-hover:text-slate-200 transition-colors">
