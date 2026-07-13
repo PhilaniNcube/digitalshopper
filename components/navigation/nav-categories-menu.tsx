@@ -44,6 +44,8 @@ type NavCategoriesMenuProps = {
 
 const MAX_PRIMARY_CATEGORIES = 4;
 
+const PRIORITY_SLUGS = ["cpu", "notebooks", "headphones", "power"];
+
 function collectFeaturedCategories(category: MegaMenuCategory) {
 	if (category.children.length === 0) {
 		return [];
@@ -60,10 +62,37 @@ function collectMenuSections(category: MegaMenuCategory) {
 	return category.children.slice(0, 12);
 }
 
+function flattenCategoryNodes(categories: MegaMenuCategory[]): Map<string, MegaMenuCategory> {
+	const map = new Map<string, MegaMenuCategory>();
+
+	const walk = (node: MegaMenuCategory) => {
+		map.set(node.slug, node);
+		for (const child of node.children) {
+			walk(child);
+		}
+	};
+
+	for (const category of categories) {
+		walk(category);
+	}
+
+	return map;
+}
+
 function splitDesktopCategories(categories: MegaMenuCategory[]) {
+	const flatNodes = flattenCategoryNodes(categories);
+
+	const primaryCategories = PRIORITY_SLUGS
+		.map((slug) => flatNodes.get(slug))
+		.filter((category): category is MegaMenuCategory => Boolean(category))
+		.slice(0, MAX_PRIMARY_CATEGORIES);
+
+	const primaryIds = new Set(primaryCategories.map((category) => category.id));
+	const overflowCategories = categories.filter((category) => !primaryIds.has(category.id));
+
 	return {
-		primaryCategories: categories.slice(0, MAX_PRIMARY_CATEGORIES),
-		overflowCategories: categories.slice(MAX_PRIMARY_CATEGORIES),
+		primaryCategories,
+		overflowCategories,
 	};
 }
 

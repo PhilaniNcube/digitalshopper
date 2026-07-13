@@ -19,7 +19,7 @@ const FeaturedCategories = () => {
       <div className="grid h-auto grid-cols-1 gap-6 lg:grid-cols-2 lg:h-150">
         {/* Left Column - Large Item (Notebooks) */}
         <Link 
-          href="/products?category=notebooks" 
+          href="/categories/notebooks" 
           className="relative block overflow-hidden border group rounded-xl bg-zinc-900 border-border/50 h-100 lg:h-full"
         >
           <Image
@@ -42,7 +42,7 @@ const FeaturedCategories = () => {
         <div className="flex flex-col h-full gap-6 lg:grid lg:grid-rows-2">
             {/* Top Right - Components */}
             <Link 
-              href="/products?category=components"
+              href="/categories/components"
               className="relative block overflow-hidden border group rounded-xl bg-zinc-900 border-border/50 h-75 lg:h-full"
             >
               <Image
@@ -62,7 +62,7 @@ const FeaturedCategories = () => {
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 h-75 lg:h-full">
                  {/* Bottom Left - Power */}
                 <Link 
-                  href="/products?category=power" 
+                  href="/categories/power" 
                   className="relative block h-full overflow-hidden border group rounded-xl bg-zinc-900 border-border/50"
                 >
                     <Image
@@ -80,7 +80,7 @@ const FeaturedCategories = () => {
 
                 {/* Bottom Right - Smart TVs */}
                 <Link 
-                  href="/products?category=smart-tvs"
+                  href="/categories/smart-tvs"
                   className="relative block h-full overflow-hidden border group rounded-xl bg-zinc-900 border-border/50"
                 >
                     <Image

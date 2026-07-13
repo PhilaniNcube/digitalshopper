@@ -205,7 +205,7 @@ const ProductDetails = async ({
           <>
             <span className="shrink-0">/</span>
             <Link
-              href={`/products?category=${product.category.slug}`}
+              href={`/categories/${product.category.slug}`}
               className="shrink-0 transition hover:text-white"
             >
               {product.category.name}

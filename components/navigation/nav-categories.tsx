@@ -21,7 +21,7 @@ function normalizeCategoryRecord(category: CategoryRecord): CategoryRecord {
 }
 
 function createCategoryHref(slug: string) {
-  return `/products?category=${encodeURIComponent(slug)}`;
+  return `/categories/${encodeURIComponent(slug)}`;
 }
 
 function buildCategoryTree(categories: CategoryRecord[]) {

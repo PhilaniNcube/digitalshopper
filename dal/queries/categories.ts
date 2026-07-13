@@ -1,6 +1,6 @@
 import "server-only";
 
-import { count, desc } from "drizzle-orm";
+import { count, desc, eq } from "drizzle-orm";
 import { categories } from "@/db/schema";
 import { db } from "@/lib/db";
 import { requireAdmin } from "@/lib/session";
@@ -69,6 +69,21 @@ export async function getCategories() {
   cacheTag(CATEGORIES_CACHE_TAG);
 
   return await db.select().from(categories).orderBy(categories.name);
+}
+
+export async function getCategoryBySlug(slug: string) {
+  "use cache";
+
+  cacheLife("days");
+  cacheTag(CATEGORIES_CACHE_TAG);
+
+  const [category] = await db
+    .select()
+    .from(categories)
+    .where(eq(categories.slug, slug))
+    .limit(1);
+
+  return category ?? null;
 }
 
 export async function getAdminCategories(
