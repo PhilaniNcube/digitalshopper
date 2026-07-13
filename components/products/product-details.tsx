@@ -164,6 +164,34 @@ const ProductDetails = async ({
     product.featuredImage ??
     "/images/banner.webp";
 
+  const SITE_URL =
+    process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.digitalshopper.co.za";
+
+  const offers: Record<string, unknown> = {
+    "@type": "Offer",
+    url: `${SITE_URL}/products/${product.slug}`,
+    priceCurrency: "ZAR",
+    price,
+    availability: product.inStock
+      ? "https://schema.org/InStock"
+      : "https://schema.org/BackOrder",
+    ...(product.category?.name && {
+      itemCondition: "https://schema.org/NewCondition",
+    }),
+  };
+
+  if (hasPromo && product.rrpIncl != null) {
+    offers.priceValidUntil = product.promoEndsAt
+      ? new Date(product.promoEndsAt).toISOString()
+      : undefined;
+    offers.priceSpecification = {
+      "@type": "OfferPriceSpecification",
+      priceCurrency: "ZAR",
+      price: product.rrpIncl,
+      priceType: "https://schema.org/RegularPrice",
+    };
+  }
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -175,18 +203,7 @@ const ProductDetails = async ({
     ...(product.brand?.name && {
       brand: { "@type": "Brand", name: product.brand.name },
     }),
-    offers: {
-      "@type": "Offer",
-      url: `https://digitalshopper.co.za/products?slug=${product.slug}`,
-      priceCurrency: "ZAR",
-      price: Math.round(price),
-      availability: product.inStock
-        ? "https://schema.org/InStock"
-        : "https://schema.org/BackOrder",
-      ...(product.category?.name && {
-        itemCondition: "https://schema.org/NewCondition",
-      }),
-    },
+    offers,
   };
 
   return (
