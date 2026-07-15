@@ -15,6 +15,17 @@ export const metadata: Metadata = {
 
 const BLOG_POSTS = [
   {
+    id: "best-budget-gaming-cpu-south-africa-2026",
+    slug: "best-budget-gaming-cpu-south-africa-2026",
+    title: "Best Budget Gaming CPU South Africa 2026: Building a Rig Without Breaking the Bank",
+    excerpt: "Building or upgrading a gaming PC in South Africa right now requires a careful balancing act. In this guide, we break down the top budget gaming CPUs to ensure your hard-earned rands go toward performance.",
+    publishedAt: "2026-07-15T09:30:00.000Z",
+    heroImage: {
+      url: "/images/budget-cpu-guide-hero.png",
+      alt: "Best Budget Gaming CPU South Africa 2026 Guide",
+    },
+  },
+  {
     id: "best-desktop-computers-south-africa-2026-guide",
     slug: "best-desktop-computers-south-africa-2026-guide",
     title: "Best Desktop Computers for Home, Office, and Gaming in South Africa (2026 Guide)",
