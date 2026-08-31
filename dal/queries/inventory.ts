@@ -2,7 +2,7 @@ import "server-only";
 
 import { and, asc, count, eq, gt, like, lte, or, sql, sum } from "drizzle-orm";
 import { productInventory, products } from "@/db/schema";
-import { db } from "@/lib/db";
+import { db, libsqlClient } from "@/lib/db";
 import { requireAdmin } from "@/lib/session";
 
 export async function getInStockProductCount() {
@@ -44,14 +44,57 @@ export async function getLowStockProductCount() {
 
 export async function getTotalUnitCount() {
 	await requireAdmin();
-
 	const [row] = await db
 		.select({
 			total: sql<number>`coalesce(${sum(productInventory.quantity)}, 0)`,
 		})
 		.from(productInventory);
-
 	return Number(row?.total ?? 0);
+}
+
+export type InventoryOverview = {
+	inStockCount: number;
+	outOfStockCount: number;
+	lowStockCount: number;
+	totalUnits: number;
+	warehouseBreakdown: WarehouseBreakdown[];
+};
+
+export async function getInventoryOverview(): Promise<InventoryOverview> {
+	await requireAdmin();
+	const result = await libsqlClient.execute(`
+    SELECT
+      (SELECT count(*) FROM products WHERE in_stock = 1) as inStockCount,
+      (SELECT count(*) FROM products WHERE in_stock = 0) as outOfStockCount,
+      (SELECT count(*) FROM products WHERE total_stock > 0 AND total_stock <= 5) as lowStockCount,
+      (SELECT coalesce(sum(quantity),0) FROM product_inventory) as totalUnits
+  `);
+	const row = result.rows[0] as unknown as Record<string, number>;
+	const warehouseBreakdown = await getWarehouseBreakdownRaw();
+	return {
+		inStockCount: Number(row.inStockCount ?? 0),
+		outOfStockCount: Number(row.outOfStockCount ?? 0),
+		lowStockCount: Number(row.lowStockCount ?? 0),
+		totalUnits: Number(row.totalUnits ?? 0),
+		warehouseBreakdown,
+	};
+}
+
+async function getWarehouseBreakdownRaw(): Promise<WarehouseBreakdown[]> {
+	const rows = await db
+		.select({
+			warehouseCode: productInventory.warehouseCode,
+			totalUnits: sql<number>`coalesce(${sum(productInventory.quantity)}, 0)`,
+			productCount: sql<number>`count(case when ${productInventory.quantity} > 0 then 1 end)`,
+		})
+		.from(productInventory)
+		.groupBy(productInventory.warehouseCode)
+		.orderBy(asc(productInventory.warehouseCode));
+	return rows.map((r) => ({
+		warehouseCode: r.warehouseCode,
+		totalUnits: Number(r.totalUnits),
+		productCount: Number(r.productCount),
+	}));
 }
 
 export type WarehouseBreakdown = {

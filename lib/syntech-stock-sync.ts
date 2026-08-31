@@ -1,7 +1,7 @@
 import { and, eq, inArray, sql } from "drizzle-orm";
 import { readFile } from "node:fs/promises";
 import { productInventory, products } from "@/db/schema";
-import { db } from "@/lib/db";
+import { db, libsqlClient } from "@/lib/db";
 
 export const SUPPLIER_NAME = "syntech";
 export const DEFAULT_UPDATE_FEED_URL =
@@ -62,7 +62,6 @@ function asNullableString(value: unknown) {
 	if (typeof value !== "string") {
 		return null;
 	}
-
 	const normalized = normalizeWhitespace(value);
 	return normalized.length > 0 ? normalized : null;
 }
@@ -71,17 +70,14 @@ function asNullableNumber(value: unknown) {
 	if (typeof value === "number") {
 		return Number.isFinite(value) ? value : null;
 	}
-
 	if (typeof value === "string") {
 		const normalized = value.replace(/,/g, "").trim();
 		if (normalized.length === 0) {
 			return null;
 		}
-
 		const parsed = Number(normalized);
 		return Number.isFinite(parsed) ? parsed : null;
 	}
-
 	return null;
 }
 
@@ -94,12 +90,10 @@ function asNullableTimestamp(value: unknown) {
 	if (typeof value !== "string") {
 		return null;
 	}
-
 	const normalized = normalizeWhitespace(value);
 	if (normalized.length === 0) {
 		return null;
 	}
-
 	const parsed = new Date(normalized.replace(" ", "T"));
 	return Number.isNaN(parsed.getTime()) ? null : parsed;
 }
@@ -110,23 +104,17 @@ async function fetchRemoteFeed(feedUrl?: string) {
 			accept: "application/json,text/plain;q=0.9,*/*;q=0.8",
 		},
 	});
-
 	if (!response.ok) {
 		throw new Error(`Failed to fetch Syntech stock update feed: ${response.status} ${response.statusText}`);
 	}
-
 	return response.text();
 }
 
 async function loadFeed(input: StockSyncInput): Promise<LoadedFeed> {
-	const rawFeed = input.feedPath
-		? await readFile(input.feedPath, "utf8")
-		: await fetchRemoteFeed(input.feedUrl);
-
+	const rawFeed = input.feedPath ? await readFile(input.feedPath, "utf8") : await fetchRemoteFeed(input.feedUrl);
 	const parsedFeed = JSON.parse(rawFeed) as SyntechFeed;
 	const allProducts = parsedFeed.syntechstock?.products ?? [];
 	const feedProducts = typeof input.limit === "number" ? allProducts.slice(0, input.limit) : allProducts;
-
 	return {
 		declaredCount: parsedFeed.syntechstock?.count,
 		feedProducts,
@@ -135,7 +123,6 @@ async function loadFeed(input: StockSyncInput): Promise<LoadedFeed> {
 
 export async function getSyntechStockFeedPreview(input: StockSyncInput = {}) {
 	const { declaredCount, feedProducts } = await loadFeed(input);
-
 	return {
 		declaredCount,
 		loadedProducts: feedProducts.length,
@@ -151,14 +138,11 @@ export async function syncSyntechStockUpdateFeed(input: StockSyncInput = {}): Pr
 			if (!sku) {
 				return null;
 			}
-
 			const warehouseQuantities = WAREHOUSE_CODES.map((warehouse) => ({
 				warehouseCode: warehouse.code,
 				quantity: asNullableInteger(product[warehouse.field]) ?? 0,
 			}));
-
 			const totalStock = warehouseQuantities.reduce((sum, warehouse) => sum + warehouse.quantity, 0);
-
 			return {
 				sku,
 				totalStock,
@@ -196,58 +180,69 @@ export async function syncSyntechStockUpdateFeed(input: StockSyncInput = {}): Pr
 
 	const productIdBySku = new Map(existingProducts.map((product) => [product.supplierSku, product.id]));
 
-	const productUpdates: any[] = [];
-	const inventoryValues: any[] = [];
+	type PendingUpdate = (typeof rowsToProcess)[number] & { productId: string };
+	const pendingUpdates: PendingUpdate[] = [];
 	let unmatchedSkuCount = 0;
 
 	for (const row of rowsToProcess) {
 		const productId = productIdBySku.get(row.sku);
-
 		if (!productId) {
 			unmatchedSkuCount += 1;
 			continue;
 		}
+		pendingUpdates.push({ ...row, productId });
+	}
 
-		productUpdates.push(
-			db
-				.update(products)
-				.set({
-					totalStock: row.totalStock,
-					inStock: row.inStock,
-					price: row.price,
-					rrpIncl: row.rrpIncl,
-					promoPrice: row.promoPrice,
-					promoStartsAt: row.promoStartsAt,
-					promoEndsAt: row.promoEndsAt,
-					nextShipmentEta: row.nextShipmentEta,
-					supplierLastModified: row.supplierLastModified,
-					lastSyncedAt: new Date(),
-					updatedAt: new Date(),
-				})
-				.where(eq(products.id, productId)),
-		);
+	if (pendingUpdates.length === 0) {
+		return {
+			declaredCount,
+			loadedProducts: feedProducts.length,
+			updatedProductCount: 0,
+			updatedInventoryRows: 0,
+			unmatchedSkuCount,
+		};
+	}
 
-		for (const warehouse of row.warehouseQuantities) {
-			inventoryValues.push({
-				productId,
-				warehouseCode: warehouse.warehouseCode,
-				quantity: warehouse.quantity,
-			});
+	const now = new Date();
+	const toEpoch = (d: Date | null) => (d ? Math.floor(d.getTime() / 1000) : null);
+
+	const stmts: { sql: string; args: unknown[] }[] = [];
+	for (const row of pendingUpdates) {
+		stmts.push({
+			sql: `UPDATE products SET total_stock = ?, in_stock = ?, price = ?, rrp_incl = ?, promo_price = ?, promo_starts_at = ?, promo_ends_at = ?, next_shipment_eta = ?, supplier_last_modified = ?, last_synced_at = ?, updated_at = ? WHERE id = ?`,
+			args: [
+				row.totalStock,
+				row.inStock ? 1 : 0,
+				row.price,
+				row.rrpIncl,
+				row.promoPrice,
+				toEpoch(row.promoStartsAt),
+				toEpoch(row.promoEndsAt),
+				row.nextShipmentEta,
+				toEpoch(row.supplierLastModified),
+				Math.floor(now.getTime() / 1000),
+				Math.floor(now.getTime() / 1000),
+				row.productId,
+			],
+		});
+	}
+
+	const inventoryValues: { productId: string; warehouseCode: "CPT" | "JHB" | "DBN"; quantity: number }[] = [];
+	for (const row of pendingUpdates) {
+		for (const w of row.warehouseQuantities) {
+			inventoryValues.push({ productId: row.productId, warehouseCode: w.warehouseCode as "CPT" | "JHB" | "DBN", quantity: w.quantity });
 		}
 	}
 
-	// Process product updates in batches to avoid massive single request
-	const BATCH_SIZE = 100;
-	for (let i = 0; i < productUpdates.length; i += BATCH_SIZE) {
-		const batch = productUpdates.slice(i, i + BATCH_SIZE);
-		// @ts-ignore - Drizzle batch support
-		await db.batch(batch as any);
-		console.log(`Updated ${Math.min(i + BATCH_SIZE, productUpdates.length)}/${productUpdates.length} product rows.`);
+	const WRITE_BATCH_SIZE = 500;
+	for (let i = 0; i < stmts.length; i += WRITE_BATCH_SIZE) {
+		const batch = stmts.slice(i, i + WRITE_BATCH_SIZE);
+		await libsqlClient.batch(batch as never[], "write");
 	}
 
-	// Process inventory in batches
-	for (let i = 0; i < inventoryValues.length; i += BATCH_SIZE * 3) {
-		const batchValues = inventoryValues.slice(i, i + BATCH_SIZE * 3);
+	const INV_BATCH = 900;
+	for (let i = 0; i < inventoryValues.length; i += INV_BATCH) {
+		const batchValues = inventoryValues.slice(i, i + INV_BATCH);
 		await db
 			.insert(productInventory)
 			.values(batchValues)
@@ -255,19 +250,16 @@ export async function syncSyntechStockUpdateFeed(input: StockSyncInput = {}): Pr
 				target: [productInventory.productId, productInventory.warehouseCode],
 				set: {
 					quantity: sql`excluded.quantity`,
-					updatedAt: new Date(),
+					updatedAt: now,
 				},
 			});
-		console.log(
-			`Updated ${Math.min(i + BATCH_SIZE * 3, inventoryValues.length)}/${inventoryValues.length} inventory rows.`,
-		);
 	}
 
 	return {
 		declaredCount,
 		loadedProducts: feedProducts.length,
-		updatedProductCount: productUpdates.length,
+		updatedProductCount: pendingUpdates.length,
 		updatedInventoryRows: inventoryValues.length,
 		unmatchedSkuCount,
 	};
-}
+}
