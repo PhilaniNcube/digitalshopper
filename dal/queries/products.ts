@@ -290,7 +290,7 @@ export async function getAdminProducts(
 }
 
 
-export async function fetchCatalogProducts(filters: ProductCatalogFilters = {}): Promise<PaginatedProductsResult> {
+async function fetchCatalogProductsUncached(filters: ProductCatalogFilters): Promise<PaginatedProductsResult> {
 	const normalizedQuery = normalizeSearchTerm(filters.q);
 	const normalizedCategory = normalizeSearchTerm(filters.category);
 	const sort = filters.sort ?? "featured";
@@ -335,6 +335,32 @@ export async function fetchCatalogProducts(filters: ProductCatalogFilters = {}):
 		sort,
 		filters,
 	);
+}
+
+async function fetchCatalogProductsCached(
+	filters: Omit<ProductCatalogFilters, "q">,
+): Promise<PaginatedProductsResult> {
+	"use cache";
+	cacheLife("days");
+	cacheTag(PRODUCTS_CACHE_TAG);
+
+	return fetchCatalogProductsUncached({
+		category: filters.category ?? "all",
+		sort: filters.sort ?? "featured",
+		stock: filters.stock ?? "all",
+		page: filters.page ?? DEFAULT_PAGE,
+		pageSize: filters.pageSize ?? DEFAULT_PAGE_SIZE,
+	});
+}
+
+export async function fetchCatalogProducts(filters: ProductCatalogFilters = {}): Promise<PaginatedProductsResult> {
+	const { q, ...cacheFilters } = filters;
+
+	if (normalizeSearchTerm(q).length === 0) {
+		return fetchCatalogProductsCached(cacheFilters);
+	}
+
+	return fetchCatalogProductsUncached(filters);
 }
 
 export async function fetchProductsByCategoryId(
