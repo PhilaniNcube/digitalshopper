@@ -71,7 +71,7 @@ export function ProductGridPagination({
 	const [isPending, startTransition] = useTransition();
 	const [filters, setFilters] = useQueryStates(productSearchParsers, {
 		history: "push",
-		shallow: false,
+		shallow: true,
 		startTransition,
 	});
 

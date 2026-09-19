@@ -24,7 +24,7 @@ export function ProductFilters({ categories }: ProductFiltersProps) {
   const [isPending, startTransition] = useTransition();
   const [filters, setFilters] = useQueryStates(productSearchParsers, {
     history: "replace",
-    shallow: false,
+    shallow: true,
     startTransition,
   });
 

@@ -1,11 +1,24 @@
-import { productSearchCache } from "@/app/(public)/products/search-params";
 import { ProductCard } from "@/components/products/product-card";
 import { ProductGridPagination } from "@/components/products/product-grid-pagination";
-import { Badge } from "@/components/ui/badge";
-import { fetchCatalogProducts } from "@/dal/queries/products";
 import { TrackViewItemList } from "@/components/products/track-view-item-list";
+import { Badge } from "@/components/ui/badge";
+import type { PaginatedProductsResult } from "@/dal/queries/products";
 import { getDisplayPrice } from "@/lib/utils";
 import { Boxes, PackageCheck, SearchX } from "lucide-react";
+
+export type CatalogFilters = {
+	q: string;
+	category: string;
+	sort: string;
+	stock: string;
+};
+
+type ProductGridContentProps = {
+	products: PaginatedProductsResult;
+	filters?: CatalogFilters;
+	withTracking?: boolean;
+	withPagination?: boolean;
+};
 
 function getVisiblePages(currentPage: number, totalPages: number) {
 	if (totalPages <= 7) {
@@ -33,16 +46,16 @@ function getVisiblePages(currentPage: number, totalPages: number) {
 	return visiblePages;
 }
 
-export async function ProductGrid({ searchParamsPromise }: { searchParamsPromise: Promise<Record<string, string | string[] | undefined>> }) {
-	const { q, category, sort, stock, page } = await productSearchCache.parse(searchParamsPromise);
-	const products = await fetchCatalogProducts({
-		q,
-		category,
-		sort,
-		stock,
-		page,
-		pageSize: 12,
-	});
+export function ProductGridContent({
+	products,
+	filters,
+	withTracking = true,
+	withPagination = true,
+}: ProductGridContentProps) {
+	const q = filters?.q ?? "";
+	const category = filters?.category ?? "all";
+	const sort = filters?.sort ?? "featured";
+	const stock = filters?.stock ?? "all";
 	const hasFilters = Boolean(q || category !== "all" || sort !== "featured" || stock !== "all");
 	const currentPage = products.pagination.page;
 	const totalPages = Math.max(products.pagination.totalPages, 1);
@@ -52,7 +65,6 @@ export async function ProductGrid({ searchParamsPromise }: { searchParamsPromise
 		<div id="products-results-top" className="grid gap-6">
 			<section className="rounded-[2rem] bg-surface-low p-5 ring-1 ring-white/6 sm:p-6">
 				<div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
-
 					<div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
 						<div className="rounded-[1.3rem] bg-black/20 px-4 py-4">
 							<p className="flex items-center gap-2 text-[11px] uppercase tracking-[0.28em] text-slate-500">
@@ -92,27 +104,29 @@ export async function ProductGrid({ searchParamsPromise }: { searchParamsPromise
 				</section>
 			) : (
 				<div className="grid gap-4 grid-cols-2 lg:grid-cols-3 ">
-					<TrackViewItemList
-						products={products.items.map((p) => ({
-							id: p.id,
-							slug: p.slug,
-							title: p.title,
-							category: p.category?.slug ?? "uncategorized",
-							price: Math.round(getDisplayPrice(p)),
-							image: p.mainImage ?? "/images/banner.webp",
-							summary: p.summary ?? p.shortDescription ?? "",
-							specs: p.specs.slice(0, 3),
-							featured: p.featured,
-							inStock: p.inStock,
-						}))}
-						listName={category !== "all" ? `Category: ${category}` : "Product Grid"}
-					/>
+					{withTracking ? (
+						<TrackViewItemList
+							products={products.items.map((p) => ({
+								id: p.id,
+								slug: p.slug,
+								title: p.title,
+								category: p.category?.slug ?? "uncategorized",
+								price: Math.round(getDisplayPrice(p)),
+								image: p.mainImage ?? "/images/banner.webp",
+								summary: p.summary ?? p.shortDescription ?? "",
+								specs: p.specs.slice(0, 3),
+								featured: p.featured,
+								inStock: p.inStock,
+							}))}
+							listName={category !== "all" ? `Category: ${category}` : "Product Grid"}
+						/>
+					) : null}
 					{products.items.map((product) => (
 						<ProductCard key={product.id} product={product} />
 					))}
 				</div>
 			)}
-			{products.pagination.totalPages > 1 ? (
+			{withPagination && products.pagination.totalPages > 1 ? (
 				<section className="rounded-[2rem] bg-surface-low px-5 py-4 ring-1 ring-white/6 sm:px-6">
 					<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 						<p className="text-xs text-slate-400 w-full">
