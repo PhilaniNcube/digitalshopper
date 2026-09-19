@@ -1,4 +1,6 @@
+import { revalidateTag } from "next/cache";
 import { auth } from "@/lib/auth";
+import { PRODUCTS_CACHE_TAG } from "@/dal/queries/products";
 import { syncSyntechStockUpdateFeed } from "@/lib/syntech-stock-sync";
 
 type SessionRoleUser = {
@@ -44,6 +46,10 @@ export async function GET(request: Request) {
 
 	try {
 		const result = await syncSyntechStockUpdateFeed({ limit });
+
+		if (result.updatedProductCount > 0) {
+			revalidateTag(PRODUCTS_CACHE_TAG, "max");
+		}
 
 		return Response.json({
 			ok: true,

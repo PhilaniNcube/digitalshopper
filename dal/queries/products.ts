@@ -1,6 +1,6 @@
 import "server-only";
 
-import { cacheLife } from "next/cache";
+import { cacheLife, cacheTag } from "next/cache";
 import { and, asc, desc, eq, inArray, like, or, sql, type SQL } from "drizzle-orm";
 import {
 	brands,
@@ -14,6 +14,8 @@ import {
 } from "@/db/schema";
 import { db } from "@/lib/db";
 import { requireAdmin } from "@/lib/session";
+
+export const PRODUCTS_CACHE_TAG = "products";
 
 const DEFAULT_PAGE = 1;
 const DEFAULT_PAGE_SIZE = 20;
@@ -197,7 +199,8 @@ function normalizeSearchTerm(value?: string) {
 
 export async function fetchProductBySlug(slug: string): Promise<ProductWithImagesAndInventory | null> {
 	"use cache";
-	cacheLife("hours");
+	cacheLife("days");
+	cacheTag(PRODUCTS_CACHE_TAG, `product:${slug}`);
 
 	const product = await db.query.products.findFirst({
 		where: eq(products.slug, slug),
@@ -363,6 +366,10 @@ export async function fetchProductsByCategorySlug(
 	categorySlug: string,
 	options: ProductPaginationOptions = {},
 ): Promise<PaginatedProductsResult> {
+	"use cache";
+	cacheLife("days");
+	cacheTag(PRODUCTS_CACHE_TAG, `category:${categorySlug}`);
+
 	const categoryRows = await db
 		.select({ path: categories.path })
 		.from(categories)
@@ -421,7 +428,8 @@ export async function fetchFeaturedProducts(limit: number): Promise<ProductListI
 
 export async function fetchProductsByIds(ids: string[]): Promise<ProductListItem[]> {
 	"use cache";
-	cacheLife("hours");
+	cacheLife("days");
+	cacheTag(PRODUCTS_CACHE_TAG);
 	if (ids.length === 0) return [];
 	const productsData = await db.query.products.findMany({
 		where: and(ACTIVE_PRODUCTS_FILTER, inArray(products.id, ids)),
