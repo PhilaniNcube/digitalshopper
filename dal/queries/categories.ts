@@ -5,8 +5,9 @@ import { categories } from "@/db/schema";
 import { db } from "@/lib/db";
 import { requireAdmin } from "@/lib/session";
 import { cacheLife, cacheTag } from "next/cache";
+import { CATEGORIES_CACHE_TAG } from "@/lib/cache-tags";
 
-export const CATEGORIES_CACHE_TAG = "categories";
+export { CATEGORIES_CACHE_TAG };
 
 const DEFAULT_PAGE = 1;
 const DEFAULT_PAGE_SIZE = 20;

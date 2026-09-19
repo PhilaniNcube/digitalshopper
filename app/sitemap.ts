@@ -1,4 +1,6 @@
 import type { MetadataRoute } from "next";
+import { cacheLife, cacheTag } from "next/cache";
+import { CATEGORIES_CACHE_TAG, PRODUCTS_CACHE_TAG } from "@/lib/cache-tags";
 import { db } from "@/lib/db";
 import { products, categories } from "@/db/schema";
 import { count, eq } from "drizzle-orm";
@@ -8,7 +10,11 @@ const BASE_URL =
 
 const CATEGORY_PAGE_SIZE = 12;
 
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+async function getSitemapEntries(): Promise<MetadataRoute.Sitemap> {
+	"use cache";
+	cacheLife("days");
+	cacheTag(PRODUCTS_CACHE_TAG, CATEGORIES_CACHE_TAG);
+
 	const [allProducts, allCategories, productCounts] = await Promise.all([
 		db
 			.select({ slug: products.slug, updatedAt: products.updatedAt })
@@ -137,4 +143,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 	}));
 
 	return [...staticRoutes, ...productRoutes, ...categoryRoutes, ...blogRoutes];
+}
+
+export default function sitemap(): Promise<MetadataRoute.Sitemap> {
+	return getSitemapEntries();
 }

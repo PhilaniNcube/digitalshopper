@@ -12,10 +12,11 @@ import {
 	type ProductInventory,
 	products,
 } from "@/db/schema";
+import { PRODUCTS_CACHE_TAG } from "@/lib/cache-tags";
 import { db } from "@/lib/db";
 import { requireAdmin } from "@/lib/session";
 
-export const PRODUCTS_CACHE_TAG = "products";
+export { PRODUCTS_CACHE_TAG };
 
 const DEFAULT_PAGE = 1;
 const DEFAULT_PAGE_SIZE = 20;

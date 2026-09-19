@@ -1,3 +1,4 @@
+import { PRODUCTS_CACHE_TAG } from "../lib/cache-tags";
 import { getSyntechStockFeedPreview, syncSyntechStockUpdateFeed } from "../lib/syntech-stock-sync";
 
 type SyncOptions = {
@@ -74,6 +75,39 @@ function sleep(milliseconds: number) {
 	});
 }
 
+async function revalidateProductCache(updatedProductCount: number) {
+	if (updatedProductCount === 0) {
+		return;
+	}
+
+	const secret = process.env.CRON_SECRET;
+	const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? process.env.REVALIDATE_URL;
+
+	if (!secret || !baseUrl) {
+		console.warn(
+			"Skipping product cache revalidation: CRON_SECRET and NEXT_PUBLIC_SITE_URL (or REVALIDATE_URL) must be set.",
+		);
+		return;
+	}
+
+	try {
+		const response = await fetch(new URL("/api/revalidate", baseUrl), {
+			method: "POST",
+			headers: {
+				"content-type": "application/json",
+				authorization: `Bearer ${secret}`,
+			},
+			body: JSON.stringify({ tag: PRODUCTS_CACHE_TAG }),
+		});
+
+		if (!response.ok) {
+			console.warn(`Product cache revalidation failed: ${response.status} ${response.statusText}`);
+		}
+	} catch (error) {
+		console.warn("Product cache revalidation request failed.", error);
+	}
+}
+
 async function runSync(options: SyncOptions) {
 	if (options.dryRun) {
 		const preview = await getSyntechStockFeedPreview({
@@ -100,6 +134,8 @@ async function runSync(options: SyncOptions) {
 		`Stock sync complete: ${result.updatedProductCount} products updated, ${result.updatedInventoryRows} warehouse rows updated, ${result.unmatchedSkuCount} unmatched SKUs.` +
 			(result.declaredCount ? ` Supplier reported ${result.declaredCount} feed rows.` : ""),
 	);
+
+	await revalidateProductCache(result.updatedProductCount);
 }
 
 async function main() {

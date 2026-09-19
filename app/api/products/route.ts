@@ -1,4 +1,6 @@
+import { cacheLife, cacheTag } from "next/cache";
 import { db } from "@/lib/db";
+import { PRODUCTS_CACHE_TAG } from "@/lib/cache-tags";
 import { products, brands, categories } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
@@ -17,7 +19,11 @@ function centsToRand(cents: number): string {
   return (cents / 100).toFixed(2);
 }
 
-export async function GET() {
+async function buildProductFeed(): Promise<string> {
+  "use cache";
+  cacheLife("days");
+  cacheTag(PRODUCTS_CACHE_TAG);
+
   const rows = await db
     .select({
       id: products.id,
@@ -118,10 +124,16 @@ ${items}
   </channel>
 </rss>`;
 
+  return xml;
+}
+
+export async function GET() {
+  const xml = await buildProductFeed();
+
   return new Response(xml, {
     headers: {
       "Content-Type": "application/xml; charset=utf-8",
-      "Cache-Control": "public, max-age=3600, s-maxage=3600",
+      "Cache-Control": "public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400",
     },
   });
 }

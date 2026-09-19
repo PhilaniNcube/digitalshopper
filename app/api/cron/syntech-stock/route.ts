@@ -1,6 +1,6 @@
 import { revalidateTag } from "next/cache";
 import { auth } from "@/lib/auth";
-import { PRODUCTS_CACHE_TAG } from "@/dal/queries/products";
+import { PRODUCTS_CACHE_TAG } from "@/lib/cache-tags";
 import { syncSyntechStockUpdateFeed } from "@/lib/syntech-stock-sync";
 
 type SessionRoleUser = {
